@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Users – FTC POS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+  .nav-gradient {
+    background: linear-gradient(90deg, #5b00e5 0%, #007bff 100%);
+  }
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff !important; }
+    .card { border: none !important; box-shadow: none !important; }
+  }
+</style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg nav-gradient navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="index.html">FTC POS</a>
+    <div class="ms-auto">
+      <button class="btn btn-outline-light btn-sm no-print" onclick="window.print()">🖨️ Print</button>
+      <a class="btn btn-outline-light btn-sm no-print" href="login.html">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">បង្កើត​ឈ្មោះអ្នកចូលប្រើ / User Management</h3>
+    <button class="btn btn-primary no-print" data-bs-toggle="modal" data-bs-target="#addModal">
+      <i class="bi bi-person-plus"></i> Add New User
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th class="no-print">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><i class="bi bi-person-circle"></i> admin</td>
+            <td><span class="badge bg-danger">Admin</span></td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>2024-11-11 15:10:24</td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-outline-warning" onclick="resetPassword('admin')">
+                <i class="bi bi-key"></i> Reset Password
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><i class="bi bi-person-circle"></i> seller</td>
+            <td><span class="badge bg-info">Sale</span></td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>2024-11-11 15:10:24</td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-outline-warning" onclick="resetPassword('seller')">
+                <i class="bi bi-key"></i> Reset Password
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="disableUser('seller')">
+                <i class="bi bi-x-circle"></i> Disable
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><i class="bi bi-person-circle"></i> cashier</td>
+            <td><span class="badge bg-info">Sale</span></td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>2024-11-11 15:10:24</td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-outline-warning" onclick="resetPassword('cashier')">
+                <i class="bi bi-key"></i> Reset Password
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="disableUser('cashier')">
+                <i class="bi bi-x-circle"></i> Disable
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-3 no-print">
+    <a href="index.html" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm">
+          <div class="mb-3">
+            <label class="form-label">Username <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="username" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" name="password" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" name="confirm_password" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role <span class="text-danger">*</span></label>
+            <select class="form-select" name="role" required>
+              <option value="">-- Select Role --</option>
+              <option value="admin">Admin (Full Access)</option>
+              <option value="sale">Sale (Limited Access)</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="addUser()">Create User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" value="seller" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role <span class="text-danger">*</span></label>
+            <select class="form-select" name="role" required>
+              <option value="admin">Admin (Full Access)</option>
+              <option value="sale" selected>Sale (Limited Access)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" checked id="isActive">
+              <label class="form-check-label" for="isActive">
+                Active (User can login)
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="updateUser()">Update User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function addUser() {
+  const form = document.getElementById('addUserForm');
+  const password = form.password.value;
+  const confirm = form.confirm_password.value;
+  
+  if (password !== confirm) {
+    alert('Passwords do not match!');
+    return;
+  }
+  
+  alert('User created successfully! (Demo mode)');
+  bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
+  form.reset();
+}
+
+function updateUser() {
+  alert('User updated successfully! (Demo mode)');
+  bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+}
+
+function resetPassword(username) {
+  if (confirm(`Reset password for user "${username}"?`)) {
+    alert('Password reset successfully! New password: 123456 (Demo mode)');
+  }
+}
+
+function disableUser(username) {
+  if (confirm(`Disable user "${username}"? They will not be able to login.`)) {
+    alert('User disabled successfully! (Demo mode)');
+  }
+}
+</script>
+</body>
+</html>

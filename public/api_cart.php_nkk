@@ -1,0 +1,154 @@
+<?php
+require_once __DIR__ . '/../auth.php';
+require_login();
+require_once __DIR__ . '/../helpers.php';
+
+$pdo = db();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$action     = $_POST['action']     ?? '';
+$invoice_id = (int)($_POST['invoice_id'] ?? 0);
+
+if (!$invoice_id) {
+    redirect('index.php');
+}
+
+switch ($action) {
+
+    /* ==========================
+     * ADD ITEM TO CART
+     * ========================== */
+    case 'add':
+        $product_id = (int)($_POST['product_id'] ?? 0);
+        $qty        = max(1, (int)($_POST['qty'] ?? 1));
+
+        if ($product_id > 0) {
+            // Load product
+            $st = $pdo->prepare("
+                SELECT id, name, price_usd, price_khr
+                FROM products
+                WHERE id = ? AND is_active = 1
+                LIMIT 1
+            ");
+            $st->execute([$product_id]);
+            $p = $st->fetch();
+
+            if ($p) {
+                $price_usd = (float)($p['price_usd'] ?? 0);
+                $price_khr = (int)  ($p['price_khr'] ?? 0);
+
+                // line total = price * qty (no discount yet)
+                $line_total_usd = $price_usd * $qty;
+                $line_total_khr = $price_khr * $qty;
+
+                $ins = $pdo->prepare("
+                    INSERT INTO invoice_items (
+                        invoice_id,
+                        product_id,
+                        name,
+                        qty,
+                        price_usd,
+                        price_khr,
+                        discount_pct,
+                        line_total_usd,
+                        line_total_khr
+                    )
+                    VALUES (?,?,?,?,?,?,?,?,?)
+                ");
+                $ins->execute([
+                    $invoice_id,
+                    $p['id'],
+                    $p['name'],
+                    $qty,
+                    $price_usd,
+                    $price_khr,
+                    0,                  // item discount initially 0%
+                    $line_total_usd,
+                    $line_total_khr
+                ]);
+
+                // recalc invoice totals (will also apply whole discount if any)
+                calc_totals($invoice_id);
+            }
+        }
+        break;
+
+    /* ==========================
+     * CHANGE QTY
+     * ========================== */
+    case 'setqty':
+        $item_id = (int)($_POST['item_id'] ?? 0);
+        $qty     = max(1, (int)($_POST['qty'] ?? 1));
+
+        $st = $pdo->prepare("
+          UPDATE invoice_items
+          SET qty = ?, 
+              line_total_usd = ROUND(price_usd * ? * (1 - discount_pct/100), 2),
+              line_total_khr = ROUND(price_khr * ? * (1 - discount_pct/100), 0)
+          WHERE id = ? AND invoice_id = ?
+        ");
+        $st->execute([$qty, $qty, $qty, $item_id, $invoice_id]);
+
+        calc_totals($invoice_id);
+        break;
+
+    /* ==========================
+     * REMOVE ITEM
+     * ========================== */
+    case 'remove':
+        $item_id = (int)($_POST['item_id'] ?? 0);
+        $st = $pdo->prepare("DELETE FROM invoice_items WHERE id=? AND invoice_id=?");
+        $st->execute([$item_id, $invoice_id]);
+
+        calc_totals($invoice_id);
+        break;
+
+    /* ==========================
+     * ITEM DISCOUNT (%)
+     * ONLY this row
+     * ========================== */
+    case 'setdiscount':
+        $item_id      = (int)($_POST['item_id'] ?? 0);
+        $discount_pct = (float)($_POST['discount_pct'] ?? 0);
+
+        if ($discount_pct < 0)   $discount_pct = 0;
+        if ($discount_pct > 100) $discount_pct = 100;
+
+        $st = $pdo->prepare("
+          UPDATE invoice_items
+          SET discount_pct   = ?,
+              line_total_usd = ROUND(price_usd * qty * (1 - ?/100), 2),
+              line_total_khr = ROUND(price_khr * qty * (1 - ?/100), 0)
+          WHERE id = ? AND invoice_id = ?
+        ");
+        $st->execute([$discount_pct, $discount_pct, $discount_pct, $item_id, $invoice_id]);
+
+        calc_totals($invoice_id);
+        break;
+
+    /* ==========================
+     * WHOLE INVOICE DISCOUNT (%)
+     * ONLY stored on invoices table
+     * DO NOT TOUCH invoice_items
+     * ========================== */
+    case 'set_invoice_discount':
+        $discount_pct = (float)($_POST['discount_pct'] ?? 0);
+
+        if ($discount_pct < 0)   $discount_pct = 0;
+        if ($discount_pct > 100) $discount_pct = 100;
+
+        // only update invoices.discount_pct
+        $st = $pdo->prepare("UPDATE invoices SET discount_pct = ? WHERE id = ?");
+        $st->execute([$discount_pct, $invoice_id]);
+
+        // recalc totals using calc_totals (subtotal already includes item discounts)
+        calc_totals($invoice_id);
+        break;
+
+    default:
+        // do nothing
+        break;
+}
+
+// back to sale page
+redirect('sale.php?invoice='.(int)$invoice_id);

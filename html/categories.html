@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Categories – FTC POS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  .nav-gradient {
+    background: linear-gradient(90deg, #5b00e5 0%, #007bff 100%);
+  }
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff !important; }
+    .card { border: none !important; box-shadow: none !important; }
+  }
+</style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg nav-gradient navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="index.html">FTC POS</a>
+    <div class="ms-auto">
+      <button class="btn btn-outline-light btn-sm no-print" onclick="window.print()">🖨️ Print</button>
+      <a class="btn btn-outline-light btn-sm no-print" href="login.html">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">បញ្ជីក្រុមទំនិញ</h3>
+    <button class="btn btn-primary no-print" data-bs-toggle="modal" data-bs-target="#addModal">បន្ថែមក្រុមទំនិញ</button>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ឈ្មោះ</th>
+            <th>ស្ថានភាព</th>
+            <th class="no-print">ការកំណត់</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>ភេសជ្ជៈ</td>
+            <td><span class="badge bg-success">ដំណើរការ</span></td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">ប្តូរឈ្មោះ</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Disable this category?')">បិទដំណើរការ</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>ផ្នែកស៊ុប</td>
+            <td><span class="badge bg-success">ដំណើរការ</span></td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">ប្តូរឈ្មោះ</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Disable this category?')">បិទដំណើរការ</button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>ផ្នែកសាច់អាំង</td>
+            <td><span class="badge bg-success">ដំណើរការ</span></td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">ប្តូរឈ្មោះ</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Disable this category?')">បិទដំណើរការ</button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>មុខម្ហូប ប្រភេទបុកល្ហុង និង ប្រភេទអាំង</td>
+            <td><span class="badge bg-success">ដំណើរការ</span></td>
+            <td class="text-nowrap no-print">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal">ប្តូរឈ្មោះ</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Disable this category?')">បិទដំណើរការ</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-3 no-print">
+    <a href="index.html" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">បន្ថែមក្រុមទំនិញ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">ឈ្មោះ</label>
+        <input class="form-control" required>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">រក្សាទុក</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">កែប្រែក្រុមទំនិញ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">ឈ្មោះ</label>
+        <input class="form-control" value="ភេសជ្ជៈ" required>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">កែប្រែ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

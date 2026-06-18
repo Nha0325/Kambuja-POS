@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Products – FTC POS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  .nav-gradient {
+    background: linear-gradient(90deg, #5b00e5 0%, #007bff 100%);
+  }
+  img.thumb{
+    width:60px;
+    height:60px;
+    object-fit:cover;
+    border-radius:8px;
+  }
+  .table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9fa !important;
+    backdrop-filter: blur(4px);
+    border-bottom: 2px solid #ddd;
+  }
+  .table-scroll {
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff !important; }
+    .table-scroll { max-height: none !important; overflow: visible !important; }
+    .card { border: none !important; box-shadow: none !important; }
+  }
+</style>
+</head>
+
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark nav-gradient">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="index.html">FTC POS</a>
+    <div class="ms-auto">
+      <button class="btn btn-outline-light btn-sm no-print" onclick="window.print()">🖨️ Print</button>
+      <a class="btn btn-outline-light btn-sm no-print" href="add_product.html">ដាក់បន្ថែមទំនិញ</a>
+      <a class="btn btn-outline-light btn-sm no-print" href="login.html">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <!-- Search bar -->
+  <form class="row g-2 mb-3 no-print">
+    <div class="col-sm-6">
+      <input class="form-control" name="q" placeholder="ស្វែងរកមុខម្ហូប ឬ ទំនិញ...">
+    </div>
+    <div class="col-sm-3">
+      <button class="btn btn-primary w-100">ស្វែងរក</button>
+    </div>
+    <div class="col-sm-3">
+      <a class="btn btn-outline-secondary w-100" href="products.html">បង្ហាញទាំងអស់</a>
+    </div>
+  </form>
+
+  <!-- Product List -->
+  <div class="card shadow-sm">
+    <div class="table-scroll">
+      <table class="table table-sticky align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width:80px">លេខរៀង</th>
+            <th style="width:80px">រូប</th>
+            <th>ឈ្មោះទំនិញ</th>
+            <th>ក្រុម</th>
+            <th class="text-end" style="width:120px">ដុល្លារ $</th>
+            <th class="text-end" style="width:140px">រៀល ៛</th>
+            <th class="text-center" style="width:100px">Qty</th>
+            <th class="text-end no-print" style="width:150px">ការកំណត់</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><img class="thumb" src="https://via.placeholder.com/60" alt=""></td>
+            <td>Angkor Beer</td>
+            <td>ភេសជ្ជៈ</td>
+            <td class="text-end">$2.00</td>
+            <td class="text-end">8,200 ៛</td>
+            <td class="text-center">50</td>
+            <td class="text-end no-print">
+              <a class="btn btn-sm btn-primary" href="edit_product.html">កែប្រែ</a>
+              <button class="btn btn-sm btn-danger" onclick="alert('Delete clicked')">លុប</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><img class="thumb" src="https://via.placeholder.com/60" alt=""></td>
+            <td>Coca Cola</td>
+            <td>ភេសជ្ជៈ</td>
+            <td class="text-end">$0.75</td>
+            <td class="text-end">3,075 ៛</td>
+            <td class="text-center">100</td>
+            <td class="text-end no-print">
+              <a class="btn btn-sm btn-primary" href="edit_product.html">កែប្រែ</a>
+              <button class="btn btn-sm btn-danger" onclick="alert('Delete clicked')">លុប</button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><img class="thumb" src="https://via.placeholder.com/60" alt=""></td>
+            <td>គោឡើងភ្នំ ឈុតធំ</td>
+            <td>ផ្នែកសាច់អាំង</td>
+            <td class="text-end">$10.00</td>
+            <td class="text-end">40,000 ៛</td>
+            <td class="text-center">20</td>
+            <td class="text-end no-print">
+              <a class="btn btn-sm btn-primary" href="edit_product.html">កែប្រែ</a>
+              <button class="btn btn-sm btn-danger" onclick="alert('Delete clicked')">លុប</button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><img class="thumb" src="https://via.placeholder.com/60" alt=""></td>
+            <td>ស៊ុបពងទាកូន ឈុតតូច</td>
+            <td>ផ្នែកស៊ុប</td>
+            <td class="text-end">$4.88</td>
+            <td class="text-end">20,000 ៛</td>
+            <td class="text-center">15</td>
+            <td class="text-end no-print">
+              <a class="btn btn-sm btn-primary" href="edit_product.html">កែប្រែ</a>
+              <button class="btn btn-sm btn-danger" onclick="alert('Delete clicked')">លុប</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-3 no-print">
+    <a href="index.html" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
