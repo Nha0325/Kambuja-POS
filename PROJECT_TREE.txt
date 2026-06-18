@@ -1,0 +1,325 @@
+ftc-pos/
+├── AGENTS.md
+├── PROJECT_TREE.txt
+├── README.md
+├── SETUP_INSTRUCTIONS.txt
+├── app/
+│   ├── Core/
+│   │   ├── Database.php
+│   │   ├── Response.php
+│   │   ├── Router.php
+│   │   ├── Session.php
+│   │   └── View.php
+│   ├── Helpers/
+│   │   └── helpers.php
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.php
+│   │   │   ├── CategoryController.php
+│   │   │   ├── Controller.php
+│   │   │   ├── CustomerController.php
+│   │   │   ├── DashboardController.php
+│   │   │   ├── ProductController.php
+│   │   │   ├── PurchaseController.php
+│   │   │   ├── ReportController.php
+│   │   │   ├── SaleController.php
+│   │   │   ├── SettingController.php
+│   │   │   ├── StockController.php
+│   │   │   └── SupplierController.php
+│   │   └── Middleware/
+│   │       └── AuthMiddleware.php
+│   ├── Models/
+│   │   ├── Category.php
+│   │   ├── Customer.php
+│   │   ├── Product.php
+│   │   ├── Purchase.php
+│   │   ├── PurchaseItem.php
+│   │   ├── Sale.php
+│   │   ├── SaleItem.php
+│   │   ├── Setting.php
+│   │   ├── StockMovement.php
+│   │   ├── Supplier.php
+│   │   └── User.php
+│   └── Services/
+│       ├── AuthService.php
+│       ├── DashboardService.php
+│       ├── ProductService.php
+│       ├── PurchaseService.php
+│       ├── ReportService.php
+│       ├── SaleService.php
+│       └── StockService.php
+├── bootstrap/
+│   └── app.php
+├── composer.json
+├── config/
+│   ├── app.php
+│   └── database.php
+├── database/
+│   ├── full.sql
+│   ├── full_fixed.sql
+│   ├── migrations/
+│   │   └── migration_001_add_category.sql
+│   ├── schema.sql
+│   └── seeders/
+│       └── users.sql
+├── docs/
+│   ├── html-prototype/
+│   │   ├── COMPLETE.md
+│   │   ├── INDEX.md
+│   │   ├── PRINT_GUIDE.md
+│   │   ├── README.md
+│   │   ├── add_product.html
+│   │   ├── categories.html
+│   │   ├── edit_product.html
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   ├── products.html
+│   │   ├── prompt.md
+│   │   ├── reports.html
+│   │   ├── sale.html
+│   │   ├── settings.html
+│   │   ├── tables.html
+│   │   └── users.html
+│   └── legacy/
+│       └── old-public-pages/
+│           ├── _debug.php
+│           ├── _nav_user.php
+│           ├── add_product.php
+│           ├── api_cart.php
+│           ├── api_cart.php_nkk
+│           ├── api_hold.php
+│           ├── auth.php
+│           ├── cancel_invoice.php
+│           ├── categories.php
+│           ├── change_table.php
+│           ├── checkout.php
+│           ├── close_business.php
+│           ├── close_business2.php
+│           ├── create_user.php
+│           ├── daily_sales_report.php
+│           ├── db.php
+│           ├── edit_product.php
+│           ├── export_csv.php
+│           ├── export_invoice_pdf.php
+│           ├── index.php_20251207
+│           ├── login.php
+│           ├── logout.php
+│           ├── merge_pay.php
+│           ├── open_business.php
+│           ├── open_table.php
+│           ├── print_closing_report.php
+│           ├── print_merged_receipt.php
+│           ├── print_receipt (11.11.25, 11.02 at night).php
+│           ├── print_receipt (20.11.25, 2.05 in the afternoon).php
+│           ├── print_receipt.php
+│           ├── products.php
+│           ├── products_delete.php
+│           ├── products_toggle.php
+│           ├── prompt.md
+│           ├── readme.txt
+│           ├── release_table.php
+│           ├── reports (15.11.25, 2.37 in the afternoon).php
+│           ├── reports.php
+│           ├── reports_business.php
+│           ├── reports_graph.php
+│           ├── reports_graph_adv.php
+│           ├── reports_preorder.php
+│           ├── reports_preorder_prints.php
+│           ├── reports_preorder_vs_receipts.php
+│           ├── reports_print_template.php
+│           ├── reports_receipts.php
+│           ├── sale.php
+│           ├── settings.php
+│           ├── signup.php
+│           ├── style_global.php
+│           ├── styles.css
+│           ├── tables.php
+│           ├── test_telegram.php
+│           ├── unpaid_invoices.php
+│           └── users.php
+├── execute_refactor.sh
+├── prompt.txt
+├── public/
+│   ├── assets/
+│   │   ├── css/
+│   │   │   └── app.css
+│   │   └── js/
+│   │       └── app.js
+│   ├── index.php
+│   └── uploads/
+│       ├── .gitkeep
+│       ├── p_1762093481_9d06a515.png
+│       ├── p_1762841052_4ff68155.png
+│       ├── p_1762841067_b91f066c.png
+│       ├── p_1762842332_75bf3bf1.png
+│       ├── p_1762843955_70dcd586.png
+│       ├── p_1762844464_e6203154.png
+│       ├── p_1763054487_a5ae57e4.png
+│       ├── p_1763143606_f7eee4de.png
+│       ├── p_1763225547_dbcad0c8.png
+│       ├── p_1763270772_8b5960c4.png
+│       ├── p_1763270802_a62316ca.png
+│       ├── p_1763450942_5b257554.png
+│       ├── p_1763450989_1ffd0b93.png
+│       ├── p_1763451364_55c7b99f.png
+│       ├── p_1763451420_122000d1.png
+│       ├── p_1763451449_b8f445b6.png
+│       ├── p_1763451480_05bd22c6.png
+│       ├── p_1763451525_7133854f.png
+│       ├── p_1763451580_ad7e7aa9.png
+│       ├── p_1763451615_2dbca5ab.png
+│       ├── p_1763451640_02017f2c.png
+│       ├── p_1763451664_df9b16ad.png
+│       ├── p_1763451698_90df9440.png
+│       ├── p_1763451738_edbf2a8e.png
+│       ├── p_1763451765_69cb42cb.png
+│       ├── p_1763451793_c8adfa0e.png
+│       ├── p_1763451816_c3d38d0e.png
+│       ├── p_1763452012_f791c98a.png
+│       ├── p_1763452049_2a57b74a.png
+│       ├── p_1763452088_5e0404ca.png
+│       ├── p_1763452121_eff07f58.png
+│       ├── p_1763452153_3e96cd5e.png
+│       ├── p_1763452181_1d7420a1.png
+│       ├── p_1763452260_6acf069c.png
+│       ├── p_1763452289_64c8cd34.png
+│       ├── p_1763452311_255ad1d5.png
+│       ├── p_1763452339_5d2ed88d.png
+│       ├── p_1763452365_4fb8d87c.png
+│       ├── p_1763452384_63a11ca9.png
+│       ├── p_1763452400_4cc14a5c.png
+│       ├── p_1763452421_7940d196.png
+│       ├── p_1763452453_24976631.png
+│       ├── p_1763452477_8ae7341f.png
+│       ├── p_1763452498_c265275b.png
+│       ├── p_1763455629_25522069.png
+│       ├── p_1763455679_faf11706.png
+│       ├── p_1763455721_479946ef.png
+│       ├── p_1763455801_a33c423e.png
+│       ├── p_1763455866_e138fa75.png
+│       ├── p_1763455903_3ba1c8d7.png
+│       ├── p_1763456007_9fc560e4.png
+│       ├── p_1763456100_03ac5985.png
+│       ├── p_1763456171_6b13ddd7.png
+│       ├── p_1763456227_8426bf8c.png
+│       ├── p_1763456346_c92cd48a.png
+│       ├── p_1763456381_376a4b95.png
+│       ├── p_1763456428_3618ad6c.png
+│       ├── p_1763456453_69c648d3.png
+│       ├── p_1763456502_2c19f1bb.png
+│       ├── p_1763456534_e64d10bc.png
+│       ├── p_1763456620_702eb0c4.png
+│       ├── p_1763456650_611623d8.png
+│       ├── p_1763457052_c381a24b.png
+│       ├── p_1763457075_3ccb1947.png
+│       ├── p_1763457097_a0f0940c.png
+│       ├── p_1763457121_77bbe450.png
+│       ├── p_1763457186_9c297480.png
+│       ├── p_1763457206_3f1214f3.png
+│       ├── p_1763457227_67c9c520.png
+│       ├── p_1763457250_7d11a472.png
+│       ├── p_1763457281_42189b00.png
+│       ├── p_1763457307_aba51d9f.png
+│       ├── p_1763457340_c97081c8.png
+│       ├── p_1763457363_47262a70.png
+│       ├── p_1763457476_7d062551.png
+│       ├── p_1763457497_61719913.png
+│       ├── p_1763457526_e47cf38b.png
+│       ├── p_1763457559_79c521dc.png
+│       ├── p_1763457601_9cf2408c.png
+│       ├── p_1763542607_8e86c525.png
+│       ├── p_1763542625_01dca6e9.png
+│       ├── p_1763542697_d2850d0f.png
+│       ├── p_1763542748_b0aa33e1.png
+│       ├── p_1763542766_828b5b8b.png
+│       ├── p_1763542791_1980ceb9.png
+│       ├── p_1763542810_9f609d20.png
+│       ├── p_1763542872_232dd7a0.png
+│       ├── p_1763542897_f42a8a0c.png
+│       ├── p_1763542930_9a995450.png
+│       ├── p_1763542947_901da647.png
+│       ├── p_1763542989_91e39a65.png
+│       ├── p_1763543008_14e825ae.png
+│       ├── p_1763543031_5b87a71a.png
+│       ├── p_1763543079_de92db2b.png
+│       ├── p_1763543231_9cb66acf.png
+│       ├── p_1763543252_cf9dfcb7.png
+│       ├── p_1763543267_c6a16adb.png
+│       ├── p_1763543282_f46b4205.png
+│       ├── p_1763543295_7a7ec890.png
+│       ├── p_1763543371_87569264.png
+│       ├── p_1763543391_7013876f.png
+│       ├── p_1763543404_45332bea.png
+│       ├── p_1763543419_7620aa6e.png
+│       ├── p_1763543434_0a5cbfb0.png
+│       ├── p_1763543446_1ff8b3bf.png
+│       ├── p_1763543470_bc7e424c.png
+│       ├── p_1763543501_9bbb5069.png
+│       ├── p_1763543524_cd2e9091.png
+│       ├── p_1763543540_3d9634a0.png
+│       ├── p_1763633888_42dc0d21.png
+│       ├── qr_1763102341_2c7f3c.jpg
+│       ├── qr_1763107078_bd426a.png
+│       └── qr_1763124963_ccc974.png
+├── resources/
+│   └── views/
+│       ├── auth/
+│       │   └── login.php
+│       ├── categories/
+│       │   ├── create.php
+│       │   ├── edit.php
+│       │   └── index.php
+│       ├── customers/
+│       │   ├── create.php
+│       │   ├── edit.php
+│       │   └── index.php
+│       ├── dashboard/
+│       │   └── index.php
+│       ├── layouts/
+│       │   ├── app.php
+│       │   ├── auth.php
+│       │   ├── header.php
+│       │   └── sidebar.php
+│       ├── products/
+│       │   ├── create.php
+│       │   ├── edit.php
+│       │   ├── index.php
+│       │   └── show.php
+│       ├── purchases/
+│       │   ├── create.php
+│       │   ├── index.php
+│       │   └── show.php
+│       ├── reports/
+│       │   ├── business.php
+│       │   ├── index.php
+│       │   ├── profit.php
+│       │   ├── purchases.php
+│       │   ├── sales.php
+│       │   └── stock.php
+│       ├── sales/
+│       │   ├── index.php
+│       │   ├── invoice.php
+│       │   ├── pos.php
+│       │   └── receipt.php
+│       ├── settings/
+│       │   └── index.php
+│       ├── stock/
+│       │   ├── index.php
+│       │   └── movements.php
+│       └── suppliers/
+│           ├── create.php
+│           ├── edit.php
+│           └── index.php
+├── routes/
+│   ├── api.php
+│   └── web.php
+├── scripts/
+│   ├── cmd-git-private-public.md
+│   ├── create-repo-and-push.sh
+│   ├── git-push.sh
+│   └── import-db.sh
+└── storage/
+    ├── cache/
+    │   └── .gitkeep
+    └── logs/
+        └── .gitkeep
