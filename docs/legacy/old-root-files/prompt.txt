@@ -1,0 +1,155 @@
+tfc-pos/
+├── README.md
+├── .env.example
+├── .gitignore
+├── composer.json
+├── PROJECT_TREE.txt
+│
+├── public/
+│   ├── index.php
+│   └── assets/
+│       ├── css/
+│       │   └── app.css
+│       ├── js/
+│       │   └── app.js
+│       └── images/
+│
+├── app/
+│   ├── Core/
+│   │   ├── Database.php
+│   │   ├── Router.php
+│   │   ├── Response.php
+│   │   ├── Session.php
+│   │   └── View.php
+│   │
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Controller.php
+│   │   │   ├── AuthController.php
+│   │   │   ├── DashboardController.php
+│   │   │   ├── ProductController.php
+│   │   │   ├── CategoryController.php
+│   │   │   ├── CustomerController.php
+│   │   │   ├── SupplierController.php
+│   │   │   ├── SaleController.php
+│   │   │   ├── PurchaseController.php
+│   │   │   ├── StockController.php
+│   │   │   ├── ReportController.php
+│   │   │   └── SettingController.php
+│   │   └── Middleware/
+│   │       └── AuthMiddleware.php
+│   │
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Product.php
+│   │   ├── Category.php
+│   │   ├── Customer.php
+│   │   ├── Supplier.php
+│   │   ├── Sale.php
+│   │   ├── SaleItem.php
+│   │   ├── Purchase.php
+│   │   ├── PurchaseItem.php
+│   │   ├── StockMovement.php
+│   │   └── Setting.php
+│   │
+│   ├── Services/
+│   │   ├── AuthService.php
+│   │   ├── DashboardService.php
+│   │   ├── ProductService.php
+│   │   ├── SaleService.php
+│   │   ├── PurchaseService.php
+│   │   ├── StockService.php
+│   │   └── ReportService.php
+│   │
+│   └── Helpers/
+│       └── helpers.php
+│
+├── resources/
+│   └── views/
+│       ├── layouts/
+│       │   ├── app.php
+│       │   ├── auth.php
+│       │   ├── header.php
+│       │   └── sidebar.php
+│       ├── auth/
+│       │   └── login.php
+│       ├── dashboard/
+│       │   └── index.php
+│       ├── products/
+│       ├── categories/
+│       ├── customers/
+│       ├── suppliers/
+│       ├── sales/
+│       ├── purchases/
+│       ├── stock/
+│       ├── reports/
+│       └── settings/
+│
+├── bootstrap/
+│   └── app.php
+│
+├── config/
+│   ├── app.php
+│   └── database.php
+│
+├── routes/
+│   ├── web.php
+│   └── api.php
+│
+├── database/
+│   ├── schema.sql
+│   ├── full.sql
+│   ├── full_fixed.sql
+│   ├── migrations/
+│   │   └── migration_001_add_category.sql
+│   └── seeders/
+│       └── users.sql
+│
+├── docs/
+│   ├── html-prototype/
+│   └── legacy/
+│       └── old-public-pages/
+│
+├── storage/
+│   ├── logs/
+│   ├── cache/
+│   └── uploads/
+│
+├── scripts/
+│   ├── git-push.sh
+│   └── import-db.sh
+│
+└── tools/
+    ├── create_user.php
+    └── daily_sales_report.php
+
+
+Move / clean rule
+Move:
+- root helpers.php -> app/Helpers/helpers.php
+- root full.sql -> database/full.sql
+- root full_fixed.sql -> database/full_fixed.sql
+- root schema.sql -> database/schema.sql
+- root migration_001_add_category.sql -> database/migrations/migration_001_add_category.sql
+- root uploads/* -> storage/uploads/ OR public/uploads/ only if images must be directly public
+- html/* -> docs/html-prototype/
+- public old PHP pages -> docs/legacy/old-public-pages/
+- root git-push.sh -> scripts/git-push.sh
+
+Keep:
+- public/index.php
+- public/assets/*
+- app/*
+- bootstrap/app.php
+- config/*
+- routes/*
+- resources/views/*
+
+Delete only after verifying unused:
+- root auth.php
+- root config.php
+- root db.php
+- root readme.txt
+- root prompt.txt
+- execute_refactor.sh
+- duplicate old files in public/

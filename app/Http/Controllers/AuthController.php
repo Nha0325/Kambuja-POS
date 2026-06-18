@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Services\AuthService;
 
 class AuthController extends Controller {
     public function showLoginForm() {
@@ -16,7 +16,7 @@ class AuthController extends Controller {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        if (login_user($username, $password)) { // using legacy function for now
+        if (AuthService::attempt($username, $password)) {
             return $this->redirect('/dashboard');
         }
 
@@ -24,6 +24,7 @@ class AuthController extends Controller {
     }
 
     public function logout() {
-        logout_user(); // using legacy function
+        AuthService::logout();
+        return $this->redirect('/login');
     }
 }

@@ -7,4 +7,5 @@ use App\Http\Middleware\AuthMiddleware;
 class SaleController extends Controller {
     public function __construct() { (new AuthMiddleware())->handle(); }
     public function index() { return $this->view('sales.index'); }
+    public function create() { return $this->view('sales.pos'); }
 }

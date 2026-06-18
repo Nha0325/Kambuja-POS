@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTC POS Dashboard</title>
+    <title>TFC POS Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        .sidebar { min-height: 100vh; background: #343a40; color: white; }
-        .sidebar a { color: #adb5bd; text-decoration: none; padding: 10px 15px; display: block; }
-        .sidebar a:hover { color: white; background: #495057; }
-        .content { padding: 20px; width: 100%; }
-    </style>
+    <link href="<?= htmlspecialchars(asset('assets/css/app.css')) ?>" rel="stylesheet">
 </head>
 <body class="d-flex">
     <?php require __DIR__ . '/sidebar.php'; ?>
@@ -22,5 +17,6 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= htmlspecialchars(asset('assets/js/app.js')) ?>"></script>
 </body>
 </html>

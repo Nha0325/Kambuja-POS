@@ -1,2 +1,1 @@
-// Main application scripts
-console.log('App loaded');
+// Application JavaScript entry point.

@@ -1,6 +1,6 @@
 {
-    "name": "nha0325/ftc-pos",
-    "description": "Clean POS system structure",
+    "name": "nha0325/tfc-pos",
+    "description": "Custom PHP MVC point-of-sale system",
     "type": "project",
     "require": {
         "php": "^7.4 || ^8.0"
