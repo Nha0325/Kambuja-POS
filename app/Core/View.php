@@ -2,15 +2,17 @@
 
 namespace App\Core;
 
-class View {
-    public static function render($view, $data = []) {
+class View
+{
+    public static function render(string $view, array $data = []): void
+    {
         extract($data);
         $viewPath = __DIR__ . '/../../resources/views/' . str_replace('.', '/', $view) . '.php';
-        
-        if (file_exists($viewPath)) {
-            require $viewPath;
-        } else {
-            die("View not found: $view");
+
+        if (!is_file($viewPath)) {
+            throw new \RuntimeException("View not found: {$view}");
         }
+
+        require $viewPath;
     }
 }

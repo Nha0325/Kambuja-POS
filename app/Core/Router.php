@@ -2,39 +2,84 @@
 
 namespace App\Core;
 
-class Router {
-    private $routes = [];
+class Router
+{
+    private array $routes = [];
 
-    public function get($path, $callback) {
-        $this->routes['GET'][$path] = $callback;
+    public function get(string $path, $callback, array $middleware = []): void
+    {
+        $this->add('GET', $path, $callback, $middleware);
     }
 
-    public function post($path, $callback) {
-        $this->routes['POST'][$path] = $callback;
+    public function post(string $path, $callback, array $middleware = []): void
+    {
+        $this->add('POST', $path, $callback, $middleware);
     }
 
-    public function dispatch($method, $uri) {
-        $path = parse_url($uri, PHP_URL_PATH);
-        $base = str_replace('/public/index.php', '', $_SERVER['SCRIPT_NAME']);
-        if (strpos($path, $base) === 0) {
-            $path = substr($path, strlen($base));
-        }
-        if ($path === '') $path = '/';
-        
-        $callback = $this->routes[$method][$path] ?? false;
+    public function add(string $method, string $path, $callback, array $middleware = []): void
+    {
+        $this->routes[strtoupper($method)][] = [
+            'path' => '/' . ltrim($path, '/'),
+            'callback' => $callback,
+            'middleware' => $middleware,
+        ];
+    }
 
-        if ($callback === false) {
-            http_response_code(404);
-            echo "404 Not Found";
+    public function dispatch(Request $request): void
+    {
+        foreach ($this->routes[$request->method()] ?? [] as $route) {
+            $parameters = $this->match($route['path'], $request->path());
+
+            if ($parameters === null) {
+                continue;
+            }
+
+            $request->setRouteParameters($parameters);
+
+            foreach ($route['middleware'] as $middleware) {
+                if ($middleware->handle($request) === false) {
+                    return;
+                }
+            }
+
+            $this->invoke($route['callback'], $request, $parameters);
             return;
         }
+
+        Response::abort(404, 'errors.404');
+    }
+
+    private function match(string $routePath, string $requestPath): ?array
+    {
+        $parameterNames = [];
+        $pattern = preg_replace_callback(
+            '/\{([A-Za-z_][A-Za-z0-9_]*)\}/',
+            static function (array $matches) use (&$parameterNames): string {
+                $parameterNames[] = $matches[1];
+                return '([^/]+)';
+            },
+            $routePath
+        );
+
+        if (!preg_match('#^' . $pattern . '$#', $requestPath, $matches)) {
+            return null;
+        }
+
+        array_shift($matches);
+        return array_combine($parameterNames, array_map('urldecode', $matches)) ?: [];
+    }
+
+    private function invoke($callback, Request $request, array $parameters): void
+    {
+        $arguments = array_values($parameters);
 
         if (is_array($callback)) {
             $controller = new $callback[0]();
             $method = $callback[1];
-            return $controller->$method();
+            $controller->{$method}($request, ...$arguments);
+            return;
         }
 
-        return call_user_func($callback);
+        $callback($request, ...$arguments);
     }
 }
