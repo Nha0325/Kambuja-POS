@@ -1,1 +1,0 @@
-// Application JavaScript entry point.
