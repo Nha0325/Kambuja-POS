@@ -1,0 +1,256 @@
+kambuja-pos/
+├── .env
+├── .env.example
+├── .dockerignore
+├── .gitattributes
+├── .gitignore
+├── README.md
+├── install
+├── a.md
+├── b.md
+├── PROJECT_TREE.txt
+├── docs/
+│   ├── api/endpoints.md
+│   ├── architecture/
+│   │   ├── folder-structure.md
+│   │   └── system-overview.md
+│   ├── database/collections.md
+│   ├── deployment-checklist.md
+│   ├── features/feature-map.md
+│   ├── operations/runbook.md
+│   ├── security/security-checklist.md
+│   └── testing/qa-checklist.md
+├── infra/
+│   ├── backup/
+│   │   ├── mongodb-backup.sh
+│   │   └── mongodb-restore.sh
+│   ├── cloud/install-cloudflare-tunnel.sh
+│   ├── docker-compose.yml
+│   ├── firewall/
+│   │   ├── ufw-setup.sh
+│   │   └── windows-firewall.ps1
+│   ├── monitoring/prometheus.yml
+│   └── nginx/
+│       ├── kambuja-pos.conf
+│       └── spa.conf
+├── scripts/
+│   ├── browser-smoke.mjs
+│   ├── dev.ps1
+│   ├── dev.sh
+│   ├── git-pull.ps1
+│   ├── git-pull.sh
+│   ├── git-push.ps1
+│   ├── git-push.sh
+│   ├── git-sync.ps1
+│   ├── git-sync.sh
+│   ├── load-env.sh
+│   ├── run.md
+│   ├── seed.ps1
+│   ├── seed.sh
+│   ├── setup.ps1
+│   ├── setup.sh
+│   ├── status.ps1
+│   ├── status.sh
+│   ├── test.ps1
+│   └── test.sh
+├── tools/
+│   ├── postman/kambuja-pos.postman.json
+│   └── seed/
+│       ├── README.md
+│       └── sample-data.js
+└── apps/
+    ├── api/
+    │   ├── .gitattributes
+    │   ├── .gitignore
+    │   ├── .mvn/wrapper/maven-wrapper.properties
+    │   ├── Dockerfile
+    │   ├── PROJECT_TREE.txt
+    │   ├── README.md
+    │   ├── mvnw
+    │   ├── mvnw.cmd
+    │   ├── pom.xml
+    │   └── src/
+    │       ├── main/
+    │       │   ├── java/com/kambujaflow/kambujapos/
+    │       │   │   ├── KambujaPosApplication.java
+    │       │   │   ├── common/
+    │       │   │   ├── config/        # Includes TelegramConfig RestTemplate bean
+    │       │   │   ├── controller/    # Includes /api/telegram
+    │       │   │   ├── dto/
+    │       │   │   │   ├── request/
+    │       │   │   │   └── response/
+    │       │   │   ├── entity/
+    │       │   │   ├── enums/
+    │       │   │   ├── repository/
+    │       │   │   ├── security/
+    │       │   │   ├── service/       # Includes environment-token Telegram alerts
+    │       │   │   ├── util/
+    │       │   │   └── waf/
+    │       │   └── resources/
+    │       │       ├── application-dev.yml
+    │       │       ├── application.yml
+    │       │       ├── static/
+    │       │       └── templates/
+    │       └── test/java/com/kambujaflow/kambujapos/
+    ├── web-admin-manager/
+    │   ├── Dockerfile
+    │   ├── README.md
+    │   ├── index.html
+    │   ├── package-lock.json
+    │   ├── package.json
+    │   ├── vite.config.js
+    │   └── src/
+    │       ├── App.jsx
+    │       ├── main.jsx
+    │       ├── index.css
+    │       ├── app/
+    │       │   ├── config.js
+    │       │   ├── providers.jsx
+    │       │   └── router.jsx
+    │       ├── routes/
+    │       │   ├── ProtectedRoute.jsx
+    │       │   └── RoleRoute.jsx
+    │       ├── layouts/
+    │       │   ├── AdminManagerLayout.jsx
+    │       │   └── AuthLayout.jsx
+    │       ├── pages/
+    │       │   ├── auth/LoginPage.jsx
+    │       │   ├── dashboard/AdminManagerDashboardPage.jsx
+    │       │   ├── admins/
+    │       │   │   ├── AdminListPage.jsx
+    │       │   │   └── CreateAdminPage.jsx
+    │       │   ├── shops/AllShopsPage.jsx
+    │       │   ├── location/
+    │       │   │   ├── CityFilterPage.jsx
+    │       │   │   └── ProvinceListPage.jsx
+    │       │   ├── reports/
+    │       │   │   ├── AllSalesReportPage.jsx
+    │       │   │   └── AllStockReportPage.jsx
+    │       │   ├── notifications/NotificationsPage.jsx
+    │       │   ├── settings/SystemSettingsPage.jsx
+    │       │   └── error/
+    │       │       ├── NotFoundPage.jsx
+    │       │       └── UnauthorizedPage.jsx
+    │       ├── features/
+    │       │   ├── auth/
+    │       │   │   ├── components/LoginForm.jsx
+    │       │   │   ├── hooks/useLogin.js
+    │       │   │   ├── services/authService.js
+    │       │   │   └── store/authStore.js
+    │       │   ├── admin-manager/
+    │       │   │   ├── components/AdminManagerStatCards.jsx
+    │       │   │   ├── services/adminManagerService.js
+    │       │   │   └── store/adminManagerStore.js
+    │       │   ├── admins/
+    │       │   │   ├── components/
+    │       │   │   │   ├── AdminTable.jsx
+    │       │   │   │   └── CreateAdminForm.jsx
+    │       │   │   ├── services/adminService.js
+    │       │   │   └── store/adminStore.js
+    │       │   ├── shops/
+    │       │   │   ├── components/ShopTable.jsx
+    │       │   │   ├── services/shopService.js
+    │       │   │   └── store/shopStore.js
+    │       │   ├── location/
+    │       │   │   ├── components/ProvinceCityFilter.jsx
+    │       │   │   └── utils/cambodiaLocations.js
+    │       │   ├── reports/
+    │       │   │   ├── components/
+    │       │   │   │   ├── AllSalesReportTable.jsx
+    │       │   │   │   ├── AllStockReportTable.jsx
+    │       │   │   │   └── ReportFilterBar.jsx
+    │       │   │   ├── services/reportService.js
+    │       │   │   └── store/reportStore.js
+    │       │   ├── notifications/
+    │       │   │   ├── components/NotificationList.jsx
+    │       │   │   ├── services/notificationService.js
+    │       │   │   └── store/notificationStore.js
+    │       │   └── settings/
+    │       │       ├── components/SystemSettingsForm.jsx
+    │       │       ├── services/settingService.js
+    │       │       └── store/settingStore.js
+    │       ├── shared/
+    │       │   ├── hooks/
+    │       │   ├── layout/
+    │       │   ├── tables/
+    │       │   ├── ui/
+    │       │   └── utils/
+    │       ├── services/
+    │       │   ├── api.js
+    │       │   └── endpoints.js
+    │       └── assets/
+    └── web-admin/
+        ├── Dockerfile
+        ├── README.md
+        ├── index.html
+        ├── package-lock.json
+        ├── package.json
+        ├── vite.config.js
+        └── src/
+            ├── App.jsx
+            ├── main.jsx
+            ├── index.css
+            ├── app/
+            │   ├── config.js
+            │   ├── providers.jsx
+            │   └── router.jsx
+            ├── routes/
+            │   ├── ProtectedRoute.jsx
+            │   └── RoleRoute.jsx
+            ├── layouts/
+            │   ├── AdminLayout.jsx
+            │   ├── AuthLayout.jsx
+            │   └── PosLayout.jsx
+            ├── pages/
+            │   ├── auth/LoginPage.jsx
+            │   ├── admin/
+            │   │   ├── AddProductPage.jsx
+            │   │   ├── AdminDashboardPage.jsx
+            │   │   ├── CashierListPage.jsx
+            │   │   ├── CategoryPage.jsx
+            │   │   ├── CreateCashierPage.jsx
+            │   │   ├── CustomerRecordsPage.jsx
+            │   │   ├── NotificationsPage.jsx
+            │   │   ├── ProductListPage.jsx
+            │   │   ├── SalesReportPage.jsx
+            │   │   ├── ShopProfilePage.jsx
+            │   │   ├── ShopSettingsPage.jsx
+            │   │   ├── StockManagementPage.jsx
+            │   │   └── StockMovementPage.jsx
+            │   ├── pos/
+            │   │   ├── PaymentPage.jsx
+            │   │   ├── PosSalePage.jsx
+            │   │   ├── ReceiptPage.jsx
+            │   │   └── TodaySalesPage.jsx
+            │   └── error/
+            │       ├── NotFoundPage.jsx
+            │       └── UnauthorizedPage.jsx
+            ├── features/
+            │   ├── auth/
+            │   ├── shop/
+            │   ├── product/
+            │   ├── category/
+            │   ├── inventory/
+            │   ├── cashier/
+            │   ├── pos/
+            │   ├── customer/
+            │   ├── report/
+            │   ├── notifications/
+            │   └── settings/
+            ├── shared/
+            │   ├── hooks/
+            │   ├── layout/
+            │   ├── tables/
+            │   ├── ui/
+            │   └── utils/
+            ├── services/
+            │   ├── api.js
+            │   └── endpoints.js
+            └── assets/
+
+Generated build output and dependency folders are excluded:
+- apps/api/target/
+- apps/web-admin-manager/node_modules/
+- apps/web-admin-manager/dist/
+- apps/web-admin/node_modules/
+- apps/web-admin/dist/

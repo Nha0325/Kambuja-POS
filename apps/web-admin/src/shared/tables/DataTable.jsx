@@ -1,0 +1,4 @@
+export default function DataTable({ columns, rows, rowKey = "id", emptyText = "No records found." }) {
+  if (!rows.length) return <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">{emptyText}</p>;
+  return <div className="overflow-x-auto rounded-xl border border-slate-200"><table className="min-w-full divide-y divide-slate-200 text-sm"><thead className="bg-slate-50"><tr>{columns.map((column) => <th key={column.key} className="px-4 py-3 text-left font-semibold text-slate-600">{column.label}</th>)}</tr></thead><tbody className="divide-y divide-slate-100 bg-white">{rows.map((row) => <tr key={row[rowKey]}>{columns.map((column) => <td key={column.key} className="px-4 py-3">{column.render ? column.render(row) : row[column.key] ?? "—"}</td>)}</tr>)}</tbody></table></div>;
+}

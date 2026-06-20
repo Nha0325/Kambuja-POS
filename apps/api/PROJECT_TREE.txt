@@ -1,0 +1,189 @@
+apps/api
+├── .gitattributes
+├── .gitignore
+├── .mvn
+│   └── wrapper
+│       └── maven-wrapper.properties
+├── Dockerfile
+├── PROJECT_TREE.txt
+├── README.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com
+    │   │       └── kambujaflow
+    │   │           └── kambujapos
+    │   │               ├── KambujaPosApplication.java
+    │   │               ├── common
+    │   │               │   ├── ApiResponse.java
+    │   │               │   ├── BaseDocument.java
+    │   │               │   ├── BusinessException.java
+    │   │               │   ├── Constants.java
+    │   │               │   ├── ErrorResponse.java
+    │   │               │   ├── GlobalExceptionHandler.java
+    │   │               │   ├── PageResponse.java
+    │   │               │   └── ResourceNotFoundException.java
+    │   │               ├── config
+    │   │               │   ├── CorsConfig.java
+    │   │               │   ├── MongoConfig.java
+    │   │               │   ├── SecurityConfig.java
+    │   │               │   ├── SwaggerConfig.java
+    │   │               │   └── TelegramConfig.java       # RestTemplate bean
+    │   │               ├── controller
+    │   │               │   ├── AdminController.java
+    │   │               │   ├── AdminManagerController.java
+    │   │               │   ├── AuditLogController.java
+    │   │               │   ├── AuthController.java
+    │   │               │   ├── CashierController.java
+    │   │               │   ├── CategoryController.java
+    │   │               │   ├── CustomerController.java
+    │   │               │   ├── InventoryController.java
+    │   │               │   ├── NotificationController.java
+    │   │               │   ├── PaymentController.java
+    │   │               │   ├── ProductCodeController.java
+    │   │               │   ├── ProductController.java
+    │   │               │   ├── ReceiptController.java
+    │   │               │   ├── ReportController.java
+    │   │               │   ├── SaleController.java
+    │   │               │   ├── SettingController.java
+    │   │               │   ├── ShopController.java
+    │   │               │   ├── StockMovementController.java
+    │   │               │   └── TelegramController.java   # /api/telegram endpoints
+    │   │               ├── dto
+    │   │               │   ├── request
+    │   │               │   │   ├── AdminCreateRequest.java
+    │   │               │   │   ├── CashierCreateRequest.java
+    │   │               │   │   ├── CategoryRequest.java
+    │   │               │   │   ├── CustomerRequest.java
+    │   │               │   │   ├── InventoryRequest.java
+    │   │               │   │   ├── LoginRequest.java
+    │   │               │   │   ├── PaymentRequest.java
+    │   │               │   │   ├── ProductCodeRequest.java
+    │   │               │   │   ├── ProductRequest.java
+    │   │               │   │   ├── SaleRequest.java
+    │   │               │   │   ├── SettingRequest.java
+    │   │               │   │   ├── ShopRequest.java
+    │   │               │   │   ├── StockMovementRequest.java
+    │   │               │   │   └── TelegramSettingRequest.java
+    │   │               │   └── response
+    │   │               │       ├── AdminManagerDashboardResponse.java
+    │   │               │       ├── AdminResponse.java
+    │   │               │       ├── AuditLogResponse.java
+    │   │               │       ├── CustomerResponse.java
+    │   │               │       ├── DashboardResponse.java
+    │   │               │       ├── InventoryResponse.java
+    │   │               │       ├── LoginResponse.java
+    │   │               │       ├── NotificationResponse.java
+    │   │               │       ├── PaymentResponse.java
+    │   │               │       ├── ProductCodeResponse.java
+    │   │               │       ├── ProductResponse.java
+    │   │               │       ├── ReceiptResponse.java
+    │   │               │       ├── ReportResponse.java
+    │   │               │       ├── SaleResponse.java
+    │   │               │       ├── SettingResponse.java
+    │   │               │       ├── ShopResponse.java
+    │   │               │       ├── StockMovementResponse.java
+    │   │               │       ├── TelegramSettingResponse.java
+    │   │               │       └── UserResponse.java
+    │   │               ├── entity
+    │   │               │   ├── AuditLog.java
+    │   │               │   ├── Category.java
+    │   │               │   ├── Customer.java
+    │   │               │   ├── Inventory.java
+    │   │               │   ├── Notification.java
+    │   │               │   ├── Payment.java
+    │   │               │   ├── Product.java
+    │   │               │   ├── ProductCode.java
+    │   │               │   ├── Receipt.java
+    │   │               │   ├── Sale.java
+    │   │               │   ├── Setting.java
+    │   │               │   ├── Shop.java
+    │   │               │   ├── StockMovement.java
+    │   │               │   ├── TelegramSetting.java
+    │   │               │   └── User.java
+    │   │               ├── enums
+    │   │               │   ├── CodeType.java
+    │   │               │   ├── NotificationType.java
+    │   │               │   ├── PaymentMethod.java
+    │   │               │   ├── PaymentStatus.java
+    │   │               │   ├── ProductStatus.java
+    │   │               │   ├── RoleName.java
+    │   │               │   ├── SaleStatus.java
+    │   │               │   ├── SettingType.java
+    │   │               │   ├── ShopStatus.java
+    │   │               │   ├── StockMovementType.java
+    │   │               │   └── UserStatus.java
+    │   │               ├── repository
+    │   │               │   ├── AuditLogRepository.java
+    │   │               │   ├── CategoryRepository.java
+    │   │               │   ├── CustomerRepository.java
+    │   │               │   ├── InventoryRepository.java
+    │   │               │   ├── NotificationRepository.java
+    │   │               │   ├── PaymentRepository.java
+    │   │               │   ├── ProductCodeRepository.java
+    │   │               │   ├── ProductRepository.java
+    │   │               │   ├── ReceiptRepository.java
+    │   │               │   ├── SaleRepository.java
+    │   │               │   ├── SettingRepository.java
+    │   │               │   ├── ShopRepository.java
+    │   │               │   ├── StockMovementRepository.java
+    │   │               │   ├── TelegramSettingRepository.java
+    │   │               │   └── UserRepository.java
+    │   │               ├── security
+    │   │               │   ├── CustomAccessDeniedHandler.java
+    │   │               │   ├── JwtAuthenticationFilter.java
+    │   │               │   ├── JwtService.java
+    │   │               │   ├── RoleGuard.java
+    │   │               │   ├── SecurityConstants.java
+    │   │               │   ├── ShopScopeGuard.java
+    │   │               │   └── UserDetailsServiceImpl.java
+    │   │               ├── service
+    │   │               │   ├── AdminManagerService.java
+    │   │               │   ├── AdminService.java
+    │   │               │   ├── AuditLogService.java
+    │   │               │   ├── AuthService.java
+    │   │               │   ├── CashierService.java
+    │   │               │   ├── CategoryService.java
+    │   │               │   ├── CustomerService.java
+    │   │               │   ├── InventoryService.java
+    │   │               │   ├── NotificationService.java
+    │   │               │   ├── PaymentService.java
+    │   │               │   ├── ProductCodeService.java
+    │   │               │   ├── ProductService.java
+    │   │               │   ├── ReceiptService.java
+    │   │               │   ├── ReportService.java
+    │   │               │   ├── SaleService.java
+    │   │               │   ├── SettingService.java
+    │   │               │   ├── ShopService.java
+    │   │               │   ├── StockMovementService.java
+    │   │               │   └── TelegramNotificationService.java # Environment-token notifications
+    │   │               ├── util
+    │   │               │   ├── BarcodeUtil.java
+    │   │               │   ├── DateUtil.java
+    │   │               │   ├── FileUtil.java
+    │   │               │   ├── MoneyUtil.java
+    │   │               │   ├── ReceiptNumberUtil.java
+    │   │               │   ├── SaleNumberUtil.java
+    │   │               │   └── StringUtil.java
+    │   │               └── waf
+    │   │                   ├── RateLimitFilter.java
+    │   │                   ├── RequestValidationFilter.java
+    │   │                   ├── SqlInjectionPatternFilter.java
+    │   │                   ├── WafFilter.java
+    │   │                   └── XssProtectionFilter.java
+    │   └── resources
+    │       ├── application-dev.yml
+    │       ├── application.yml
+    │       ├── static
+    │       └── templates
+    └── test
+        └── java
+            └── com
+                └── kambujaflow
+                    └── kambujapos
+                        ├── KambujaPosApplicationTests.java
+                        └── util
+                            └── UtilityTests.java

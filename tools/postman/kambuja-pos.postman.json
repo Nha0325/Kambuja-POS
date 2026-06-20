@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "Kambuja POS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@kambujaflow.local\",\n  \"password\": \"change-me-before-production\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Manager Dashboard",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/admin-manager/dashboard"
+      }
+    },
+    {
+      "name": "Shop Admin Dashboard",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/admin/dashboard"
+      }
+    },
+    {
+      "name": "Products",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/products?page=0&size=20"
+      }
+    },
+    {
+      "name": "Sales",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/sales"
+      }
+    }
+  ]
+}
