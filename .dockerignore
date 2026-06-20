@@ -1,0 +1,10 @@
+.git
+.env
+.agents
+.codex
+**/node_modules
+**/dist
+**/target
+logs
+backups
+data
