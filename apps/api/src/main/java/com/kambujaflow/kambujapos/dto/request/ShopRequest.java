@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShopRequest {
-    @NotBlank
     private String code;
 
     @NotBlank

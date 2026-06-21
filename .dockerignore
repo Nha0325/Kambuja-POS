@@ -1,10 +1,42 @@
+# Version control
 .git
+.gitignore
+
+# Environment variables
 .env
-.agents
-.codex
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / Javascript
 **/node_modules
 **/dist
+build/
+
+# Java / Maven (Spring Boot)
 **/target
-logs
-backups
-data
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Project specific
+backups/
+data/
+.agents
+.codex

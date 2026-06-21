@@ -21,19 +21,19 @@ public class ShopService {
     private final ShopScopeGuard shopScopeGuard;
 
     public ShopResponse create(ShopRequest request) {
-        if (shopRepository.existsByCodeIgnoreCase(request.getCode())) {
-            throw new BusinessException("Shop code already exists");
-        }
-        return toResponse(shopRepository.save(map(new Shop(), request)));
+        Shop shop = map(new Shop(), request);
+        return toResponse(shopRepository.save(shop));
     }
 
     public ShopResponse update(String id, ShopRequest request) {
         Shop shop = getEntity(id);
-        shopRepository.findByCodeIgnoreCase(request.getCode())
-                .filter(existing -> !existing.getId().equals(id))
-                .ifPresent(existing -> {
-                    throw new BusinessException("Shop code already exists");
-                });
+        if (request.getCode() != null && !request.getCode().isBlank() && !request.getCode().equalsIgnoreCase(shop.getCode())) {
+            shopRepository.findByCodeIgnoreCase(request.getCode().trim())
+                    .filter(existing -> !existing.getId().equals(id))
+                    .ifPresent(existing -> {
+                        throw new BusinessException("Shop code already exists");
+                    });
+        }
         return toResponse(shopRepository.save(map(shop, request)));
     }
 
@@ -61,7 +61,18 @@ public class ShopService {
     }
 
     private Shop map(Shop shop, ShopRequest request) {
-        shop.setCode(request.getCode().trim().toUpperCase());
+        if (shop.getId() == null) {
+            long count = shopRepository.count();
+            String code = String.format("KFP-SHOP-%06d", count + 1);
+            while (shopRepository.existsByCodeIgnoreCase(code)) {
+                count++;
+                code = String.format("KFP-SHOP-%06d", count + 1);
+            }
+            shop.setCode(code);
+        } else if (request.getCode() != null && !request.getCode().isBlank()) {
+            shop.setCode(request.getCode().trim().toUpperCase());
+        }
+
         shop.setName(request.getName().trim());
         shop.setOwnerUserId(request.getOwnerUserId());
         shop.setPhone(request.getPhone());

@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/i18n/**",
                                 "/actuator/health",
                                 "/actuator/health/**",
                                 "/actuator/prometheus",

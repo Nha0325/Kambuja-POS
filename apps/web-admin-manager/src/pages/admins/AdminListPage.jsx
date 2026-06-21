@@ -1,6 +1,8 @@
 import AdminTable from "../../features/admins/components/AdminTable";
 import PageTitle from "../../shared/layout/PageTitle";
+import { useI18nStore } from "../../app/i18nStore";
 
 export default function AdminListPage() {
-  return <><PageTitle title="Admins" description="Business owners created by the platform manager." /><AdminTable /></>;
+  const { t } = useI18nStore();
+  return <><PageTitle title={t("admins.title", "Administrators")} description={t("admins.subtitle", "Manage platform administrators")} /><AdminTable /></>;
 }

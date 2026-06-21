@@ -1,18 +1,21 @@
 import { NavLink } from "react-router-dom";
-
-const links = [
-  ["/dashboard", "Dashboard"],
-  ["/admins", "Admins"],
-  ["/admins/create", "Create admin"],
-  ["/shops", "Shops"],
-  ["/location/provinces", "Locations"],
-  ["/reports/sales", "Sales report"],
-  ["/reports/stock", "Stock report"],
-  ["/notifications", "Notifications"],
-  ["/settings", "System settings"],
-];
+import { useI18nStore } from "../../app/i18nStore";
 
 export default function Sidebar() {
+  const { t } = useI18nStore();
+
+  const links = [
+    ["/dashboard", t("nav.dashboard")],
+    ["/admins", t("nav.admins")],
+    ["/admins/create", t("nav.create-admin")],
+    ["/shops", t("nav.shops")],
+    ["/location/provinces", t("nav.locations")],
+    ["/reports/sales", t("nav.sales-report")],
+    ["/reports/stock", t("nav.stock-report")],
+    ["/notifications", t("nav.notifications")],
+    ["/settings", t("nav.settings")],
+  ];
+
   return (
     <aside className="w-64 shrink-0 bg-slate-950 p-5 text-white">
       <p className="mb-8 text-lg font-bold">Kambuja POS</p>

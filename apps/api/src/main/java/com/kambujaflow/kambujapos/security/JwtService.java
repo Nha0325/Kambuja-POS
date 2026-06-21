@@ -20,11 +20,11 @@ public class JwtService {
     private final long expirationMs;
 
     public JwtService(
-            @Value("${security.jwt.secret}") String secret,
-            @Value("${security.jwt.expiration-ms}") long expirationMs
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-token-minutes}") long expirationMinutes
     ) {
         this.secret = secret;
-        this.expirationMs = expirationMs;
+        this.expirationMs = expirationMinutes * 60 * 1000;
     }
 
     public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
