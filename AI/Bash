@@ -1,0 +1,14 @@
+cd ~/Desktop/PROJECT_NAME
+code .
+
+
+
+curl -fsSL https://github.com/getkimchi/kimchi/releases/latest/download/install.sh | bash
+
+
+
+kimchi --version
+which kimchi
+
+
+kimchi setup
