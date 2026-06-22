@@ -1,1 +1,7 @@
-export { default } from "./ShopForm"
+import ShopForm from "./ShopForm"
+
+function CreateShop() {
+  return <ShopForm />
+}
+
+export default CreateShop

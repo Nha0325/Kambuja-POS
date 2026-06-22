@@ -33,7 +33,7 @@ const authGuard = async (req, res, next) => {
     } catch (error) {
         res.status(401).json({
             success: false,
-            error: "Authentication Invalid: Token verrification failed!"
+            error: "Authentication Invalid: Token verification failed!"
         })
     }
 }

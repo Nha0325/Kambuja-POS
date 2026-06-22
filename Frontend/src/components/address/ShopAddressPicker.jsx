@@ -120,35 +120,134 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
     }
   }
 
-  if (!open) return null
+  const handleBack = () => {
+    setSearch("")
 
-  const breadcrumbs = [
-    "Cambodia",
-    level !== "province" && selected.province?.nameEn,
-    (level === "commune" || level === "village") && selected.district?.nameEn,
-    level === "village" && selected.commune?.nameEn,
-  ].filter(Boolean)
+    if (level === "village") {
+      setLevel("commune")
+      return
+    }
+
+    if (level === "commune") {
+      setLevel("district")
+      return
+    }
+
+    if (level === "district") {
+      setLevel("province")
+    }
+  }
+
+  const getBreadcrumbItems = () => {
+    const items = [
+      {
+        key: "country",
+        label: "Cambodia",
+        targetLevel: "province",
+        disabled: level === "province",
+      },
+    ]
+
+    if (selected.province && ["district", "commune", "village"].includes(level)) {
+      items.push({
+        key: "province",
+        label: selected.province.nameEn,
+        targetLevel: "district",
+        disabled: level === "district",
+      })
+    }
+
+    if (selected.district && ["commune", "village"].includes(level)) {
+      items.push({
+        key: "district",
+        label: selected.district.nameEn,
+        targetLevel: "commune",
+        disabled: level === "commune",
+      })
+    }
+
+    if (selected.commune && level === "village") {
+      items.push({
+        key: "commune",
+        label: selected.commune.nameEn,
+        targetLevel: "village",
+        disabled: level === "village",
+      })
+    }
+
+    return items
+  }
+
+  const handleBreadcrumbClick = (targetLevel) => {
+    setSearch("")
+
+    if (targetLevel === "province") {
+      setLevel("province")
+      return
+    }
+
+    if (targetLevel === "district" && selected.province) {
+      setLevel("district")
+      return
+    }
+
+    if (targetLevel === "commune" && selected.district) {
+      setLevel("commune")
+      return
+    }
+
+    if (targetLevel === "village" && selected.commune) {
+      setLevel("village")
+    }
+  }
+
+  if (!open) return null
 
   const selectedAtLevel = selected[level]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-gray-300 bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-gray-200 bg-[#f8f9fa] px-5 py-4">
-          <h2 className="text-lg font-semibold text-gray-950">Select shop address</h2>
-          <button className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-950 transition-colors hover:bg-gray-100" type="button" onClick={onClose}>Close</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-6">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-xl">
+        <div className="flex items-start justify-between gap-4 border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 px-5 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Select shop address</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+              {getBreadcrumbItems().map((item, index) => (
+                <div key={item.key} className="flex items-center gap-2">
+                  {index > 0 && <span className="text-slate-300">›</span>}
+
+                  <button
+                    type="button"
+                    onClick={() => handleBreadcrumbClick(item.targetLevel)}
+                    disabled={item.disabled}
+                    className={[
+                      "rounded-full px-3 py-1 text-xs font-medium transition",
+                      item.disabled
+                        ? "cursor-default bg-violet-600 text-white shadow-sm"
+                        : "bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900",
+                    ].join(" ")}
+                  >
+                    {item.label}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <button
+            className="rounded-xl border border-violet-200 bg-white px-3 py-1.5 text-xs font-medium text-violet-700 shadow-sm transition-colors hover:bg-violet-50"
+            type="button"
+            onClick={onClose}
+          >
+            Close
+          </button>
         </div>
 
         <div className="space-y-4 p-5">
-          <div className="text-sm font-semibold text-gray-700">
-            {breadcrumbs.join(" > ")}
-          </div>
-
-          <div>
+          <div className="space-y-2">
             <label className="block space-y-2">
-              <span className="block text-xs font-bold uppercase tracking-[0.05em] text-gray-500">{levelLabels[level]}</span>
+              <span className="block text-xs font-bold uppercase tracking-[0.05em] text-slate-500">{levelLabels[level]}</span>
               <input
-                className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-950 outline-none transition-all focus:border-gray-950 focus:ring-1 focus:ring-gray-950"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search"
@@ -156,15 +255,17 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
             </label>
           </div>
 
-          <div className="max-h-80 overflow-y-auto rounded-lg border border-gray-300">
+          <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
             {items.map((item) => {
               const isSelected = selectedAtLevel?.code === item.code
               return (
                 <button
                   key={item.code}
                   type="button"
-                  className={`block w-full border-b border-gray-100 px-4 py-3 text-left text-sm last:border-b-0 hover:bg-[#f3f4f5] ${
-                    isSelected ? "bg-gray-950 text-white" : "bg-white text-gray-800"
+                  className={`w-full rounded-xl border px-4 py-3 text-left text-sm shadow-sm transition-all ${
+                    isSelected
+                      ? "border-violet-400 bg-violet-50 text-violet-900 ring-2 ring-violet-500/10"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-900"
                   }`}
                   onClick={() => handleSelect(item)}
                 >
@@ -173,12 +274,29 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
               )
             })}
             {items.length === 0 && (
-              <div className="px-4 py-6 text-center text-sm text-gray-500">No address found</div>
+              <div className="rounded-xl border border-dashed border-violet-200 bg-violet-50/40 px-4 py-10 text-center text-sm text-slate-500">
+                No address found
+              </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-2">
-            <button className="h-10 rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-950 transition-colors hover:bg-gray-100" type="button" onClick={onClose}>Cancel</button>
+          <div className="flex items-center justify-between gap-2 border-t border-violet-100 pt-4">
+            {level !== "province" ? (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="rounded-xl border border-violet-200 bg-white px-4 py-2 text-sm font-medium text-violet-700 shadow-sm transition hover:border-violet-300 hover:bg-violet-50"
+              >
+                Back
+              </button>
+            ) : <span />}
+            <button
+              className="h-10 rounded-xl border border-violet-200 bg-white px-4 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-50"
+              type="button"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
