@@ -26,19 +26,19 @@ show_menu() {
   echo -e "${CYAN}  Kambuja POS Git Push Menu${NC}"
   echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
   echo ""
-  echo -e "${GREEN}Backend (Spring Boot)${NC}"
+  echo -e "${GREEN}Backend (Node.js / Express)${NC}"
   echo -e "  ${YELLOW}1)${NC}  Update backend API endpoints"
   echo -e "  ${YELLOW}2)${NC}  Fix backend bug"
   echo -e "  ${YELLOW}3)${NC}  Add backend feature"
   echo -e "  ${YELLOW}4)${NC}  Update backend security/auth"
   echo -e "  ${YELLOW}5)${NC}  Update database schema/MongoDB"
   echo ""
-  echo -e "${GREEN}Frontend (Admin Manager)${NC}"
-  echo -e "  ${YELLOW}6)${NC}  Update admin manager UI"
-  echo -e "  ${YELLOW}7)${NC}  Fix admin manager bug"
-  echo -e "  ${YELLOW}8)${NC}  Add admin manager feature"
+  echo -e "${GREEN}Frontend (React)${NC}"
+  echo -e "  ${YELLOW}6)${NC}  Update frontend UI"
+  echo -e "  ${YELLOW}7)${NC}  Fix frontend bug"
+  echo -e "  ${YELLOW}8)${NC}  Add frontend feature"
   echo ""
-  echo -e "${GREEN}Frontend (Admin / Cashier)${NC}"
+  echo -e "${GREEN}POS Workflows${NC}"
   echo -e "  ${YELLOW}9)${NC}  Update admin/cashier UI"
   echo -e "  ${YELLOW}10)${NC} Fix admin/cashier bug"
   echo -e "  ${YELLOW}11)${NC} Add admin/cashier feature"
@@ -92,9 +92,9 @@ else
     3)  MSG="Add backend feature" ;;
     4)  MSG="Update backend security/auth" ;;
     5)  MSG="Update database schema/MongoDB" ;;
-    6)  MSG="Update admin manager UI" ;;
-    7)  MSG="Fix admin manager bug" ;;
-    8)  MSG="Add admin manager feature" ;;
+    6)  MSG="Update frontend UI" ;;
+    7)  MSG="Fix frontend bug" ;;
+    8)  MSG="Add frontend feature" ;;
     9)  MSG="Update admin/cashier UI" ;;
     10) MSG="Fix admin/cashier bug" ;;
     11) MSG="Add admin/cashier feature" ;;

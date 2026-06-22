@@ -1,99 +1,113 @@
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Split-Path -Parent $ScriptDir
-Set-Location $ProjectRoot
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
+$BackendDir = Join-Path $ProjectRoot "Backend"
+$FrontendDir = Join-Path $ProjectRoot "Frontend"
 
 $SkipBackend = $false
 $SkipFrontend = $false
 $SkipToolCheck = $false
+$RunBackend = $false
+$RunFrontend = $false
 
-for ($i = 0; $i -lt $args.Count; $i++) {
-    switch ($args[$i]) {
+foreach ($Arg in $args) {
+    switch ($Arg) {
         "--skip-backend" { $SkipBackend = $true }
         "--skip-frontend" { $SkipFrontend = $true }
         "--skip-tool-check" { $SkipToolCheck = $true }
+        "--run-backend" { $RunBackend = $true }
+        "--run-frontend" { $RunFrontend = $true }
+        "--help" {
+            Write-Host @"
+Usage: .\scripts\ps1\setup.ps1 [options]
+
+Options:
+  --skip-backend     Skip Backend dependency installation.
+  --skip-frontend    Skip Frontend dependency installation.
+  --skip-tool-check  Skip Node.js and npm checks.
+  --run-backend      Start Backend after setup.
+  --run-frontend     Start Frontend after setup.
+  --help             Show this help.
+"@
+            exit 0
+        }
+        default { Write-Host "Unknown option: $Arg" -ForegroundColor Red; exit 1 }
     }
 }
 
-function Section($Title) { Write-Host "`n$Title" -ForegroundColor Cyan }
-function Info($Msg) { Write-Host "  $Msg" -ForegroundColor Green }
-function Warn($Msg) { Write-Host "  WARNING: $Msg" -ForegroundColor Yellow }
-function Err($Msg) { Write-Host "  ERROR: $Msg" -ForegroundColor Red }
+function Section([string]$Title) { Write-Host "`n$Title" -ForegroundColor Cyan }
+function Info([string]$Message) { Write-Host "  $Message" -ForegroundColor Green }
+function Fail([string]$Message) { Write-Host "  ERROR: $Message" -ForegroundColor Red; exit 1 }
 
-Section "[1/5] Checking required tools"
+function Prepare-Env([string]$Target, [string]$Example) {
+    if (Test-Path $Target) {
+        Info "$Target already exists"
+        return
+    }
+    if (-not (Test-Path $Example)) { Fail "Missing env template: $Example" }
+    Copy-Item $Example $Target
+    Info "Created $Target from template"
+}
+
+function Install-Dependencies([string]$Directory, [string]$Label) {
+    if (-not (Test-Path (Join-Path $Directory "package.json"))) {
+        Fail "$Label\package.json was not found"
+    }
+
+    Push-Location $Directory
+    try {
+        if (Test-Path "package-lock.json") {
+            Info "Running npm ci in $Label"
+            npm.cmd ci --no-audit --no-fund
+        }
+        else {
+            Info "Running npm install in $Label"
+            npm.cmd install --no-audit --no-fund
+        }
+        if ($LASTEXITCODE -ne 0) { Fail "Dependency installation failed in $Label" }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+Section "[1/4] Checking project structure"
+if (-not (Test-Path $BackendDir)) { Fail "Backend directory was not found" }
+if (-not (Test-Path $FrontendDir)) { Fail "Frontend directory was not found" }
+Info "Project root: $ProjectRoot"
+
+Section "[2/4] Checking required tools"
 if ($SkipToolCheck) {
-    Info "Skipping tool checks"
-} else {
-    foreach ($Tool in @("git", "mongosh")) {
-        if (Get-Command $Tool -ErrorAction SilentlyContinue) {
-            Info "$Tool found."
-        } else {
-            Err "$Tool is missing."
-        }
-    }
-    if (-not $SkipBackend) {
-        if (Get-Command java -ErrorAction SilentlyContinue) {
-            Info "java found."
-        } else {
-            Err "java (JDK 21+) is missing."
-        }
-    }
-    if (-not $SkipFrontend) {
-        if (Get-Command node -ErrorAction SilentlyContinue) {
-            Info "node found."
-        } else {
-            Err "node (v20+) is missing."
-        }
-        if (Get-Command npm -ErrorAction SilentlyContinue) {
-            Info "npm found."
-        } else {
-            Err "npm is missing."
-        }
-    }
-}
-
-Section "[2/5] Preparing env files"
-if (-not (Test-Path "$ProjectRoot\.env")) {
-    Copy-Item "$ProjectRoot\.env.example" "$ProjectRoot\.env"
-    Info "Created .env from .env.example"
-    Warn "Replace JWT_SECRET, BOOTSTRAP_ADMIN_MANAGER_PASSWORD, and TELEGRAM_BOT_TOKEN before running."
-} else {
-    Info ".env already exists"
-}
-
-Section "[3/5] Install frontend dependencies"
-if ($SkipFrontend) {
     Info "Skipped"
-} else {
-    if (Get-Command npm -ErrorAction SilentlyContinue) {
-        Info "Installing apps\web-admin-manager..."
-        Push-Location "$ProjectRoot\apps\web-admin-manager"
-        npm ci --no-audit --no-fund
-        Pop-Location
+}
+else {
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) { Fail "Node.js 20+ is required" }
+    if (-not (Get-Command npm.cmd -ErrorAction SilentlyContinue)) { Fail "npm is required" }
 
-        Info "Installing apps\web-admin..."
-        Push-Location "$ProjectRoot\apps\web-admin"
-        npm ci --no-audit --no-fund
-        Pop-Location
-    }
+    $NodeVersion = node --version
+    $NodeMajor = [int](($NodeVersion -replace "^v", "") -split "\.")[0]
+    if ($NodeMajor -lt 20) { Fail "Node.js 20+ is required; found $NodeVersion" }
+
+    Info "Node.js: $NodeVersion"
+    Info "npm: $(npm.cmd --version)"
 }
 
-Section "[4/5] Backend check"
-if ($SkipBackend) {
-    Info "Skipped"
-} else {
-    if (Test-Path "$ProjectRoot\apps\api\mvnw.cmd") {
-        Info "Resolving backend dependencies..."
-        Push-Location "$ProjectRoot\apps\api"
-        .\mvnw.cmd -q -DskipTests dependency:go-offline
-        Pop-Location
-    } else {
-        Err "apps\api\mvnw.cmd not found."
-    }
-}
+Section "[3/4] Preparing environment files"
+Prepare-Env (Join-Path $BackendDir ".env") (Join-Path $BackendDir ".env.example")
+Prepare-Env (Join-Path $FrontendDir ".env") (Join-Path $FrontendDir ".env.example")
 
-Section "[5/5] Summary"
+Section "[4/4] Installing dependencies"
+if ($SkipBackend) { Info "Backend skipped" } else { Install-Dependencies $BackendDir "Backend" }
+if ($SkipFrontend) { Info "Frontend skipped" } else { Install-Dependencies $FrontendDir "Frontend" }
+
 Write-Host "`nSetup completed." -ForegroundColor Green
-Write-Host "Next steps:"
-Write-Host "  .\scripts\ps1\dev.ps1" -ForegroundColor Cyan
+Write-Host "Run validation: .\scripts\ps1\test.ps1"
+Write-Host "Start development: .\scripts\ps1\dev.ps1"
+
+if ($RunBackend -or $RunFrontend) {
+    $DevArgs = @()
+    if (-not $RunBackend) { $DevArgs += "--no-backend" }
+    if (-not $RunFrontend) { $DevArgs += "--no-frontend" }
+    & (Join-Path $ScriptDir "dev.ps1") @DevArgs
+}

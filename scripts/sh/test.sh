@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd -P)"
 
-echo -e "\033[0;36m[TEST]\033[0m Running Backend Tests..."
-if [ -f "$PROJECT_ROOT/apps/api/mvnw" ]; then
-  (cd "$PROJECT_ROOT/apps/api" && ./mvnw test)
-else
-  echo -e "\033[0;33m[WARN]\033[0m Backend not found, skipping."
-fi
+printf '\033[0;36m[TEST]\033[0m Backend validation\n'
+(cd "$PROJECT_ROOT/Backend" && npm test)
 
-echo -e "\033[0;32m[TEST]\033[0m All validations passed!"
+printf '\033[0;36m[TEST]\033[0m Frontend lint\n'
+(cd "$PROJECT_ROOT/Frontend" && npm run lint)
+
+printf '\033[0;36m[TEST]\033[0m Frontend build\n'
+(cd "$PROJECT_ROOT/Frontend" && npm run build)
+
+printf '\033[0;32m[TEST]\033[0m All validations passed\n'

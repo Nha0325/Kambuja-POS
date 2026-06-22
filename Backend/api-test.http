@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8080/api/v1
+@email = manager@example.local
+@password = replace-with-local-password
+@token = replace-with-token-from-login
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Current user
+GET {{baseUrl}}/auth/current
+Cookie: token={{token}}
+
+### ADMIN_MANAGER dashboard
+GET {{baseUrl}}/admin-manager/dashboard
+Cookie: token={{token}}
+
+### ADMIN_MANAGER shops
+GET {{baseUrl}}/admin-manager/shops
+Cookie: token={{token}}
+
+### ADMIN categories
+GET {{baseUrl}}/categories
+Cookie: token={{token}}
+
+### ADMIN products
+GET {{baseUrl}}/products
+Cookie: token={{token}}
+
+### CASHIER today sales
+GET {{baseUrl}}/sales/today
+Cookie: token={{token}}
+
+### CASHIER scan
+GET {{baseUrl}}/pos/scan/PRODUCT_CODE
+Cookie: token={{token}}

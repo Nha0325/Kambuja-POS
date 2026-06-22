@@ -8,7 +8,7 @@ $CYAN = "Cyan"
 $MAGENTA = "Magenta"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Split-Path -Parent $ScriptDir
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
 Set-Location $ProjectRoot
 
 function ShowMenu() {
@@ -16,17 +16,17 @@ function ShowMenu() {
     Write-Host "  Kambuja POS Git Push Menu" -ForegroundColor $CYAN
     Write-Host "═══════════════════════════════════════════════════`n" -ForegroundColor $CYAN
     
-    Write-Host "Backend (Spring Boot)" -ForegroundColor $GREEN
+    Write-Host "Backend (Node.js / Express)" -ForegroundColor $GREEN
     Write-Host "  1)  Update backend API endpoints"
     Write-Host "  2)  Fix backend bug"
     Write-Host "  3)  Add backend feature"
     Write-Host "  4)  Update backend security/auth"
     Write-Host "  5)  Update database schema/MongoDB`n"
     
-    Write-Host "Frontend (Admin Manager)" -ForegroundColor $GREEN
-    Write-Host "  6)  Update admin manager UI"
-    Write-Host "  7)  Fix admin manager bug"
-    Write-Host "  8)  Add admin manager feature`n"
+    Write-Host "Frontend (React)" -ForegroundColor $GREEN
+    Write-Host "  6)  Update frontend UI"
+    Write-Host "  7)  Fix frontend bug"
+    Write-Host "  8)  Add frontend feature`n"
     
     Write-Host "Frontend (Admin / Cashier)" -ForegroundColor $GREEN
     Write-Host "  9)  Update admin/cashier UI"
@@ -72,9 +72,9 @@ if ($args.Count -ge 1) {
         "3"  { $Msg = "Add backend feature" }
         "4"  { $Msg = "Update backend security/auth" }
         "5"  { $Msg = "Update database schema/MongoDB" }
-        "6"  { $Msg = "Update admin manager UI" }
-        "7"  { $Msg = "Fix admin manager bug" }
-        "8"  { $Msg = "Add admin manager feature" }
+        "6"  { $Msg = "Update frontend UI" }
+        "7"  { $Msg = "Fix frontend bug" }
+        "8"  { $Msg = "Add frontend feature" }
         "9"  { $Msg = "Update admin/cashier UI" }
         "10" { $Msg = "Fix admin/cashier bug" }
         "11" { $Msg = "Add admin/cashier feature" }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# dev.sh — Start everything for Kambuja POS local development
+# dev.sh — Start Backend + Frontend for Kambuja POS local development
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -9,40 +9,38 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd -P)"
 
 # shellcheck source=./load-env.sh
 source "$PROJECT_ROOT/scripts/sh/load-env.sh"
-load_root_env "$PROJECT_ROOT"
 
 LOG_DIR="$PROJECT_ROOT/logs"
 mkdir -p "$LOG_DIR"
 
-BACKEND_PORT="${SERVER_PORT:-8080}"
-MANAGER_PORT="${WEB_ADMIN_MANAGER_PORT:-5173}"
-WEB_ADMIN_PORT="${WEB_ADMIN_PORT:-5174}"
+if ! load_env_file "$PROJECT_ROOT/Backend/.env"; then
+  printf '[DEV] Backend/.env is missing. Run ./scripts/sh/setup.sh first.\n' >&2
+  exit 1
+fi
+
+BACKEND_PORT="${PORT:-${SERVER_PORT:-5000}}"
+FRONTEND_PORT="${FRONTEND_PORT:-5173}"
 NGROK_API_PORT="${NGROK_API_PORT:-4040}"
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
 USE_NGROK=false
 USE_CLOUDFLARE=false
-run_api=1
-run_manager=1
-run_web_admin=1
+run_backend=1
+run_frontend=1
 
 for arg in "$@"; do
   case "$arg" in
-    --api-only)    run_manager=0; run_web_admin=0 ;;
-    --no-api)      run_api=0 ;;
-    --no-manager)  run_manager=0 ;;
-    --no-web-admin)run_web_admin=0 ;;
-    --ngrok)       USE_NGROK=true ;;
-    --cloudflare)  USE_CLOUDFLARE=true; USE_NGROK=false ;;
+    --no-backend)    run_backend=0 ;;
+    --no-frontend)   run_frontend=0 ;;
+    --ngrok)         USE_NGROK=true ;;
+    --cloudflare)    USE_CLOUDFLARE=true; USE_NGROK=false ;;
     --help)
       cat <<'EOF'
 Usage: ./scripts/sh/dev.sh [options]
 
 Options:
-  --api-only       Start only apps/api.
-  --no-api         Skip apps/api.
-  --no-manager     Skip apps/web-admin-manager.
-  --no-web-admin   Skip apps/web-admin.
+  --no-backend     Skip Backend.
+  --no-frontend    Skip Frontend.
   --ngrok          Start ngrok tunnel for webhook/public access.
   --cloudflare     Start cloudflare tunnel (recommended over ngrok).
 EOF
@@ -116,30 +114,68 @@ free_project_port() {
   done
 }
 
-# ── MongoDB Check ────────────────────────────────────────────────────────────
+# ── MongoDB check ────────────────────────────────────────────────────────────
 check_mongodb() {
+  local mongo_uri="${MONGODB_URI:-mongodb://localhost:27017/kambuja_pos}"
+
   if command -v mongosh >/dev/null 2>&1; then
-    if ! mongosh "${MONGODB_URI:-mongodb://localhost:27017/kambuja_pos}" --quiet --eval 'db.runCommand({ ping: 1 }).ok' >/dev/null 2>&1; then
-      err "MongoDB is not reachable through MONGODB_URI."
-      exit 1
+    if mongosh "$mongo_uri" --quiet --eval 'db.runCommand({ ping: 1 }).ok' >/dev/null 2>&1; then
+      return
     fi
-    return
   fi
 
-  if [[ "${MONGODB_URI:-}" =~ ^mongodb://([^/:]+):([0-9]+) ]]; then
+  if [[ "$mongo_uri" =~ ^mongodb://(localhost|127\.0\.0\.1)(:([0-9]+))?/ ]]; then
     local host="${BASH_REMATCH[1]}"
-    local port="${BASH_REMATCH[2]}"
-    if command -v nc >/dev/null 2>&1 && ! nc -z "$host" "$port"; then
-      err "MongoDB is not reachable at $host:$port."
+    local port="${BASH_REMATCH[3]:-27017}"
+
+    if command -v nc >/dev/null 2>&1 && nc -z "$host" "$port"; then
+      return
+    fi
+
+    if command -v mongod >/dev/null 2>&1; then
+      local mongo_data_dir="$PROJECT_ROOT/data/mongodb"
+      local mongo_log="$LOG_DIR/mongodb.log"
+      mkdir -p "$mongo_data_dir"
+
+      log "Starting local MongoDB on port $port..."
+      mongod \
+        --dbpath "$mongo_data_dir" \
+        --bind_ip "$host" \
+        --port "$port" \
+        --logpath "$mongo_log" \
+        --logappend &
+      PIDS+=($!)
+
+      for _ in {1..30}; do
+        sleep 1
+        if command -v mongosh >/dev/null 2>&1; then
+          mongosh "$mongo_uri" --quiet --eval 'db.runCommand({ ping: 1 }).ok' >/dev/null 2>&1 && return
+        elif nc -z "$host" "$port" 2>/dev/null; then
+          return
+        fi
+      done
+
+      tail -n 30 "$mongo_log" >&2 || true
+      err "Local MongoDB failed to start on $host:$port."
       exit 1
     fi
   fi
+
+  err "MongoDB is not reachable through MONGODB_URI."
+  exit 1
 }
+
 
 # ── PID tracking ─────────────────────────────────────────────────────────────
 PIDS=()
+CLEANED_UP=0
 
 cleanup() {
+  if [ "$CLEANED_UP" -eq 1 ]; then
+    return
+  fi
+  CLEANED_UP=1
+
   if [ "${#PIDS[@]}" -eq 0 ]; then
     return
   fi
@@ -149,9 +185,8 @@ cleanup() {
     kill "$pid" 2>/dev/null || true
   done
 
-  free_project_port "$BACKEND_PORT" "API" || true
-  free_project_port "$MANAGER_PORT" "ADMIN_MANAGER" || true
-  free_project_port "$WEB_ADMIN_PORT" "ADMIN_CASHIER" || true
+  free_project_port "$BACKEND_PORT"  "Backend"  || true
+  free_project_port "$FRONTEND_PORT" "Frontend" || true
   if [ "$USE_NGROK" = true ]; then
     free_project_port "$NGROK_API_PORT" "ngrok" || true
   fi
@@ -175,9 +210,8 @@ wait_for_port() {
 
 # ── Free ports from previous runs ────────────────────────────────────────────
 log "Checking development ports..."
-free_project_port "$BACKEND_PORT" "API"
-free_project_port "$MANAGER_PORT" "ADMIN_MANAGER"
-free_project_port "$WEB_ADMIN_PORT" "ADMIN_CASHIER"
+free_project_port "$BACKEND_PORT"  "Backend"
+free_project_port "$FRONTEND_PORT" "Frontend"
 if [ "$USE_NGROK" = true ]; then
   free_project_port "$NGROK_API_PORT" "ngrok"
 fi
@@ -208,37 +242,62 @@ elif [ "$USE_NGROK" = true ]; then
 fi
 
 # ── 2. Backend ───────────────────────────────────────────────────────────────
-if ((run_api)); then
-  log "Starting Spring Boot API..."
+if ((run_backend)); then
+  log "Starting Backend..."
   check_mongodb
   (
-    cd "$PROJECT_ROOT/apps/api"
-    ./mvnw spring-boot:run > "$LOG_DIR/api.log" 2>&1
+    cd "$PROJECT_ROOT/Backend"
+    npm run migrate:roles >> "$LOG_DIR/backend.log" 2>&1
+    npm run seed >> "$LOG_DIR/backend.log" 2>&1
+  )
+  (
+    cd "$PROJECT_ROOT/Backend"
+    if node -e "process.exit(require('./package.json').scripts.dev ? 0 : 1)" 2>/dev/null; then
+      npm run dev > "$LOG_DIR/backend.log" 2>&1
+    elif node -e "process.exit(require('./package.json').scripts['start:dev'] ? 0 : 1)" 2>/dev/null; then
+      npm run start:dev > "$LOG_DIR/backend.log" 2>&1
+    elif node -e "process.exit(require('./package.json').scripts.start ? 0 : 1)" 2>/dev/null; then
+      npm start > "$LOG_DIR/backend.log" 2>&1
+    else
+      err "No 'dev', 'start:dev', or 'start' script found in Backend/package.json"
+      exit 1
+    fi
   ) &
   PIDS+=($!)
-  info "API log → logs/api.log"
+  info "Backend log → logs/backend.log"
 fi
 
-# ── 3. Frontend Admin Manager ────────────────────────────────────────────────
-if ((run_manager)); then
-  log "Starting ADMIN_MANAGER frontend..."
+# ── 3. Frontend ──────────────────────────────────────────────────────────────
+if ((run_frontend)); then
+  log "Starting Frontend..."
   (
-    cd "$PROJECT_ROOT/apps/web-admin-manager"
-    npm run dev -- --port "$MANAGER_PORT" --strictPort > "$LOG_DIR/web-admin-manager.log" 2>&1
+    cd "$PROJECT_ROOT/Frontend"
+    if node -e "process.exit(require('./package.json').scripts.dev ? 0 : 1)" 2>/dev/null; then
+      npm run dev -- --port "$FRONTEND_PORT" --strictPort > "$LOG_DIR/frontend.log" 2>&1
+    elif node -e "process.exit(require('./package.json').scripts.start ? 0 : 1)" 2>/dev/null; then
+      npm start > "$LOG_DIR/frontend.log" 2>&1
+    else
+      err "No 'dev' or 'start' script found in Frontend/package.json"
+      exit 1
+    fi
   ) &
   PIDS+=($!)
-  info "Manager log → logs/web-admin-manager.log"
+  info "Frontend log → logs/frontend.log"
 fi
 
-# ── 4. Frontend Admin/Cashier ────────────────────────────────────────────────
-if ((run_web_admin)); then
-  log "Starting ADMIN/CASHIER frontend..."
-  (
-    cd "$PROJECT_ROOT/apps/web-admin"
-    npm run dev -- --port "$WEB_ADMIN_PORT" --strictPort > "$LOG_DIR/web-admin.log" 2>&1
-  ) &
-  PIDS+=($!)
-  info "Admin/Cashier log → logs/web-admin.log"
+# ── 4. Readiness checks ──────────────────────────────────────────────────────
+if ((run_backend)); then
+  if ! wait_for_port "$BACKEND_PORT" "Backend"; then
+    tail -n 30 "$LOG_DIR/backend.log" >&2 || true
+    exit 1
+  fi
+fi
+
+if ((run_frontend)); then
+  if ! wait_for_port "$FRONTEND_PORT" "Frontend"; then
+    tail -n 30 "$LOG_DIR/frontend.log" >&2 || true
+    exit 1
+  fi
 fi
 
 # ── 5. Resolve Tunnel URLs ───────────────────────────────────────────────────
@@ -261,7 +320,6 @@ fi
 
 if [ -n "$PUBLIC_API_URL" ]; then
   log "Public API URL: ${YELLOW}$PUBLIC_API_URL${NC}"
-  # Update webhook automatically if we have a tunnel
   TELEGRAM_BOT_TOKEN=$(grep -E "^[[:space:]]*TELEGRAM_BOT_TOKEN=" "$PROJECT_ROOT/.env" | cut -d= -f2- | tr -d '"'\''\r' || true)
   if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ "$TELEGRAM_BOT_TOKEN" != "replace_with_botfather_token" ]; then
     WEBHOOK_URL="$PUBLIC_API_URL/api/telegram/webhook"
@@ -277,9 +335,8 @@ echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}  Kambuja POS Dev Environment Started${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
-((run_api)) && echo -e "  ${CYAN}Backend API     ${NC}→ http://localhost:$BACKEND_PORT"
-((run_manager)) && echo -e "  ${CYAN}Admin Manager UI${NC}→ http://localhost:$MANAGER_PORT"
-((run_web_admin)) && echo -e "  ${CYAN}Admin/Cashier UI${NC}→ http://localhost:$WEB_ADMIN_PORT"
+((run_backend))  && echo -e "  ${CYAN}Backend   ${NC}→ http://localhost:$BACKEND_PORT"
+((run_frontend)) && echo -e "  ${CYAN}Frontend  ${NC}→ http://localhost:$FRONTEND_PORT"
 [ -n "$PUBLIC_API_URL" ] && echo -e "  ${CYAN}Public Tunnel   ${NC}→ $PUBLIC_API_URL"
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
 echo -e "  Logs in ${YELLOW}./logs/${NC}"

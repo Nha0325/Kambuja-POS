@@ -1,189 +1,238 @@
-# Kambuja POS — Project Memory
+# Kambuja-POS Project Memory
 
-This file summarizes the **kambuja-pos** codebase so future AI agents can onboard quickly.
+## Project Identity
 
----
+This project is Kambuja-POS, a Node.js + Express + MongoDB/Mongoose backend and React + Vite + Tailwind frontend POS system.
 
-## 1. Project purpose
+Do not convert this project to Spring Boot.
+Do not convert MongoDB to MySQL.
+Do not create a new architecture unless explicitly requested.
+Work with the existing folder structure.
 
-`kambuja-pos` is a **B2B point-of-sale and inventory platform** built for the Cambodian market. It supports multi-shop management, product catalogs, stock tracking, sales processing, receipt generation, and Telegram notifications.
+## Current Root
 
-Key roles:
-- `ADMIN_MANAGER` — platform-level manager (creates shops, manages global settings)
-- `ADMIN` — shop owner/admin (manages products, inventory, staff)
-- `CASHIER` — shop cashier (processes sales, prints receipts)
+Project path:
+`/home/star/Desktop/Kambuja-POS`
 
----
+## Backend
 
-## 2. Tech stack
+Backend path:
+`Backend/`
 
-| Layer | Technology | Version |
-|---|---|---|
-| Backend | Spring Boot | 4.1.0 |
-| Language | Java | 21 |
-| Database | MongoDB | (local/cloud) |
-| Auth | Spring Security + JWT (jjwt 0.13.0) |
-| Docs | SpringDoc OpenAPI | 3.0.0 |
-| Monitoring | Spring Boot Actuator + Prometheus |
-| Frontend (Admin) | React + Vite + TailwindCSS | React 19.2.7, Tailwind 4.3.1, Vite 8.0.16 |
-| Frontend (Manager) | React + Vite + TailwindCSS | same versions |
-| State | Zustand | 5.0.14 |
-| HTTP client | Axios | 1.18.0 |
-| Build | Maven (api), npm (frontends) |
+Backend stack:
 
----
+* Node.js
+* Express
+* MongoDB
+* Mongoose
+* JWT auth
+* Role guards
+* File upload support
 
-## 3. Frontend structure
+Important backend folders:
 
-Two independent React SPAs in `apps/`:
+* `Backend/models`
+* `Backend/controller`
+* `Backend/routes`
+* `Backend/guards`
+* `Backend/helper`
+* `Backend/database`
+* `Backend/config`
 
-### `apps/web-admin-manager`
-- Role: `ADMIN_MANAGER` platform UI
-- Dev URL: `http://localhost:5173`
-- Structure: `features/`, `pages/`, `routes/`, `services/`, `shared/`, `layouts/`
-- Key feature areas: location/Cambodia provinces & districts, system settings, shop management
+Backend entry:
 
-### `apps/web-admin`
-- Role: `ADMIN` shop UI and `CASHIER` POS UI
-- Dev URL: `http://localhost:5174`
-- Structure: same pattern — `features/`, `pages/`, `routes/`, `services/`, `shared/`, `layouts/`
+* `Backend/server.js`
+* `Backend/app.js`
 
-Both use **Vite** with `@tailwindcss/vite` plugin and **Zustand** for state management.
+## Frontend
 
----
+Frontend path:
+`Frontend/`
 
-## 4. Backend structure
+Frontend stack:
 
-`apps/api` — Spring Boot monolith.
+* React
+* Vite
+* Tailwind CSS
+* React Router
+* Custom hooks
 
-Key packages under `com.kambujaflow.kambujapos`:
+Important frontend folders:
 
-| Package | Contents |
-|---|---|
-| `controller/` | REST controllers — `AuthController`, `AdminController`, `ShopController`, `ProductController`, `SaleController`, `CashierController`, `ReportController`, `TelegramController`, etc. |
-| `service/` | Business logic — `AuthService`, `SaleService`, `InventoryService`, `TelegramNotificationService`, etc. |
-| `repository/` | Spring Data MongoDB repositories |
-| `entity/` | Document models — `User`, `Shop`, `Product`, `Category`, `Inventory`, `Sale`, `Payment`, `Receipt`, `Customer`, `StockMovement`, `TelegramSetting`, `AuditLog`, `Notification` |
-| `dto/request/` | Input DTOs |
-| `dto/response/` | Output DTOs |
-| `security/` | `JwtAuthenticationFilter`, `JwtService`, `RoleGuard`, `ShopScopeGuard`, `UserDetailsServiceImpl` |
-| `enums/` | `RoleName`, `SaleStatus`, `PaymentMethod`, `PaymentStatus`, `ProductStatus`, `StockMovementType`, `CodeType`, `NotificationType`, `SettingType`, `ShopStatus`, `UserStatus` |
-| `config/` | `SecurityConfig`, `CorsConfig`, `MongoConfig`, `SwaggerConfig`, `TelegramConfig` |
-| `waf/` | Web Application Firewall filters — `RateLimitFilter`, `RequestValidationFilter`, `SqlInjectionPatternFilter`, `XssProtectionFilter`, `WafFilter` |
-| `util/` | `BarcodeUtil`, `DateUtil`, `FileUtil`, `MoneyUtil`, `ReceiptNumberUtil`, `SaleNumberUtil`, `StringUtil` |
-| `common/` | `ApiResponse`, `PageResponse`, `ErrorResponse`, `BusinessException`, `ResourceNotFoundException`, `GlobalExceptionHandler`, `Constants` (API_PREFIX="/api", DEFAULT_PAGE_SIZE=20, MAX_PAGE_SIZE=100) |
+* `Frontend/src/pages`
+* `Frontend/src/layouts`
+* `Frontend/src/components`
+* `Frontend/src/hooks`
+* `Frontend/src/configs`
+* `Frontend/src/utils`
 
----
+Frontend entry:
 
-## 5. Database structure
+* `Frontend/src/main.jsx`
+* `Frontend/src/App.jsx`
 
-**MongoDB** database (`kambuja_pos` by default). Collections correspond to `@Document` entity classes:
+## Roles
 
-| Collection | Entity | Purpose |
-|---|---|---|
-| `users` | `User` | Admin managers, admins, cashiers |
-| `shops` | `Shop` | Shop records |
-| `categories` | `Category` | Product categories |
-| `products` | `Product` | Product catalog |
-| `product_codes` | `ProductCode` | Barcodes/SKUs |
-| `inventories` | `Inventory` | Stock levels per shop |
-| `stock_movements` | `StockMovement` | In/out stock logs |
-| `sales` | `Sale` | Sales transactions |
-| `payments` | `Payment` | Payment records |
-| `receipts` | `Receipt` | Issued receipts |
-| `customers` | `Customer` | Customer records |
-| `settings` | `Setting` | System/shop settings |
-| `telegram_settings` | `TelegramSetting` | Bot token & webhook config |
-| `notifications` | `Notification` | In-app notifications |
-| `audit_logs` | `AuditLog` | Audit trail |
+Use exactly these roles:
 
-`application.yml`: `auto-index-creation: true`
+* `ADMIN_MANAGER`
+* `ADMIN`
+* `CASHIER`
 
----
+Do not use mixed role names like:
 
-## 6. Scripts and run commands
+* super
+* super_admin
+* adminmanage
+* admin manager
+* manager
 
-All scripts live in `scripts/sh/` (and Powershell versions in `scripts/ps1/`).
+## Role Meaning
 
-| Script | Purpose |
-|---|---|
-| `./scripts/sh/setup.sh` | Check tools, install frontend deps, prepare `.env`, validate backend |
-| `./scripts/sh/dev.sh` | Start MongoDB, backend API, and both frontends concurrently. Supports `--api-only`, `--no-api`, `--no-manager`, `--no-web-admin`, `--ngrok`, `--cloudflare` |
-| `./scripts/sh/test.sh` | Run backend unit tests (`./mvnw test`) |
-| `./scripts/sh/load-env.sh` | Helper to load `.env` into shell environment |
+`ADMIN_MANAGER`:
+Platform owner. Can manage shops, admin accounts, platform reports, and system logs.
 
-Or start apps individually:
-```bash
-cd apps/api && ./mvnw spring-boot:run
-cd apps/web-admin-manager && npm run dev
-cd apps/web-admin && npm run dev
-```
+`ADMIN`:
+Shop owner or shop manager. Can manage own shop products, inventory, purchases, suppliers, cashiers, reports, settings, and notification channels.
 
-Requirements: Java 21+, Node.js 20+, npm 10+, MongoDB, mongosh.
-Logs are written to `./logs/` when using `dev.sh`.
+`CASHIER`:
+Seller. Can scan products, create sales, receive payment, print receipts, and view own today sales.
 
----
+## Frontend Layouts
 
-## 7. Environment variables needed
+The frontend should have separate role-based layouts:
 
-Copy `.env.example` → `.env` and update secrets before production.
+* `AdminManagerLayout.jsx`
+* `AdminLayout.jsx`
+* `CashierLayout.jsx`
+* `AuthLayout.jsx`
 
-| Variable | Default | Notes |
-|---|---|---|
-| `APP_NAME` | `kambuja-pos-api` | |
-| `SERVER_PORT` | `8080` | API port |
-| `MONGODB_URI` | `mongodb://localhost:27017/kambuja_pos` | |
-| `JWT_SECRET` | *(none)* | **Required — must be ≥32 random bytes** |
-| `JWT_ISSUER` | `kambuja-pos-api` | |
-| `JWT_ACCESS_TOKEN_MINUTES` | `60` | |
-| `BOOTSTRAP_ADMIN_MANAGER_NAME` | `Platform Manager` | |
-| `BOOTSTRAP_ADMIN_MANAGER_EMAIL` | `manager@kambujaflow.local` | |
-| `BOOTSTRAP_ADMIN_MANAGER_PASSWORD` | `change-me-before-production` | **Change before production** |
-| `CORS_ENABLED` | `true` | |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:5174` | |
-| `WAF_ENABLED` | `true` | |
-| `WAF_MAX_REQUESTS_PER_MINUTE` | `120` | |
-| `TELEGRAM_BOT_TOKEN` | *(none)* | Required for Telegram notifications |
-| `MANAGEMENT_PORT` | `8081` | Actuator/Prometheus metrics |
+Route groups:
 
----
+* `/admin-manager/*`
+* `/admin/*`
+* `/cashier/*`
+* `/login`
 
-## 8. Khmer UI/business vocabulary
+## Database Collections
 
-The application supports Khmer language and Cambodia-specific location data.
+Use these main MongoDB collections for MVP:
 
-- **Language label:** `ខ្មែរ` — used in the language switcher (`value="km"`)
-- **Cambodia locations:** All 25 provinces and Phnom Penh districts are stored in `web-admin-manager/src/features/location/utils/cambodiaLocations.js`
-  - Province: `ខេត្ត` / `Province`
-  - District/Khan: `ស្រុក` / `Khan` / `District`
-  - Capital: `រាជធានី` / `Capital`
-  - Example provinces: `រាជធានីភ្នំពេញ` (Phnom Penh), `បន្ទាយមានជ័យ` (Banteay Meanchey), `បាត់ដំបង` (Battambang), `កំពង់ធំ` (Kampong Thom), `សៀមរាប` (Siem Reap)
+1. `users`
+2. `shops`
+3. `categories`
+4. `products`
+5. `product_codes`
+6. `inventory`
+7. `stock_movements`
+8. `sales`
+9. `payments`
+10. `receipts`
+11. `audit_logs`
+12. `notification_channels`
+13. `notification_logs`
 
-> **Rule:** Preserve all Khmer text exactly. Do not transliterate, romanize, or "clean up" Khmer strings.
+Do not add `customers` unless explicitly requested.
+Do not use `telegram_settings`; use `notification_channels` instead.
 
----
+## Create Shop Rules
 
-## 9. Rules for AI agents
+Create Shop is only for `ADMIN_MANAGER`.
 
-1. **Preserve Khmer text** — never edit, rename, or remove Khmer strings, file names containing Khmer, or Cambodia location data.
-2. **Do not rename files** without explicit user approval.
-3. **Do not delete files** without explicit user approval.
-4. Prefer creating new files over modifying large existing files when the change is isolated.
-5. Always run `./scripts/sh/test.sh` after backend changes.
-6. Do not commit secrets into `.env.example` or source code.
-7. Use `./scripts/sh/dev.sh` for local development rather than manually starting services.
-8. When adding new REST endpoints, prefix with `/api` (the API_PREFIX constant).
+Create Shop fields:
 
----
+* Shop Name
+* Shop Code, readonly and auto-generated by backend
+* Phone
+* Owner Admin select
+* Address Picker
+* Address Detail
+* Status
 
-## 10. Current known issues
+Shop Code format:
+`SHOP-{PROVINCE_CODE}-{RUNNING_NUMBER}`
 
-- **Test coverage is minimal:** Only `KambujaPosApplicationTests` and `UtilityTests` exist in `apps/api/src/test/`. The project would benefit from broader unit and integration test coverage.
-- **Telegram webhook dependency:** The backend startup does not fail hard on a missing `TELEGRAM_BOT_TOKEN`, but Telegram notification features will silently not work. The dev script warns if the token is the placeholder value.
-- **WAF audit mode:** The WAF can run in `WAF_AUDIT_ONLY=true` mode (logging only, no blocking) — useful for debugging false positives.
-- **Ngrok vs Cloudflare:** `dev.sh` supports both tunnel options, but Cloudflare (`--cloudflare`) is recommended over ngrok (`--ngrok`).
-- **No frontend tests** were discovered in the React apps; both `web-admin` and `web-admin-manager` lack test suites.
+Example:
+`SHOP-02-0001`
 
----
+Owner Admin must come from real users:
 
-*Generated from codebase exploration on 2026-06-21.*
+* role = `ADMIN`
+* status = `ACTIVE`
+* shopId = null
+
+## Address Picker Rules
+
+Use delivery-app-style address picker:
+Province → District/Municipality/Khan → Commune/Sangkat → Village
+
+Cambodia is only a breadcrumb/root label, not a selectable option.
+
+On first open:
+Show all provinces.
+
+After province selected:
+Show only districts inside that province.
+
+After district selected:
+Show only communes inside that district.
+
+After commune selected:
+Show only villages inside that commune.
+
+Search behavior:
+
+* If user types English, search and display English only.
+* If user types Khmer, search and display Khmer only.
+* If search is empty, display English + Khmer.
+
+Detect Khmer input using:
+`/[\u1780-\u17FF]/`
+
+## Checkout Rule
+
+Sale checkout must keep these consistent:
+
+* `sales`
+* `payments`
+* `inventory`
+* `stock_movements`
+* `receipts`
+* `audit_logs`
+
+Telegram or notification failure must not fail the sale.
+
+Rule:
+Stock update fail = sale fail.
+Payment save fail = sale fail.
+Telegram fail ≠ sale fail.
+Receipt print fail ≠ sale fail.
+
+## Coding Rules
+
+Before editing:
+
+* Read existing files.
+* Follow existing style.
+* Do not delete existing Admin/Cashier pages.
+* Do not rename folders unless requested.
+* Do not change unrelated files.
+* Keep frontend UI consistent with current style.
+* Add small safe changes first.
+* Test build or run relevant checks after changes.
+
+## Security Rules
+
+Frontend hiding menu is not enough.
+Backend must enforce:
+
+* login required
+* role permission
+* shop ownership/scope
+
+`ADMIN_MANAGER` can access all shops.
+`ADMIN` can access only own shop.
+`CASHIER` can access only own shop and only cashier features.
+
+Never expose `passwordHash`.
+Never commit `.env`.

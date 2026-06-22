@@ -8,7 +8,7 @@ $BLUE = "Cyan"
 $CYAN = "Cyan"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Split-Path -Parent $ScriptDir
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
 Set-Location $ProjectRoot
 
 $TargetRemote = "origin"

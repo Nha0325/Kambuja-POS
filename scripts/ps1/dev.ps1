@@ -1,156 +1,177 @@
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Split-Path -Parent $ScriptDir
-Set-Location $ProjectRoot
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
+$BackendDir = Join-Path $ProjectRoot "Backend"
+$FrontendDir = Join-Path $ProjectRoot "Frontend"
+$LogDir = Join-Path $ProjectRoot "logs"
+$BackendEnvPath = Join-Path $BackendDir ".env"
 
-$LogDir = "$ProjectRoot\logs"
-if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
+function Get-DotEnvValue([string]$Path, [string]$Name, [string]$DefaultValue) {
+    if (-not (Test-Path $Path)) { return $DefaultValue }
 
-$BackendPort = 8080
-$ManagerPort = 5173
-$WebAdminPort = 5174
-$NgrokApiPort = 4040
+    $Line = Get-Content $Path |
+        Where-Object { $_ -match "^\s*$([regex]::Escape($Name))=" } |
+        Select-Object -First 1
 
-$RunApi = $true
-$RunManager = $true
-$RunWebAdmin = $true
-$UseNgrok = $false
-$UseCloudflare = $false
+    if (-not $Line) { return $DefaultValue }
+    return (($Line -split "=", 2)[1].Trim().Trim('"').Trim("'"))
+}
 
-for ($i = 0; $i -lt $args.Count; $i++) {
-    switch ($args[$i]) {
-        "--api-only" { $RunManager = $false; $RunWebAdmin = $false }
-        "--no-api" { $RunApi = $false }
-        "--no-manager" { $RunManager = $false }
-        "--no-web-admin" { $RunWebAdmin = $false }
-        "--ngrok" { $UseNgrok = $true }
-        "--cloudflare" { $UseCloudflare = $true; $UseNgrok = $false }
+function Log([string]$Message) { Write-Host "[DEV] $Message" -ForegroundColor Green }
+function Info([string]$Message) { Write-Host "[DEV] $Message" -ForegroundColor Cyan }
+function Fail([string]$Message) { Write-Host "[DEV] $Message" -ForegroundColor Red; exit 1 }
+
+function Assert-PortFree([int]$Port, [string]$Label) {
+    $Connections = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+    if ($Connections) {
+        $Pids = ($Connections | Select-Object -ExpandProperty OwningProcess -Unique) -join ", "
+        Fail "$Label port $Port is already in use by PID(s): $Pids"
     }
 }
 
-function Log($Msg) { Write-Host "[DEV] $Msg" -ForegroundColor Green }
-function Info($Msg) { Write-Host "[DEV] $Msg" -ForegroundColor Cyan }
-function Warn($Msg) { Write-Host "[DEV] $Msg" -ForegroundColor Yellow }
-function Err($Msg) { Write-Host "[DEV] $Msg" -ForegroundColor Red }
-
-function Kill-Port($Port, $Label) {
-    $Conns = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-    if ($Conns) {
-        Warn "Stopping existing $Label process on port $Port"
-        $Conns | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
+function Wait-ForPort([int]$Port, [string]$Label, [int]$Retries = 30) {
+    for ($Attempt = 0; $Attempt -lt $Retries; $Attempt++) {
+        if (Test-NetConnection -ComputerName "localhost" -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue) {
+            Log "$Label ready on port $Port"
+            return
+        }
         Start-Sleep -Seconds 1
     }
+    Fail "$Label did not start on port $Port within $Retries seconds"
 }
 
-function Check-MongoDB() {
-    if (Get-Command mongosh -ErrorAction SilentlyContinue) {
-        $Uri = "mongodb://localhost:27017/kambuja_pos"
-        $EnvPath = "$ProjectRoot\.env"
-        if (Test-Path $EnvPath) {
-            $Line = Get-Content $EnvPath | Where-Object { $_ -match "^MONGODB_URI=" } | Select-Object -First 1
-            if ($Line) { $Uri = ($Line -split "=", 2)[1].Trim('"') }
-        }
-        
-        mongosh $Uri --quiet --eval "db.runCommand({ ping: 1 }).ok" >$null 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Err "MongoDB is not reachable through MONGODB_URI."
-            exit 1
-        }
-    }
-}
-
-Log "Checking development ports..."
-Kill-Port $BackendPort "API"
-Kill-Port $ManagerPort "ADMIN_MANAGER"
-Kill-Port $WebAdminPort "ADMIN_CASHIER"
-if ($UseNgrok) { Kill-Port $NgrokApiPort "ngrok" }
-if ($UseCloudflare) {
-    Get-Process cloudflared -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-}
-
-$Jobs = @()
-
-$PublicApiUrl = ""
-if ($UseCloudflare) {
-    if (Get-Command cloudflared -ErrorAction SilentlyContinue) {
-        Log "Starting Cloudflare Tunnel..."
-        $Jobs += Start-Process cloudflared -ArgumentList "tunnel","--url","http://localhost:$BackendPort","--no-autoupdate" -RedirectStandardOutput "$LogDir\cloudflare-tunnel.log" -RedirectStandardError "$LogDir\cloudflare-tunnel.log" -WindowStyle Hidden -PassThru
-    }
-} elseif ($UseNgrok) {
-    if (Get-Command ngrok -ErrorAction SilentlyContinue) {
-        Log "Starting ngrok tunnel..."
-        $Jobs += Start-Process ngrok -ArgumentList "http","$BackendPort","--log=stdout" -RedirectStandardOutput "$LogDir\ngrok.log" -RedirectStandardError "$LogDir\ngrok.log" -WindowStyle Hidden -PassThru
-    }
-}
-
-if ($RunApi) {
-    Log "Starting Spring Boot API..."
-    Check-MongoDB
-    Push-Location "$ProjectRoot\apps\api"
-    $Jobs += Start-Process "cmd.exe" -ArgumentList "/c mvnw.cmd spring-boot:run" -RedirectStandardOutput "$LogDir\api.log" -RedirectStandardError "$LogDir\api.log" -WindowStyle Hidden -PassThru
-    Pop-Location
-    Info "API log -> logs/api.log"
-}
-
-if ($RunManager) {
-    Log "Starting ADMIN_MANAGER frontend..."
-    Push-Location "$ProjectRoot\apps\web-admin-manager"
-    $Jobs += Start-Process "cmd.exe" -ArgumentList "/c npm run dev -- --port $ManagerPort --strictPort" -RedirectStandardOutput "$LogDir\web-admin-manager.log" -RedirectStandardError "$LogDir\web-admin-manager.log" -WindowStyle Hidden -PassThru
-    Pop-Location
-    Info "Manager log -> logs/web-admin-manager.log"
-}
-
-if ($RunWebAdmin) {
-    Log "Starting ADMIN/CASHIER frontend..."
-    Push-Location "$ProjectRoot\apps\web-admin"
-    $Jobs += Start-Process "cmd.exe" -ArgumentList "/c npm run dev -- --port $WebAdminPort --strictPort" -RedirectStandardOutput "$LogDir\web-admin.log" -RedirectStandardError "$LogDir\web-admin.log" -WindowStyle Hidden -PassThru
-    Pop-Location
-    Info "Admin/Cashier log -> logs/web-admin.log"
-}
-
-if ($UseCloudflare) {
-    for ($i = 0; $i -lt 15; $i++) {
-        Start-Sleep -Seconds 1
-        if (Test-Path "$LogDir\cloudflare-tunnel.log") {
-            $Line = Get-Content "$LogDir\cloudflare-tunnel.log" | Where-Object { $_ -match "https://[a-z0-9-]+\.trycloudflare\.com" } | Select-Object -First 1
-            if ($Line -match "(https://[a-z0-9-]+\.trycloudflare\.com)") {
-                $PublicApiUrl = $Matches[1]
-                break
-            }
-        }
-    }
-} elseif ($UseNgrok) {
-    Start-Sleep -Seconds 4
+function Ensure-MongoDB([string]$MongoUri) {
     try {
-        $Resp = Invoke-RestMethod -Uri "http://localhost:$NgrokApiPort/api/tunnels" -ErrorAction SilentlyContinue
-        if ($Resp.tunnels) {
-            $PublicApiUrl = $Resp.tunnels[0].public_url
+        $ParsedUri = [Uri]$MongoUri
+    }
+    catch {
+        Fail "MONGODB_URI is invalid"
+    }
+
+    $MongoHost = $ParsedUri.Host
+    $MongoPort = if ($ParsedUri.Port -gt 0) { $ParsedUri.Port } else { 27017 }
+
+    if (Test-NetConnection -ComputerName $MongoHost -Port $MongoPort -InformationLevel Quiet -WarningAction SilentlyContinue) {
+        return
+    }
+
+    if (($MongoHost -ne "localhost") -and ($MongoHost -ne "127.0.0.1")) {
+        Fail "MongoDB is not reachable through MONGODB_URI"
+    }
+
+    $Mongod = Get-Command mongod.exe -ErrorAction SilentlyContinue
+    if (-not $Mongod) { $Mongod = Get-Command mongod -ErrorAction SilentlyContinue }
+    if (-not $Mongod) { Fail "MongoDB is not running and mongod was not found" }
+
+    $MongoDataDir = Join-Path $ProjectRoot "data\mongodb"
+    $MongoLog = Join-Path $LogDir "mongodb.log"
+    New-Item -ItemType Directory -Path $MongoDataDir -Force | Out-Null
+
+    Log "Starting local MongoDB on port $MongoPort..."
+    $script:Processes += Start-Process $Mongod.Source `
+        -ArgumentList "--dbpath", $MongoDataDir, "--bind_ip", "127.0.0.1", "--port", "$MongoPort", "--logpath", $MongoLog, "--logappend" `
+        -WindowStyle Hidden `
+        -PassThru
+
+    Wait-ForPort $MongoPort "MongoDB"
+}
+
+$RunBackend = $true
+$RunFrontend = $true
+
+foreach ($Arg in $args) {
+    switch ($Arg) {
+        "--no-backend" { $RunBackend = $false }
+        "--no-frontend" { $RunFrontend = $false }
+        "--help" {
+            Write-Host @"
+Usage: .\scripts\ps1\dev.ps1 [options]
+
+Options:
+  --no-backend   Skip Backend.
+  --no-frontend  Skip Frontend.
+  --help         Show this help.
+"@
+            exit 0
         }
-    } catch {}
+        default { Fail "Unknown option: $Arg" }
+    }
 }
 
-if ($PublicApiUrl) {
-    Log "Public API URL: $PublicApiUrl"
+if (-not (Test-Path (Join-Path $BackendDir "package.json"))) {
+    Fail "Backend\package.json was not found"
+}
+if (-not (Test-Path (Join-Path $FrontendDir "package.json"))) {
+    Fail "Frontend\package.json was not found"
 }
 
-Write-Host "`n═══════════════════════════════════════════════════" -ForegroundColor Green
-Write-Host "  Kambuja POS Dev Environment Started" -ForegroundColor Green
-Write-Host "═══════════════════════════════════════════════════" -ForegroundColor Green
-if ($RunApi) { Write-Host "  Backend API     -> http://localhost:$BackendPort" -ForegroundColor Cyan }
-if ($RunManager) { Write-Host "  Admin Manager UI-> http://localhost:$ManagerPort" -ForegroundColor Cyan }
-if ($RunWebAdmin) { Write-Host "  Admin/Cashier UI-> http://localhost:$WebAdminPort" -ForegroundColor Cyan }
-if ($PublicApiUrl) { Write-Host "  Public Tunnel   -> $PublicApiUrl" -ForegroundColor Cyan }
-Write-Host "═══════════════════════════════════════════════════" -ForegroundColor Green
-Write-Host "  Logs in ./logs/" -ForegroundColor Yellow
-Write-Host "  Close this window or press Ctrl+C to stop services" -ForegroundColor Red
-Write-Host ""
+New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
+
+$ServerPort = Get-DotEnvValue $BackendEnvPath "SERVER_PORT" "5000"
+$BackendPort = [int](Get-DotEnvValue $BackendEnvPath "PORT" $ServerPort)
+$FrontendPort = if ($env:FRONTEND_PORT) { [int]$env:FRONTEND_PORT } else { 5173 }
+$MongoUri = Get-DotEnvValue $BackendEnvPath "MONGODB_URI" "mongodb://localhost:27017/kambuja_pos"
+$Processes = @()
+
+if ($RunBackend) { Assert-PortFree $BackendPort "Backend" }
+if ($RunFrontend) { Assert-PortFree $FrontendPort "Frontend" }
 
 try {
+    if ($RunBackend) {
+        Ensure-MongoDB $MongoUri
+        Log "Migrating roles and ensuring configured ADMIN_MANAGER exists..."
+        Push-Location $BackendDir
+        try {
+            & npm.cmd run migrate:roles
+            if ($LASTEXITCODE -ne 0) { Fail "Backend role migration failed" }
+            & npm.cmd run seed
+            if ($LASTEXITCODE -ne 0) { Fail "Backend seed failed" }
+        }
+        finally {
+            Pop-Location
+        }
+
+        Log "Starting Backend..."
+        $BackendLog = Join-Path $LogDir "backend.log"
+        $BackendErrorLog = Join-Path $LogDir "backend-error.log"
+        $Processes += Start-Process "npm.cmd" `
+            -ArgumentList "run", "start:dev" `
+            -WorkingDirectory $BackendDir `
+            -RedirectStandardOutput $BackendLog `
+            -RedirectStandardError $BackendErrorLog `
+            -WindowStyle Hidden `
+            -PassThru
+        Info "Backend logs: logs\backend.log and logs\backend-error.log"
+        Wait-ForPort $BackendPort "Backend"
+    }
+
+    if ($RunFrontend) {
+        Log "Starting Frontend..."
+        $FrontendLog = Join-Path $LogDir "frontend.log"
+        $FrontendErrorLog = Join-Path $LogDir "frontend-error.log"
+        $Processes += Start-Process "npm.cmd" `
+            -ArgumentList "run", "dev", "--", "--port", "$FrontendPort", "--strictPort" `
+            -WorkingDirectory $FrontendDir `
+            -RedirectStandardOutput $FrontendLog `
+            -RedirectStandardError $FrontendErrorLog `
+            -WindowStyle Hidden `
+            -PassThru
+        Info "Frontend logs: logs\frontend.log and logs\frontend-error.log"
+        Wait-ForPort $FrontendPort "Frontend"
+    }
+
+    Write-Host ""
+    if ($RunBackend) { Write-Host "Backend:  http://localhost:$BackendPort" -ForegroundColor Cyan }
+    if ($RunFrontend) { Write-Host "Frontend: http://localhost:$FrontendPort" -ForegroundColor Cyan }
+    Write-Host "Press Ctrl+C to stop services." -ForegroundColor Yellow
+
     while ($true) { Start-Sleep -Seconds 1 }
-} finally {
-    Write-Host "`nShutting down services..." -ForegroundColor Yellow
-    foreach ($Job in $Jobs) {
-        if (-not $Job.HasExited) { Stop-Process -Id $Job.Id -Force -ErrorAction SilentlyContinue }
+}
+finally {
+    foreach ($Process in $Processes) {
+        if ($Process -and -not $Process.HasExited) {
+            Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
+        }
     }
 }

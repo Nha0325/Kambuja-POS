@@ -1,92 +1,73 @@
-# Kambuja Flow Digital POS
+# Kambuja POS
 
-`kambuja-pos` is a B2B point-of-sale and inventory platform.
+Kambuja POS contains a Node.js/Express backend and a React/Vite frontend.
 
 ## Applications
 
-| Application | Purpose | Default URL |
+| Application | Path | Default URL |
 |---|---|---|
-| `apps/api` | Spring Boot, MongoDB, JWT, Telegram notifications | `http://localhost:8080` |
-| `apps/web-admin-manager` | `ADMIN_MANAGER` platform UI | `http://localhost:5173` |
-| `apps/web-admin` | `ADMIN` shop UI and `CASHIER` POS UI | `http://localhost:5174` |
+| Backend API | `Backend/` | `http://localhost:8080` |
+| Frontend | `Frontend/` | `http://localhost:5173` |
 
-Telegram logic is implemented inside `apps/api`. There is no separate Telegram service.
+The API routes are mounted under `/api/v1`.
 
 ## Requirements
 
-- Java 21+
 - Node.js 20+
-- npm 10+
+- npm
 - MongoDB
 
 ## Setup
 
 ```bash
-cp .env.example .env
-./scripts/setup.sh
+./scripts/sh/setup.sh
 ```
 
-Update `JWT_SECRET` and `BOOTSTRAP_ADMIN_MANAGER_PASSWORD` in `.env` before using the application outside local development.
+The setup script installs dependencies from both lock files and creates missing application env files from their templates.
+
+Update the placeholder secrets and credentials before starting the application.
 
 ## Development
 
-Start MongoDB first, then run:
+Start MongoDB, then run:
 
 ```bash
-./scripts/dev.sh
+./scripts/sh/dev.sh
 ```
 
-Or start applications separately:
+Start applications separately:
 
 ```bash
-cd apps/api && ./mvnw spring-boot:run
-cd apps/web-admin-manager && npm run dev
-cd apps/web-admin && npm run dev
+cd Backend && npm run dev
+cd Frontend && npm run dev
+```
+
+Available development flags:
+
+```bash
+./scripts/sh/dev.sh --no-frontend
+./scripts/sh/dev.sh --no-backend
 ```
 
 ## Validation
 
 ```bash
-./scripts/test.sh
+./scripts/sh/test.sh
 ```
 
-Additional commands:
+This validates Backend JavaScript syntax, runs Frontend lint, and creates a production Frontend build.
 
-```bash
-./scripts/status.sh
-./scripts/seed.sh
+## Windows
+
+```powershell
+.\scripts\ps1\setup.ps1
+.\scripts\ps1\dev.ps1
+.\scripts\ps1\test.ps1
 ```
 
-Operational support:
+## Environment
 
-- Docker Compose: `infra/docker-compose.yml`
-- Nginx examples: `infra/nginx/`
-- MongoDB backup and restore: `infra/backup/`
-- Firewall examples: `infra/firewall/`
-- Prometheus configuration: `infra/monitoring/prometheus.yml`
-- Safe Git helpers: `scripts/git-pull.*`, `scripts/git-push.*`, `scripts/git-sync.*`
+- Backend: `Backend/.env`
+- Frontend: `Frontend/.env`
 
-## Authentication
-
-The API creates an initial `ADMIN_MANAGER` only when the `users` collection is empty. Credentials come from:
-
-- `BOOTSTRAP_ADMIN_MANAGER_EMAIL`
-- `BOOTSTRAP_ADMIN_MANAGER_PASSWORD`
-
-All protected API requests require:
-
-```http
-Authorization: Bearer <token>
-```
-
-## Documentation
-
-- [System architecture](docs/architecture/system-overview.md)
-- [Folder structure](docs/architecture/folder-structure.md)
-- [API reference](docs/api/endpoints.md)
-- [MongoDB collections](docs/database/collections.md)
-- [Security checklist](docs/security/security-checklist.md)
-- [Deployment checklist](docs/deployment-checklist.md)
-- [Feature map](docs/features/feature-map.md)
-- [QA checklist](docs/testing/qa-checklist.md)
-- [Operations runbook](docs/operations/runbook.md)
+The Frontend API base URL is configured with `VITE_BASE_URL` in `Frontend/.env`.

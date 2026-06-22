@@ -1,16 +1,3 @@
 gh repo edit Nha0325/Kambuja-POS --visibility public
 
-
-
 gh repo edit Nha0325/Kambuja-POS --visibility private
-
-
-
-# ១. ត្រលប់មកកាន់ folder ដើមរបស់ project សិន
-cd ~/Desktop/Kambuja-POS
-
-# ២. ដក .env ចេញពី Git (ប៉ុន្តែមិនលុបចេញពីកុំព្យូទ័រទេ)
-git rm --cached .env
-
-# ៣. Push ការផ្លាស់ប្តូរនេះទៅ GitHub
-./scripts/sh/git-push.sh
