@@ -12,7 +12,7 @@ const Modal= ({ open, size = "md" , onClose, children, title }) => {
     return <>
         <div
             className={`
-          fixed inset-0 flex  backdrop-blur-sm transition-colors duration-300 justify-center items-center
+          fixed inset-0 z-50 flex justify-center items-center overflow-y-auto p-3 backdrop-blur-sm transition-colors duration-300
           ${open ? "visible bg-slate-300/30" : "invisible"}
         `}
         >
@@ -20,13 +20,13 @@ const Modal= ({ open, size = "md" , onClose, children, title }) => {
             <div
                 onClick={(e) => e.stopPropagation()}
                 className={`
-            bg-white rounded-xl shadow-xl p-6 transition-all w-[90%] mx-auto relative
+            bg-white rounded-xl shadow-xl p-4 sm:p-6 transition-all w-full max-h-[calc(100vh-2rem)] overflow-y-auto mx-auto relative
             ${sizes[size]}
             ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}
           `}
             >
-                <div className="flex justify-between items-center relative">
-                    <h1 className="text-3xl font-semibold">{title}</h1>
+                <div className="relative flex items-start justify-between gap-3">
+                    <h1 className="min-w-0 text-xl font-semibold sm:text-3xl">{title}</h1>
                     <button
                         onClick={onClose}
                         className="p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"

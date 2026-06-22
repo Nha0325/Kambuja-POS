@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { notificationService } from "../../../services/notification.service"
+import { adminSurface } from "../adminPageUi"
 
 function NotificationChannels() {
   const [channels, setChannels] = useState([])
@@ -34,20 +35,43 @@ function NotificationChannels() {
   }
 
   return (
-    <section className="max-w-xl">
-      <h1 className="text-xl font-semibold">Notification Channels</h1>
-      <form onSubmit={submit} className="mt-4 space-y-4 border border-gray-200 bg-white p-5">
+    <section className={adminSurface.page}>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>Notifications</p>
+          <h1 className={adminSurface.title}>Notification Channels</h1>
+          <p className={adminSurface.description}>
+            Configure delivery channels used for shop alerts and operational updates.
+          </p>
+        </div>
+      </div>
+
+      <div className={adminSurface.statGrid}>
+        {[
+          ["Configured", channels.length],
+          ["Enabled", channels.filter((channel) => channel?.enabled).length],
+          ["Type", "Telegram"],
+          ["Current", enabled ? "Enabled" : "Disabled"],
+        ].map(([label, value]) => (
+          <div key={label} className={adminSurface.statCard}>
+            <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className={adminSurface.statValue}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <form onSubmit={submit} className={`${adminSurface.card} max-w-2xl space-y-5`}>
         <label className="form-control">
-          <span className="mb-1 text-sm">Telegram Chat ID</span>
-          <input required className="input input-bordered" value={chatId} onChange={(event) => setChatId(event.target.value)} />
+          <span className="mb-2 text-sm font-semibold text-[#0b1c30]">Telegram Chat ID</span>
+          <input required className={`${adminSurface.input} h-12 w-full`} value={chatId} onChange={(event) => setChatId(event.target.value)} />
         </label>
-        <label className="flex items-center gap-2">
-          <input className="checkbox checkbox-sm" type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />
-          <span className="text-sm">Enabled</span>
+        <label className="flex items-center gap-3 rounded-xl border border-[#d7dced] bg-[#f8f9ff] px-4 py-3">
+          <input className="checkbox checkbox-sm border-[#0058be] checked:border-[#0058be] checked:bg-[#0058be]" type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />
+          <span className="text-sm font-medium text-[#213145]">Enabled</span>
         </label>
-        <button className="btn btn-sm btn-neutral" type="submit">Save</button>
+        <button className={adminSurface.primaryButton} type="submit">Save</button>
       </form>
-      <p className="mt-3 text-xs text-gray-500">{channels.length} configured channel(s)</p>
     </section>
   )
 }

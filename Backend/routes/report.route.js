@@ -5,7 +5,7 @@ const shopScopeGuard = require("../guards/shop-scope.guard")
 
 const router = express.Router()
 
-router.use(restrict("ADMIN"), shopScopeGuard)
+router.use(restrict("ADMIN_MANAGER", "ADMIN"), shopScopeGuard)
 
 router.get("/general",generalReport)
 router.get("/sale",saleReport)

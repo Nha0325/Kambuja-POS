@@ -100,10 +100,10 @@ function EditProduct() {
   }, [product, isFinding]);
 
   return (
-    <div className="p-4">
+    <div className="w-full max-w-full p-3 sm:p-4">
       <h1 className="text-xl font-semibold text-black">Edit Product</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-5xl w-full mt-4 grid md:grid-cols-2 gap-4 items-start">
+      <form onSubmit={handleSubmit} className="mt-4 grid w-full max-w-5xl grid-cols-1 items-start gap-4 md:grid-cols-2">
         {/* Left Side Controls */}
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="mb-3">
@@ -180,9 +180,9 @@ function EditProduct() {
             ></textarea>
           </div>
 
-          <div className="flex justify-end items-center space-x-2 mt-4">
-            <Link to="/admin/products" className="btn btn-sm">Cancel</Link>
-            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral">
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <Link to="/admin/products" className="btn btn-sm w-full sm:w-auto">Cancel</Link>
+            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-auto">
               {isLoading ? <span className="loading loading-spinner loading-xs"></span> : "Update"}
             </button>
           </div>
@@ -192,7 +192,7 @@ function EditProduct() {
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <label className="block text-sm font-medium mb-2">Product Image*</label>
           {preview ? (
-            <div className="relative w-full h-64 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 flex items-center justify-center">
+            <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50 sm:h-64">
               <img
                 src={preview}
                 alt="Preview"
@@ -207,7 +207,7 @@ function EditProduct() {
               </button>
             </div>
           ) : (
-            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition">
+            <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition hover:border-gray-400 hover:bg-gray-50 sm:h-64">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                 <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload new image</span></p>

@@ -5,6 +5,10 @@ import Home from "../pages/admin/Dashboard"
 import Supplier from "../pages/admin/supplier/Supplier"
 import CreateSupplier from "../pages/admin/supplier/CreateSupplier"
 import EditSupplier from "../pages/admin/supplier/EditSupplier"
+import Customer from "../pages/admin/customer/Customer"
+import CreateCustomer from "../pages/admin/customer/CreateCustomer"
+import EditCustomer from "../pages/admin/customer/EditCustomer"
+import Profile from "../pages/profile/Profile"
 import Category from "../pages/admin/category/Category"
 import CreateCategory from "../pages/admin/category/CreateCategory"
 import EditCategory from "../pages/admin/category/EditCategory"
@@ -42,6 +46,10 @@ export const adminRoutes = (
       <Route path="suppliers" element={<Supplier />} />
       <Route path="suppliers/create" element={<CreateSupplier />} />
       <Route path="suppliers/:id/edit" element={<EditSupplier />} />
+      <Route path="customers" element={<Customer />} />
+      <Route path="customers/create" element={<CreateCustomer />} />
+      <Route path="customers/:id/edit" element={<EditCustomer />} />
+      <Route path="profile" element={<Profile />} />
       <Route path="categories" element={<Category />} />
       <Route path="categories/create" element={<CreateCategory />} />
       <Route path="categories/:id/edit" element={<EditCategory />} />
@@ -69,6 +77,9 @@ export const adminRoutes = (
       <Route path="/supplier" element={<Supplier />} />
       <Route path="/supplier/create" element={<CreateSupplier />} />
       <Route path="/supplier/edit/:id" element={<EditSupplier />} />
+      <Route path="/customer" element={<Customer />} />
+      <Route path="/customer/create" element={<CreateCustomer />} />
+      <Route path="/customer/edit/:id" element={<EditCustomer />} />
       <Route path="/category" element={<Category />} />
       <Route path="/category/create" element={<CreateCategory />} />
       <Route path="/category/edit/:id" element={<EditCategory />} />

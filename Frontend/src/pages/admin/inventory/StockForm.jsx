@@ -28,7 +28,7 @@ function StockForm({ mode }) {
   }
 
   return (
-    <section className="max-w-xl">
+    <section className="w-full max-w-xl">
       <h1 className="text-xl font-semibold">{mode === "stock-in" ? "Stock In" : "Stock Adjustment"}</h1>
       <form onSubmit={submit} className="mt-4 space-y-4 border border-gray-200 bg-white p-5">
         <label className="form-control">
@@ -46,9 +46,9 @@ function StockForm({ mode }) {
           <span className="mb-1 text-sm">Note</span>
           <input className="input input-bordered" value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} />
         </label>
-        <div className="flex justify-end gap-2">
-          <Link className="btn btn-sm" to="/admin/inventory">Cancel</Link>
-          <button className="btn btn-sm btn-neutral" type="submit">Save</button>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Link className="btn btn-sm w-full sm:w-auto" to="/admin/inventory">Cancel</Link>
+          <button className="btn btn-sm btn-neutral w-full sm:w-auto" type="submit">Save</button>
         </div>
       </form>
     </section>

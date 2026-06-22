@@ -6,6 +6,7 @@ import { IoPencilSharp } from "react-icons/io5";
 import { apiUrl } from "../../configs/env";
 import { useCollection } from "../../hooks/useCollection";
 import { useQuery } from "../../hooks/useQuery";
+import { adminSurface } from "../admin/adminPageUi";
 
 function Product() {
   const [search, setSearch] = useState("");
@@ -16,6 +17,9 @@ function Product() {
   const { data: products, totalPage, isLoading } = useQuery("products", search, page, limit, refetch);
   const { remove, isLoading: isDeleting } = useCollection("products");
   const currency = "៛";
+  const productCount = products?.length || 0;
+  const stockTotal = products?.reduce((sum, item) => sum + Number(item?.currentStock || 0), 0) || 0;
+  const zeroStockCount = products?.filter((item) => Number(item?.currentStock || 0) <= 0).length || 0;
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure! you want to delete?")) {
@@ -28,35 +32,57 @@ function Product() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mt-2">
-        <h1 className="text-xl font-semibold text-black">Product</h1>
-        <Link to="/admin/products/create" className="btn btn-sm btn-neutral">
+    <div className={adminSurface.page}>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>Catalog</p>
+          <h1 className={adminSurface.title}>Products</h1>
+          <p className={adminSurface.description}>
+            Maintain product codes, pricing, category assignment, stock count, and labels.
+          </p>
+        </div>
+        <Link to="/admin/products/create" className={adminSurface.primaryButton}>
           + New Product
         </Link>
       </div>
 
-      <div className="bg-white mt-4 rounded-md border border-gray-200 px-4 py-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={adminSurface.statGrid}>
+        {[
+          ["Products", productCount],
+          ["Total stock", stockTotal],
+          ["Out of stock", zeroStockCount],
+          ["Rows per page", limit],
+        ].map(([label, value]) => (
+          <div key={label} className={adminSurface.statCard}>
+            <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className={adminSurface.statValue}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className={adminSurface.tableShell}>
+        <div className={adminSurface.toolbar}>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <fieldset className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Show</span>
+            <span className="text-sm text-[#45464d]">Show</span>
             <select
               onChange={(e) => {
                 setLimit(Number(e.target.value));
                 setPage(1);
               }}
               value={limit}
-              className="select select-bordered select-sm h-9 min-h-0 w-20 rounded-md text-sm"
+              className={`${adminSurface.select} w-20`}
             >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <span className="text-sm text-gray-600">entries</span>
+            <span className="text-sm text-[#45464d]">entries</span>
           </fieldset>
 
-          <label className="input input-bordered input-sm flex h-9 min-h-0 w-full items-center gap-2 rounded-md text-sm sm:max-w-xs">
+          <label className={`${adminSurface.input} flex w-full items-center gap-2 lg:max-w-sm`}>
             <svg className="h-4 w-4 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
                 <circle cx="11" cy="11" r="8" />
@@ -74,20 +100,21 @@ function Product() {
             />
           </label>
         </div>
+        </div>
 
-        <div className="overflow-x-auto mt-4 rounded-lg border border-gray-200">
-          <table className="table w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 text-sm text-gray-700 border-b border-gray-200">
-                <th className="w-16 p-4 text-center font-semibold">N.o</th>
-                <th className="p-4 text-left font-semibold">Code</th>
-                <th className="p-4 text-left font-semibold">Product</th>
-                <th className="p-4 text-left font-semibold">Category</th>
-                <th className="p-4 text-right font-semibold">Cost Price</th>
-                <th className="p-4 text-right font-semibold">Sale Price</th>
-                <th className="p-4 text-center font-semibold">Current Stock</th>
-                <th className="p-4 text-left font-semibold">Note</th>
-                <th className="w-28 p-4 text-center font-semibold">Actions</th>
+        <div className={adminSurface.tableWrap}>
+          <table className={`${adminSurface.table} min-w-[1180px]`}>
+            <thead className={adminSurface.tableHead}>
+              <tr>
+                <th className={`${adminSurface.th} w-16 text-center`}>N.o</th>
+                <th className={adminSurface.th}>Code</th>
+                <th className={adminSurface.th}>Product</th>
+                <th className={adminSurface.th}>Category</th>
+                <th className={`${adminSurface.th} text-right`}>Cost Price</th>
+                <th className={`${adminSurface.th} text-right`}>Sale Price</th>
+                <th className={`${adminSurface.th} text-center`}>Current Stock</th>
+                <th className={adminSurface.th}>Note</th>
+                <th className={`${adminSurface.th} w-28 text-center`}>Actions</th>
               </tr>
             </thead>
 
@@ -95,7 +122,7 @@ function Product() {
               {isLoading && (
                 <tr>
                   <td colSpan={9} className="p-8">
-                    <div className="flex justify-center text-gray-500">
+                    <div className="flex justify-center text-[#45464d]">
                       <span className="loading loading-spinner" />
                     </div>
                   </td>
@@ -104,7 +131,7 @@ function Product() {
 
               {!isLoading && products?.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-sm text-gray-400">
+                  <td colSpan={9} className="p-8 text-center text-sm text-[#5b6472]">
                     No products found.
                   </td>
                 </tr>
@@ -118,16 +145,16 @@ function Product() {
                   return (
                     <tr
                       key={item?._id || idx}
-                      className="border-b border-gray-100 text-sm text-gray-800 transition-colors hover:bg-gray-50"
+                      className={adminSurface.row}
                     >
-                      <td className="p-4 text-center font-medium text-gray-500">
+                      <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
                         {(page - 1) * limit + idx + 1}
                       </td>
-                      <td className="min-w-28 p-4 font-semibold uppercase text-gray-700">{item?.code || "-"}</td>
-                      <td className="min-w-56 p-4">
+                      <td className={`${adminSurface.td} min-w-28 font-semibold uppercase text-[#213145]`}>{item?.code || "-"}</td>
+                      <td className={`${adminSurface.td} min-w-56`}>
                         <div className="flex items-center gap-3">
                           {item?.imageUrl ? (
-                            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md border border-gray-100 bg-gray-50">
+                            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#d7dced] bg-[#f8f9ff]">
                               <img
                                 src={`${apiUrl}/upload/${item.imageUrl}`}
                                 alt={item?.name || "Product"}
@@ -135,28 +162,28 @@ function Product() {
                               />
                             </div>
                           ) : (
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-dashed border-gray-200 bg-gray-50 text-[10px] text-gray-400">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#c6c6cd] bg-[#f8f9ff] text-[10px] text-[#5b6472]">
                               No Img
                             </div>
                           )}
-                          <span className="font-medium text-gray-900">{item?.name || "-"}</span>
+                          <span className="font-semibold text-[#0b1c30]">{item?.name || "-"}</span>
                         </div>
                       </td>
-                      <td className="min-w-36 p-4 text-gray-600">{item?.category?.name || "-"}</td>
-                      <td className="min-w-32 p-4 text-right font-semibold text-red-600">
+                      <td className={`${adminSurface.td} min-w-36 text-[#45464d]`}>{item?.category?.name || "-"}</td>
+                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
                         {cost.toLocaleString()} {currency}
                       </td>
-                      <td className="min-w-32 p-4 text-right font-semibold text-red-600">
+                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
                         {sale.toLocaleString()} {currency}
                       </td>
-                      <td className="min-w-32 p-4 text-center text-gray-600">{item?.currentStock ?? 0}</td>
-                      <td className="min-w-48 max-w-xs truncate p-4 text-gray-600">{item?.note || "-"}</td>
-                      <td className="p-4">
+                      <td className={`${adminSurface.td} min-w-32 text-center text-[#45464d]`}>{item?.currentStock ?? 0}</td>
+                      <td className={`${adminSurface.td} min-w-48 max-w-xs truncate text-[#45464d]`}>{item?.note || "-"}</td>
+                      <td className={adminSurface.td}>
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             to={`/admin/products/${item._id}/edit`}
                             title="Edit product"
-                            className="btn btn-square btn-xs btn-outline border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            className={adminSurface.iconButton}
                           >
                             <IoPencilSharp />
                           </Link>
@@ -164,7 +191,7 @@ function Product() {
                             type="button"
                             title="Delete product"
                             onClick={() => handleDelete(item._id)}
-                            className="btn btn-square btn-xs btn-outline border-red-100 text-red-600 hover:bg-red-50"
+                            className={adminSurface.dangerIconButton}
                           >
                             <IoMdTrash />
                           </button>
@@ -177,25 +204,25 @@ function Product() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between mt-4 border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-600">
+        <div className={adminSurface.footer}>
+          <p className="text-sm text-[#45464d]">
             Page {page}/{totalPage || 1}
           </p>
           <div className="join">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {"<<"}
             </button>
-            <button className="join-item btn btn-sm btn-active bg-gray-100 border-gray-200 pointer-events-none">
+            <button className="join-item btn btn-sm pointer-events-none border-[#0058be] bg-[#d8e2ff] text-[#0058be]">
               Page {page}
             </button>
             <button
               onClick={() => setPage(page + 1)}
               disabled={page >= totalPage}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {">>"}
             </button>

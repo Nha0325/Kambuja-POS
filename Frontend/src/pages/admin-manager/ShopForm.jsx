@@ -316,9 +316,9 @@ function ShopForm() {
           </section>
 
           <div className="flex flex-col-reverse gap-3 border-t border-violet-100 pt-8 sm:flex-row sm:items-center sm:justify-end">
-            <Link className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-50" to="/admin-manager/shops">Cancel</Link>
+            <Link className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-violet-200 bg-white px-5 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-50 sm:w-auto" to="/admin-manager/shops">Cancel</Link>
             <button
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-violet-600 px-6 text-sm font-medium text-white shadow-sm transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-violet-600 px-6 text-sm font-medium text-white shadow-sm transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               type="submit"
               disabled={isSaving || noOwnerAdmin}
             >

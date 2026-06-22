@@ -9,13 +9,13 @@ router.use(shopScopeGuard)
 
 router
     .route("/")
-    .post(restrict("ADMIN"),create)
-    .get(restrict("ADMIN","CASHIER"),findAll)
+    .post(restrict("ADMIN_MANAGER","ADMIN"),create)
+    .get(restrict("ADMIN_MANAGER","ADMIN","CASHIER"),findAll)
 router
-    .get("/code/:code",restrict("ADMIN","CASHIER"), findOneByCode)
+    .get("/code/:code",restrict("ADMIN_MANAGER","ADMIN","CASHIER"), findOneByCode)
 router
     .route("/:id")
-    .get(restrict("ADMIN","CASHIER"),findOne)
-    .patch(restrict("ADMIN"),update)
-    .delete(restrict("ADMIN"),remove)
+    .get(restrict("ADMIN_MANAGER","ADMIN","CASHIER"),findOne)
+    .patch(restrict("ADMIN_MANAGER","ADMIN"),update)
+    .delete(restrict("ADMIN_MANAGER","ADMIN"),remove)
 module.exports = router

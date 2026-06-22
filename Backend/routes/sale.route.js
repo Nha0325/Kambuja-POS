@@ -10,13 +10,13 @@ router.use(shopScopeGuard)
 router
     .route("/")
     .post(restrict("CASHIER"), create)
-    .get(restrict("ADMIN", "CASHIER"), findAll)
+    .get(restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findAll)
 
-router.get("/checkStock", restrict("ADMIN", "CASHIER"), checkStock)
-router.get("/today", restrict("ADMIN", "CASHIER"), findToday)
-router.patch("/addPayment/:id", restrict("ADMIN", "CASHIER"), addPayment)
+router.get("/checkStock", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), checkStock)
+router.get("/today", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findToday)
+router.patch("/addPayment/:id", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), addPayment)
 
 router // Moved to bottom so it doesn't shadow other routes
     .route("/:id")
-    .get(restrict("ADMIN", "CASHIER"), findOne)
+    .get(restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findOne)
 module.exports = router

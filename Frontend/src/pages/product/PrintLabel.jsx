@@ -45,18 +45,18 @@ function PrintLabel() {
   }
 
   return (
-    <div className="p-4">
+    <div className="w-full max-w-full p-3 sm:p-4">
       <h1 className="text-xl font-semibold">Print Label</h1>
 
       <div className="bg-white w-full p-4 rounded-lg my-4">
         <h1 className="text-xl font-medium">Add product</h1>
-        <div className="flex justify-center items-center">
-          <form onSubmit={handleSearchProductByCode} className="flex space-x-2">
-          <label className="input input-bordered flex items-center gap-2">
+        <div className="flex items-center justify-center">
+          <form onSubmit={handleSearchProductByCode} className="flex w-full max-w-md gap-2">
+          <label className="input input-bordered flex min-w-0 flex-1 items-center gap-2">
                     <input
                       type="text"
                       onChange={(e) => setProductCode(e.target.value)}
-                      className="grow"
+                      className="min-w-0 grow"
                       required
                       placeholder="Enter product code"
                     />
@@ -79,8 +79,8 @@ function PrintLabel() {
           </form>
         </div>
 
-        <div className="mt-3 max-w-[500px] mx-auto overflow-auto lg:overflow-visible">
-          <table className="w-full">
+        <div className="mx-auto mt-3 max-w-full overflow-x-auto sm:max-w-[500px]">
+          <table className="min-w-[480px] w-full">
             <thead>
               <tr className="bg-gray-200 text-sm">
                 <th className="text-left whitespace-nowrap p-4">Product</th>
@@ -91,7 +91,7 @@ function PrintLabel() {
             </thead>
             <tbody>
               {products?.map((el) => (
-                <tr key={el._id} className="even:bg-gray-100">
+                <tr key={el.id} className="even:bg-gray-100">
          
                   <td className="py-2 !p-4">{el?.productName}</td>
                   <td className="py-2 !p-4 capitalize">{el?.code}</td>
@@ -101,7 +101,7 @@ function PrintLabel() {
                   </td>
    
                   <td className="text-center px-4">
-                    <p onClick={() => handleRemove(el?._id)} className="text-red-600 w-full flex justify-end text-center space-x-1 mr-3 cursor-pointer">
+                    <p onClick={() => handleRemove(el?.id)} className="text-red-600 w-full flex justify-end text-center space-x-1 mr-3 cursor-pointer">
                       <FaTrash className="w-4 h-4" />
                     </p>
                   </td>
@@ -112,7 +112,7 @@ function PrintLabel() {
         </div>
 
         <div className="mt-4 flex justify-center">
-              <button onClick={handlePrintLabel} className="btn btn-neutral w-20">Save</button>
+              <button onClick={handlePrintLabel} className="btn btn-neutral w-full sm:w-20">Save</button>
         </div>
           
 

@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { useSaleReport } from "../../hooks/useSaleReport";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { adminSurface } from "../admin/adminPageUi";
 
 function SaleReport() {
   const [startDate, setStartDate] = useState("");
@@ -10,6 +11,8 @@ function SaleReport() {
   const [totalAmount, setTotalAmount] = useState(0);
 
   const { fetchSaleReport, isLoading } = useSaleReport();
+  const paidAmount = data.reduce((sum, item) => sum + Number(item?.paidAmount || 0), 0);
+  const dueAmount = data.reduce((sum, item) => sum + Number(item?.dueAmount || 0), 0);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -32,17 +35,36 @@ function SaleReport() {
   };
 
   return (
-    <>
-      <div className="p-4">
-        <div className="flex justify-between items-center p-4">
-          <h1 className="text-xl font-semibold">Sale Report</h1>
+    <div className={adminSurface.page}>
+        <div className={adminSurface.header}>
+          <div>
+            <p className={adminSurface.eyebrow}>Reports</p>
+            <h1 className={adminSurface.title}>Sale Report</h1>
+            <p className={adminSurface.description}>
+              Filter sales by date range and review invoice totals, payment status, and cashier activity.
+            </p>
+          </div>
         </div>
 
-        <div className="p-4 bg-white rounded-lg flex justify-center items-center">
-          {/* Changed: Added flex-wrap and gap properties to prevent items from being squeezed out */}
-          <form onSubmit={handleFilter} className="flex flex-wrap gap-4 items-end justify-center">
-            <div>
-              <label htmlFor="sale-report-startDate" className="block text-sm font-medium mb-1">
+        <div className={adminSurface.statGrid}>
+          {[
+            ["Sales", data.length],
+            ["Total amount", `${totalAmount?.toLocaleString()}៛`],
+            ["Paid amount", `${paidAmount.toLocaleString()}៛`],
+            ["Due amount", `${dueAmount.toLocaleString()}៛`],
+          ].map(([label, value]) => (
+            <div key={label} className={adminSurface.statCard}>
+              <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+              <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+              <p className="mt-3 truncate text-2xl font-bold text-[#0b1c30]">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className={adminSurface.card}>
+          <form onSubmit={handleFilter} className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+            <div className="min-w-0">
+              <label htmlFor="sale-report-startDate" className="mb-2 block text-sm font-semibold text-[#0b1c30]">
                 Start Date
               </label>
               <input
@@ -51,12 +73,12 @@ function SaleReport() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="input border border-gray-300 rounded p-2"
+                className={`${adminSurface.input} h-12 w-full lg:w-56`}
                 required
               />
             </div>
-            <div>
-              <label htmlFor="sale-report-endDate" className="block text-sm font-medium mb-1">
+            <div className="min-w-0">
+              <label htmlFor="sale-report-endDate" className="mb-2 block text-sm font-semibold text-[#0b1c30]">
                 End Date
               </label>
               <input
@@ -65,13 +87,12 @@ function SaleReport() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="input border border-gray-300 rounded p-2"
+                className={`${adminSurface.input} h-12 w-full lg:w-56`}
                 required
               />
             </div>
-            {/* Changed: Ensured button container alignment stays consistent */}
-            <div className="flex space-x-2 min-w-[170px]">
-              <button disabled={isLoading} className="btn w-20 btn-neutral text-white px-4 py-2 bg-slate-800 rounded">
+            <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
+              <button disabled={isLoading} className={`${adminSurface.primaryButton} flex-1 lg:w-24 lg:flex-none`}>
                 {isLoading ? "..." : "Filter"}
               </button>
               <button
@@ -82,7 +103,7 @@ function SaleReport() {
                   setEndDate("");
                   setStartDate("");
                 }}
-                className="btn w-20 btn-error text-white px-4 py-2 bg-red-500 rounded"
+                className="btn min-h-11 flex-1 rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 hover:bg-red-100 lg:w-24 lg:flex-none"
               >
                 Clear
               </button>
@@ -90,33 +111,47 @@ function SaleReport() {
           </form>
         </div>
 
-        <div className="bg-white p-5 rounded-lg mt-3">
-          <div className="overflow-x-auto grid grid-cols-12">
-            <table className="table border col-span-12 border-gray-200">
-              <thead className="md:text-sm text-slate-600 bg-black/5">
-                <tr><th>N.o</th><th>Invoice</th><th>Sale By</th><th>Total Cost</th><th>Paid Amount</th><th>Due Amount</th><th>Change Amount</th><th>Payment Status</th><th>Created Date</th></tr>
+        <div className={adminSurface.tableShell}>
+          <div className={adminSurface.toolbar}>
+            <p className="text-sm font-semibold text-[#0b1c30]">Sale results</p>
+            <p className="mt-1 text-xs text-[#5b6472]">{data.length} row(s) displayed</p>
+          </div>
+          <div className={adminSurface.tableWrap}>
+            <table className={`${adminSurface.table} min-w-[1080px]`}>
+              <thead className={adminSurface.tableHead}>
+                <tr>
+                  <th className={adminSurface.th}>N.o</th>
+                  <th className={adminSurface.th}>Invoice</th>
+                  <th className={adminSurface.th}>Sale By</th>
+                  <th className={adminSurface.th}>Total Cost</th>
+                  <th className={adminSurface.th}>Paid Amount</th>
+                  <th className={adminSurface.th}>Due Amount</th>
+                  <th className={adminSurface.th}>Change Amount</th>
+                  <th className={adminSurface.th}>Payment Status</th>
+                  <th className={adminSurface.th}>Created Date</th>
+                </tr>
               </thead>
 
               {data?.length > 0 && (
                 <tbody>
                   {data?.map((item, index) => (
-                    <tr key={index} className="hover">
-                      <td>{index + 1}</td>
-                      <td>{item?.invoiceNumber}</td>
-                      <td className="capitalize">{item?.user?.username}</td>
-                      <td className="text-red-600 font-semibold">
+                    <tr key={index} className={adminSurface.row}>
+                      <td className={adminSurface.td}>{index + 1}</td>
+                      <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>{item?.invoiceNumber}</td>
+                      <td className={`${adminSurface.td} capitalize text-[#45464d]`}>{item?.user?.username}</td>
+                      <td className={`${adminSurface.td} font-semibold text-red-600`}>
                         {item?.totalCost?.toLocaleString()}៛
                       </td>
-                      <td className="text-red-600 font-semibold">
+                      <td className={`${adminSurface.td} font-semibold text-red-600`}>
                         {item?.paidAmount?.toLocaleString()}៛
                       </td>
-                      <td className="text-red-600 font-semibold">
+                      <td className={`${adminSurface.td} font-semibold text-red-600`}>
                         {item?.dueAmount?.toLocaleString()}៛
                       </td>
-                      <td className="text-red-600 font-semibold">
+                      <td className={`${adminSurface.td} font-semibold text-red-600`}>
                         {item?.changeAmount?.toLocaleString()}៛
                       </td>
-                      <td>
+                      <td className={adminSurface.td}>
                         <span
                           className={`
                                     text-xs font-medium me-2 px-2.5 py-0.5 rounded uppercase
@@ -141,7 +176,7 @@ function SaleReport() {
                           {item.paymentStatus}
                         </span>
                       </td>
-                      <td>{formatDate(item.createdAt)}</td>
+                      <td className={`${adminSurface.td} text-[#45464d]`}>{formatDate(item.createdAt)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -150,7 +185,7 @@ function SaleReport() {
               {data?.length <= 0 && (
                 <tbody>
                   <tr>
-                    <td colSpan={9} className="text-center">
+                    <td colSpan={9} className="p-8 text-center text-sm text-[#5b6472]">
                       No Data!
                     </td>
                   </tr>
@@ -158,8 +193,8 @@ function SaleReport() {
               )}
             </table>
           </div>
-          <div className="flex justify-end items-center mt-3">
-            <h1>
+          <div className={adminSurface.footer}>
+            <h1 className="text-sm font-semibold text-[#0b1c30]">
               Total Amount:{" "}
               <span className="text-red-500 font-semibold">{totalAmount?.toLocaleString()}៛
               </span>
@@ -167,7 +202,6 @@ function SaleReport() {
           </div>
         </div>
       </div>
-    </>
   );
 }
 

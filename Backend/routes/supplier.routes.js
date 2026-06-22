@@ -11,7 +11,7 @@ const {
 const restrict = require("../guards/restrict.guard")
 const shopScopeGuard = require("../guards/shop-scope.guard")
 
-router.use(restrict("ADMIN"), shopScopeGuard)
+router.use(restrict("ADMIN_MANAGER", "ADMIN"), shopScopeGuard)
 
 router
     .route('/')

@@ -40,12 +40,12 @@ function EditUser() {
   }, [data]);
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center">
+    <div className="w-full max-w-full p-3 sm:p-4">
+      <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Edit User</h1>
       </div>
 
-      <div className="max-w-lg bg-white p-6 rounded-lg mt-4 border border-gray-200 shadow-sm">
+      <div className="mt-4 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="block">Username*</label>
@@ -71,11 +71,11 @@ function EditUser() {
             />
           </div>
 
-          <div className="flex justify-end items-center space-x-2">
-            <Link to="/admin/cashiers" className="btn btn-sm">
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <Link to="/admin/cashiers" className="btn btn-sm w-full sm:w-auto">
               Cancel
             </Link>
-            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral">
+            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-auto">
               Save
             </button>
           </div>

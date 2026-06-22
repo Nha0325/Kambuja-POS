@@ -5,6 +5,7 @@ import { IoMdTrash } from "react-icons/io";
 import { IoPencilSharp } from "react-icons/io5";
 import useCollection from "../../hooks/useCollection";
 import useFetchData from "../../hooks/useFetchData";
+import { adminSurface } from "../admin/adminPageUi";
 
 function Category() {
   const [search, setSearch] = useState("");
@@ -14,6 +15,8 @@ function Category() {
 
   const { data, totalPage, isLoading } = useFetchData("categories", page, limit, search, refetch);
   const { remove, isLoading: isDeleting } = useCollection("categories");
+  const categoryCount = data?.length || 0;
+  const notedCount = data?.filter((item) => item?.note).length || 0;
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure? you want to delete!")) {
@@ -26,35 +29,57 @@ function Category() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-black">Category</h1>
-        <Link to="/admin/categories/create" className="btn btn-sm btn-neutral">
+    <div className={adminSurface.page}>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>Catalog</p>
+          <h1 className={adminSurface.title}>Categories</h1>
+          <p className={adminSurface.description}>
+            Organize products into clean groups for browsing, reporting, and stock control.
+          </p>
+        </div>
+        <Link to="/admin/categories/create" className={adminSurface.primaryButton}>
           + Add Category
         </Link>
       </div>
 
-      <div className="bg-white mt-4 rounded-md border border-gray-200 px-4 py-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={adminSurface.statGrid}>
+        {[
+          ["Categories", categoryCount],
+          ["With notes", notedCount],
+          ["Page", page],
+          ["Rows per page", limit],
+        ].map(([label, value]) => (
+          <div key={label} className={adminSurface.statCard}>
+            <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className={adminSurface.statValue}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className={adminSurface.tableShell}>
+        <div className={adminSurface.toolbar}>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <fieldset className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Show</span>
+            <span className="text-sm text-[#45464d]">Show</span>
             <select
               onChange={(e) => {
                 setLimit(Number(e.target.value));
                 setPage(1);
               }}
               value={limit}
-              className="select select-bordered select-sm h-9 min-h-0 w-20 rounded-md text-sm"
+              className={`${adminSurface.select} w-20`}
             >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <span className="text-sm text-gray-600">entries</span>
+            <span className="text-sm text-[#45464d]">entries</span>
           </fieldset>
 
-          <label className="input input-bordered input-sm flex h-9 min-h-0 w-full items-center gap-2 rounded-md text-sm sm:max-w-xs">
+          <label className={`${adminSurface.input} flex w-full items-center gap-2 lg:max-w-sm`}>
             <svg className="h-4 w-4 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
                 <circle cx="11" cy="11" r="8" />
@@ -72,15 +97,16 @@ function Category() {
             />
           </label>
         </div>
+        </div>
 
-        <div className="overflow-x-auto mt-4 rounded-lg border border-gray-200">
-          <table className="table w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 text-sm text-gray-700 border-b border-gray-200">
-                <th className="w-16 p-4 text-center font-semibold">N.o</th>
-                <th className="p-4 text-left font-semibold">Name</th>
-                <th className="p-4 text-left font-semibold">Note</th>
-                <th className="w-28 p-4 text-center font-semibold">Actions</th>
+        <div className={adminSurface.tableWrap}>
+          <table className={`${adminSurface.table} min-w-[700px]`}>
+            <thead className={adminSurface.tableHead}>
+              <tr>
+                <th className={`${adminSurface.th} w-16 text-center`}>N.o</th>
+                <th className={adminSurface.th}>Name</th>
+                <th className={adminSurface.th}>Note</th>
+                <th className={`${adminSurface.th} w-28 text-center`}>Actions</th>
               </tr>
             </thead>
 
@@ -88,7 +114,7 @@ function Category() {
               {isLoading && (
                 <tr>
                   <td colSpan={4} className="p-8">
-                    <div className="flex justify-center text-gray-500">
+                    <div className="flex justify-center text-[#45464d]">
                       <span className="loading loading-spinner" />
                     </div>
                   </td>
@@ -97,7 +123,7 @@ function Category() {
 
               {!isLoading && data?.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-sm text-gray-400">
+                  <td colSpan={4} className="p-8 text-center text-sm text-[#5b6472]">
                     No categories found.
                   </td>
                 </tr>
@@ -107,19 +133,19 @@ function Category() {
                 data?.map((item, idx) => (
                   <tr
                     key={item?._id || idx}
-                    className="border-b border-gray-100 text-sm text-gray-800 transition-colors hover:bg-gray-50"
+                    className={adminSurface.row}
                   >
-                    <td className="p-4 text-center font-medium text-gray-500">
+                    <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
                       {(page - 1) * limit + idx + 1}
                     </td>
-                    <td className="min-w-44 p-4 font-medium text-gray-900">{item.name || "-"}</td>
-                    <td className="min-w-60 p-4 text-gray-600">{item.note || "-"}</td>
-                    <td className="p-4">
+                    <td className={`${adminSurface.td} min-w-44 font-semibold text-[#0b1c30]`}>{item.name || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-60 text-[#45464d]`}>{item.note || "-"}</td>
+                    <td className={adminSurface.td}>
                       <div className="flex items-center justify-center gap-2">
                         <Link
                           to={`/admin/categories/${item._id}/edit`}
                           title="Edit category"
-                          className="btn btn-square btn-xs btn-outline border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          className={adminSurface.iconButton}
                         >
                           <IoPencilSharp />
                         </Link>
@@ -127,7 +153,7 @@ function Category() {
                           type="button"
                           title="Delete category"
                           onClick={() => handleDelete(item._id)}
-                          className="btn btn-square btn-xs btn-outline border-red-100 text-red-600 hover:bg-red-50"
+                          className={adminSurface.dangerIconButton}
                         >
                           <IoMdTrash />
                         </button>
@@ -139,25 +165,25 @@ function Category() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between mt-4 border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-600">
+        <div className={adminSurface.footer}>
+          <p className="text-sm text-[#45464d]">
             Page {page}/{totalPage || 1}
           </p>
           <div className="join">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {"<<"}
             </button>
-            <button className="join-item btn btn-sm btn-active bg-gray-100 border-gray-200 pointer-events-none">
+            <button className="join-item btn btn-sm pointer-events-none border-[#0058be] bg-[#d8e2ff] text-[#0058be]">
               Page {page}
             </button>
             <button
               onClick={() => setPage(page + 1)}
               disabled={page >= totalPage}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {">>"}
             </button>

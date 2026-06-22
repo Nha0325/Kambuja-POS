@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
-import { FaFilter, FaMagnifyingGlass, FaPlus, FaShop, FaUserShield } from "react-icons/fa6"
+import { FaDownload, FaFilter, FaMagnifyingGlass, FaPlus, FaShop, FaUserShield } from "react-icons/fa6"
 import { adminManagerService } from "../../services/adminManager.service"
+import { downloadCsv } from "../../utils/downloadCsv"
+import { formatApiError } from "../../utils/formatApiError"
 import {
   cardClass,
   getInitials,
@@ -16,25 +18,56 @@ import { PageHeader, StatusBadge, TableEmpty } from "./adminManagerComponents"
 
 function Admins() {
   const [admins, setAdmins] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
   const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("ALL")
+  const [assignmentFilter, setAssignmentFilter] = useState("ALL")
 
-  const load = () => adminManagerService.admins()
-    .then((response) => setAdmins(response.data.result || []))
+  const load = useCallback(() => {
+    setIsLoading(true)
+    setError("")
+    return adminManagerService.admins()
+      .then((response) => setAdmins(response.data.result || []))
+      .catch((loadError) => {
+        if (loadError?.response?.status !== 401) {
+          setError(formatApiError(loadError) || "Unable to load admin accounts")
+        }
+      })
+      .finally(() => setIsLoading(false))
+  }, [])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   const displayedAdmins = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return admins
     return admins.filter((admin) => (
-      admin.username?.toLowerCase().includes(term)
-      || admin.email?.toLowerCase().includes(term)
-      || admin.shopId?.name?.toLowerCase().includes(term)
-      || admin.status?.toLowerCase().includes(term)
+      (statusFilter === "ALL" || admin.status === statusFilter)
+      && (assignmentFilter === "ALL"
+        || (assignmentFilter === "ASSIGNED" && admin.shopId)
+        || (assignmentFilter === "UNASSIGNED" && !admin.shopId))
+      && (!term
+        || admin.username?.toLowerCase().includes(term)
+        || admin.email?.toLowerCase().includes(term)
+        || admin.shopId?.name?.toLowerCase().includes(term)
+        || admin.status?.toLowerCase().includes(term))
     ))
-  }, [admins, search])
+  }, [admins, assignmentFilter, search, statusFilter])
+
+  const exportAdmins = () => {
+    downloadCsv(
+      "admin-manager-admins.csv",
+      [
+        { label: "Username", value: (admin) => admin.username || "" },
+        { label: "Email", value: (admin) => admin.email || "" },
+        { label: "Assigned Shop", value: (admin) => admin.shopId?.name || "Platform Wide" },
+        { label: "Status", value: (admin) => admin.status || "" },
+      ],
+      displayedAdmins
+    )
+  }
 
   const toggle = async (admin) => {
     const status = admin.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"
@@ -43,6 +76,7 @@ function Admins() {
       toast.success(`Admin ${status.toLowerCase()}`)
       load()
     } catch (error) {
+      if (error?.response?.status === 401) return
       toast.error(error.response?.data?.error || "Unable to update admin")
     }
   }
@@ -63,44 +97,75 @@ function Admins() {
         )}
       />
 
+      {error && (
+        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-gray-500">Total Admins</p>
-          <strong className="block text-3xl font-bold text-gray-950">{admins.length.toLocaleString()}</strong>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Total Admins</p>
+          <strong className="block text-3xl font-bold text-slate-900">{admins.length.toLocaleString()}</strong>
         </article>
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-gray-500">Active</p>
-          <strong className="block text-3xl font-bold text-gray-950">{activeCount.toLocaleString()}</strong>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Active</p>
+          <strong className="block text-3xl font-bold text-slate-900">{activeCount.toLocaleString()}</strong>
         </article>
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-gray-500">Assigned Shops</p>
-          <strong className="block text-3xl font-bold text-gray-950">{assignedCount.toLocaleString()}</strong>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Assigned Shops</p>
+          <strong className="block text-3xl font-bold text-slate-900">{assignedCount.toLocaleString()}</strong>
         </article>
       </div>
 
-      <div className="mb-6 grid grid-cols-12 gap-4">
-        <label className={`${cardClass} col-span-12 flex h-14 items-center gap-3 px-4 md:col-span-6`}>
-          <FaMagnifyingGlass className="text-gray-500" />
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-12">
+        <label className={`${cardClass} flex h-14 min-w-0 items-center gap-3 px-4 sm:col-span-2 xl:col-span-5`}>
+          <FaMagnifyingGlass className="text-slate-500" />
           <input
-            className="h-full min-w-0 flex-1 border-none bg-transparent text-sm text-gray-950 outline-none placeholder:text-gray-400 focus:ring-0"
+            className="h-full min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:ring-0"
             placeholder="Search by username, email, shop, or status..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </label>
-        <button className={`${secondaryButtonClass} col-span-6 h-14 md:col-span-3`} type="button">
+        <label className={`${secondaryButtonClass} h-14 min-w-0 xl:col-span-2`}>
           <FaFilter />
-          Status: All
-        </button>
-        <button className={`${secondaryButtonClass} col-span-6 h-14 md:col-span-3`} type="button">
+          <select
+            className="min-w-0 bg-transparent text-sm font-semibold outline-none"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+          >
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </label>
+        <label className={`${secondaryButtonClass} h-14 min-w-0 xl:col-span-3`}>
           <FaShop />
-          Assigned Shop: Any
+          <select
+            className="min-w-0 bg-transparent text-sm font-semibold outline-none"
+            value={assignmentFilter}
+            onChange={(event) => setAssignmentFilter(event.target.value)}
+          >
+            <option value="ALL">Any Assignment</option>
+            <option value="ASSIGNED">Assigned</option>
+            <option value="UNASSIGNED">Unassigned</option>
+          </select>
+        </label>
+        <button
+          className={`${secondaryButtonClass} h-14 min-w-0 sm:col-span-2 xl:col-span-2`}
+          type="button"
+          onClick={exportAdmins}
+          disabled={displayedAdmins.length === 0}
+        >
+          <FaDownload />
+          Export
         </button>
       </div>
 
       <div className={`${cardClass} overflow-hidden`}>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="min-w-[820px] w-full border-collapse text-left">
             <thead className={tableHeadClass}>
               <tr>
                 <th className={tableHeadCellClass}>Username</th>
@@ -110,20 +175,22 @@ function Admins() {
                 <th className={`${tableHeadCellClass} text-right`}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {displayedAdmins.map((admin) => (
-                <tr key={admin._id} className="transition-colors hover:bg-[#f3f4f5]">
+            <tbody className="divide-y divide-violet-100">
+              {isLoading ? (
+                <TableEmpty colSpan="5">Loading admins...</TableEmpty>
+              ) : displayedAdmins.map((admin) => (
+                <tr key={admin._id} className="transition-colors hover:bg-violet-50/50">
                   <td className={tableCellClass}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#edeeef] text-xs font-bold text-gray-950">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-xs font-bold text-violet-800">
                         {getInitials(admin.username)}
                       </div>
-                      <span className="font-semibold text-gray-950">{admin.username}</span>
+                      <span className="font-semibold text-slate-900">{admin.username}</span>
                     </div>
                   </td>
                   <td className={tableCellClass}>{admin.email}</td>
                   <td className={tableCellClass}>
-                    <span className="inline-flex rounded-full border border-gray-300 bg-[#edeeef] px-3 py-1 text-xs font-mono text-gray-600">
+                    <span className="inline-flex rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-mono text-violet-800">
                       {admin.shopId?.name || "Platform Wide"}
                     </span>
                   </td>
@@ -136,7 +203,7 @@ function Admins() {
                   </td>
                 </tr>
               ))}
-              {displayedAdmins.length === 0 && <TableEmpty colSpan="5">No admins found</TableEmpty>}
+              {!isLoading && displayedAdmins.length === 0 && <TableEmpty colSpan="5">No admins found</TableEmpty>}
             </tbody>
           </table>
         </div>

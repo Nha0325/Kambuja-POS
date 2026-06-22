@@ -4,7 +4,7 @@ const shopScopeGuard = require("../guards/shop-scope.guard")
 const controller = require("../controller/receipt.controller")
 
 const router = express.Router()
-router.use(restrict("ADMIN", "CASHIER"), shopScopeGuard)
+router.use(restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), shopScopeGuard)
 router.post("/sale/:saleId", controller.issue)
 router.get("/sale/:saleId", controller.getBySale)
 router.post("/sale/:saleId/print", controller.markPrinted)

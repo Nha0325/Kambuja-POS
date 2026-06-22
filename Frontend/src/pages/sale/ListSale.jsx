@@ -25,18 +25,18 @@ function ListSale() {
 
   return (
     <>
-      <div className="p-4">
-        <div className="flex items-center justify-between mt-2">
+      <div className="w-full max-w-full p-3 sm:p-4">
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-semibold text-black">Sale Lists</h1>
           {normalizeRole(currentUser?.role) === ROLES.CASHIER && (
-            <Link to="/cashier/pos" className="btn btn-sm btn-neutral">
+            <Link to="/cashier/pos" className="btn btn-sm btn-neutral w-full sm:w-auto">
               + New Sale
             </Link>
           )}
         </div>
 
         <div className="bg-white mt-4 p-4 rounded-md border border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <select
               onChange={(e) => setLimit(Number(e.target.value))}
               value={limit}
@@ -48,7 +48,7 @@ function ListSale() {
               <option value="200">200</option>
             </select>
 
-            <label className="input input-sm input-bordered flex items-center gap-2">
+            <label className="input input-sm input-bordered flex w-full items-center gap-2 sm:w-64">
               <input
                 onChange={(e) => setSearch(e.target.value)}
                 type="text"
@@ -71,7 +71,7 @@ function ListSale() {
           </div>
 
           <div className="overflow-x-auto mt-4">
-            <table className="table w-full border-collapse">
+            <table className="table min-w-[1120px] w-full border-collapse">
             <thead className="text-xs text-slate-500 bg-gray-50">
               <tr>
                 <th className="py-3 px-2">N.o</th>
@@ -159,7 +159,7 @@ function ListSale() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-gray-500">
               Page {page}/{totalPage || 1}
             </p>

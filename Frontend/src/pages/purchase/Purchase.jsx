@@ -6,6 +6,7 @@ import { FaCreditCard } from "react-icons/fa6";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import { TbTruckDelivery } from "react-icons/tb";
 import PurchaseStatusModal from "./PurchaseStatusModal";
+import { adminSurface } from "../admin/adminPageUi";
 
 function Purchase() {
   const [search, setSearch] = useState("");
@@ -17,110 +18,137 @@ function Purchase() {
   const [refetch, setRefetch] = useState(false);
 
   const { data, totalPage, isLoading } = useFetchData("purchases", page, limit, search, refetch);
+  const purchaseCount = data?.length || 0;
+  const totalCost = data?.reduce((sum, item) => sum + Number(item?.totalCost || 0), 0) || 0;
+  const dueCount = data?.filter((item) => item?.paymentStatus === "due").length || 0;
+  const pendingCount = data?.filter((item) => item?.purchaseStatus === "pending").length || 0;
 
   return (
     <>
-      <div className="p-4">
+      <div className={adminSurface.page}>
         {/* Top Header Controls */}
-        <div className="flex items-center justify-between mt-2">
-          <h1 className="text-xl font-semibold text-black">Purchase Lists</h1>
-          <Link to="/admin/purchases/create" className="btn btn-sm btn-neutral">
+        <div className={adminSurface.header}>
+          <div>
+            <p className={adminSurface.eyebrow}>Procurement</p>
+            <h1 className={adminSurface.title}>Purchases</h1>
+            <p className={adminSurface.description}>
+              Track supplier purchases, payment state, receiving status, and purchase dates.
+            </p>
+          </div>
+          <Link to="/admin/purchases/create" className={adminSurface.primaryButton}>
             + New Purchase
           </Link>
         </div>
 
-        <div className="bg-white mt-4 p-4 rounded-md border border-gray-200">
+        <div className={adminSurface.statGrid}>
+          {[
+            ["Purchases", purchaseCount],
+            ["Total cost", `${totalCost.toLocaleString()} ៛`],
+            ["Due", dueCount],
+            ["Pending", pendingCount],
+          ].map(([label, value]) => (
+            <div key={label} className={adminSurface.statCard}>
+              <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+              <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+              <p className={adminSurface.statValue}>{value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className={adminSurface.tableShell}>
           {/* Filters Panel */}
-          <div className="flex items-center justify-between">
+          <div className={adminSurface.toolbar}>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <fieldset className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Show</span>
+              <span className="text-sm text-[#45464d]">Show</span>
               <select
                 onChange={(e) => setLimit(Number(e.target.value))}
                 value={limit}
-                className="select select-bordered select-sm h-9 min-h-0"
+                className={`${adminSurface.select} w-20`}
               >
                 <option value={25}>25</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
               </select>
-              <span className="text-sm text-gray-600">entries</span>
+              <span className="text-sm text-[#45464d]">entries</span>
             </fieldset>
 
-            <fieldset>
+            <fieldset className="w-full lg:max-w-sm">
               <input
                 type="text"
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search purchase..."
-                className="input input-bordered input-sm h-9 w-64"
+                className={`${adminSurface.input} w-full`}
               />
             </fieldset>
           </div>
+          </div>
 
           {/* Main Purchase Table Grid */}
-          <div className="overflow-x-auto mt-4 border border-gray-200 rounded-lg">
-            <table className="table w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100 text-gray-700 text-sm border-b border-gray-200">
-                  <th className="p-4 text-center font-semibold w-12">N.o</th>
-                  <th className="p-4 text-left font-semibold">Supplier</th>
-                  <th className="p-4 text-left font-semibold">Purchase By</th>
-                  <th className="p-4 text-right font-semibold">Total Cost</th>
-                  <th className="p-4 text-right font-semibold">Due Amount</th>
-                  <th className="p-4 text-right font-semibold">Change Amount</th>
-                  <th className="p-4 text-center font-semibold">Payment Status</th>
-                  <th className="p-4 text-center font-semibold">Purchase Status</th>
-                  <th className="p-4 text-center font-semibold">Purchase Date</th>
-                  <th className="p-4 text-center font-semibold whitespace-nowrap">Action</th>
+          <div className={adminSurface.tableWrap}>
+            <table className={`${adminSurface.table} min-w-[1120px]`}>
+              <thead className={adminSurface.tableHead}>
+                <tr>
+                  <th className={`${adminSurface.th} w-12 text-center`}>N.o</th>
+                  <th className={adminSurface.th}>Supplier</th>
+                  <th className={adminSurface.th}>Purchase By</th>
+                  <th className={`${adminSurface.th} text-right`}>Total Cost</th>
+                  <th className={`${adminSurface.th} text-right`}>Due Amount</th>
+                  <th className={`${adminSurface.th} text-right`}>Change Amount</th>
+                  <th className={`${adminSurface.th} text-center`}>Payment Status</th>
+                  <th className={`${adminSurface.th} text-center`}>Purchase Status</th>
+                  <th className={`${adminSurface.th} text-center`}>Purchase Date</th>
+                  <th className={`${adminSurface.th} text-center`}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="10" className="text-center p-8 text-gray-500">
+                    <td colSpan="10" className="p-8 text-center text-[#45464d]">
                       កំពុងទាញយកទិន្នន័យ...
                     </td>
                   </tr>
                 ) : data?.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="text-center p-8 text-gray-400">
+                    <td colSpan="10" className="p-8 text-center text-[#5b6472]">
                       មិនមានទិន្នន័យទិញទំនិញឡើយ។
                     </td>
                   </tr>
                 ) : (
                   data?.map((el, index) => (
-                    <tr key={el?._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm text-gray-800">
+                    <tr key={el?._id} className={adminSurface.row}>
                       {/* Row Auto-Increment Index Number */}
-                      <td className="p-4 text-center font-medium text-gray-500">
+                      <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
                         {(page - 1) * limit + index + 1}
                       </td>
 
                       {/* Supplier */}
-                      <td className="p-4 font-medium">
+                      <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>
                         {el?.supplier?.businessName || el?.supplier?.name || "—"}
                       </td>
 
                       {/* Purchased By (User Account Name) */}
-                      <td className="p-4 text-gray-600 font-medium">
+                      <td className={`${adminSurface.td} font-medium text-[#45464d]`}>
                         {el?.user?.username || el?.user?.name || "Admin"}
                       </td>
 
                       {/* Total Cost */}
-                      <td className="p-4 text-right font-semibold text-red-600 whitespace-nowrap">
+                      <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>
                         {(el?.totalCost || 0).toLocaleString()} ៛
                       </td>
 
                       {/* Due Amount */}
-                      <td className="p-4 text-right text-orange-600 font-medium whitespace-nowrap">
+                      <td className={`${adminSurface.td} text-right font-medium text-orange-600`}>
                         {(el?.dueAmount || 0).toLocaleString()} ៛
                       </td>
 
                       {/* Change Amount */}
-                      <td className="p-4 text-right text-green-600 font-medium whitespace-nowrap">
+                      <td className={`${adminSurface.td} text-right font-medium text-green-600`}>
                         {(el?.changeAmount || 0).toLocaleString()} ៛
                       </td>
 
                       {/* Payment Status Badges */}
-                      <td className="p-4 text-center whitespace-nowrap">
+                      <td className={`${adminSurface.td} text-center`}>
                         {el?.paymentStatus === "paid" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
                             Paid
@@ -139,7 +167,7 @@ function Purchase() {
                       </td>
 
                       {/* Purchase Operational Status Badges */}
-                      <td className="p-4 text-center whitespace-nowrap">
+                      <td className={`${adminSurface.td} text-center`}>
                         {el?.purchaseStatus === "received" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
                             Received
@@ -158,12 +186,12 @@ function Purchase() {
                       </td>
 
                       {/* Purchase Date */}
-                      <td className="p-4 text-center whitespace-nowrap text-gray-600">
+                      <td className={`${adminSurface.td} text-center text-[#45464d]`}>
                         {el?.purchaseDate ? formatDate(el.purchaseDate) : "N/A"}
                       </td>
 
                       {/* Action Modal Trigger Buttons */}
-                      <td className="p-4 text-center">
+                      <td className={`${adminSurface.td} text-center`}>
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             type="button"
@@ -172,7 +200,7 @@ function Purchase() {
                               setEditId(el?._id);
                               setOpen(true);
                             }}
-                            className="btn btn-square btn-xs btn-outline border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            className={adminSurface.iconButton}
                           >
                             <FaCreditCard className="w-3.5 h-3.5" />
                           </button>
@@ -183,7 +211,7 @@ function Purchase() {
                               setEditId(el?._id);
                               setOpenStatus(true);
                             }}
-                            className="btn btn-square btn-xs btn-outline border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            className={adminSurface.iconButton}
                           >
                             <TbTruckDelivery className="w-3.5 h-3.5" />
                           </button>
@@ -197,25 +225,25 @@ function Purchase() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-4 border-t border-gray-100 pt-4">
-            <p className="text-sm text-gray-600">
+          <div className={adminSurface.footer}>
+            <p className="text-sm text-[#45464d]">
               Page {page}/{totalPage || 1}
             </p>
             <div className="join">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
-                className="join-item btn btn-sm btn-outline border-gray-200"
+                className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
               >
                 {"<<"}
               </button>
-              <button className="join-item btn btn-sm btn-active bg-gray-100 border-gray-200 pointer-events-none">
+              <button className="join-item btn btn-sm pointer-events-none border-[#0058be] bg-[#d8e2ff] text-[#0058be]">
                 Page {page}
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= totalPage}
-                className="join-item btn btn-sm btn-outline border-gray-200"
+                className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
               >
                 {">>"}
               </button>

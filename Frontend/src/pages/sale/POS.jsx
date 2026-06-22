@@ -145,15 +145,15 @@ function POS() {
   if (productsLoading || categoriesLoading) return <Loading />;
 
   return (
-    <div className="p-4 w-full">
-      <h1 className="text-2xl font-bold text-gray-800">Point of Sale</h1>
-      <div className="grid grid-cols-12 gap-4 mt-4">
-        <div className="col-span-12 lg:col-span-8">
-            <div className="mb-3 bg-white p-3 shadow-sm rounded-lg border border-gray-100 flex items-center justify-between">
+    <div className="w-full max-w-full p-3 sm:p-4">
+      <h1 className="text-xl font-bold text-gray-800 sm:text-2xl">Point of Sale</h1>
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="min-w-0 xl:col-span-8">
+            <div className="mb-3 flex flex-col gap-3 rounded-lg border border-gray-100 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="font-semibold text-lg">Categories</h1>
-                <label className="input input-sm input-bordered flex items-center gap-2">
+                <label className="input input-sm input-bordered flex w-full items-center gap-2 sm:w-72">
                   <LuScanBarcode size={18}/>
-                  <input onChange={(e) => setSearch(e.target.value)} value={search} onKeyDown={handleAddToCartKeyDown} placeholder="Scan code..." />
+                  <input className="min-w-0 flex-1" onChange={(e) => setSearch(e.target.value)} value={search} onKeyDown={handleAddToCartKeyDown} placeholder="Scan code..." />
                 </label>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-3 mb-2 scrollbar-hide">
@@ -164,7 +164,7 @@ function POS() {
                   </button>
                 ))}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               {products?.map((item) => (
                 <div key={item._id} onClick={() => handleAddToCart(item)} className="p-2 cursor-pointer bg-white rounded-lg border shadow-sm hover:shadow-md flex flex-col items-center">
                   <div className="w-full aspect-square overflow-hidden rounded-md bg-gray-50 flex items-center justify-center mb-2 border border-gray-100">
@@ -184,9 +184,10 @@ function POS() {
               ))}
             </div>
         </div>
-        <div className="col-span-12 lg:col-span-4 bg-white p-4 rounded-lg border">
+        <div className="min-w-0 rounded-lg border bg-white p-4 xl:col-span-4">
             <h4 className="font-bold border-b pb-2">Carts</h4>
-            <table className="table w-full">
+            <div className="max-w-full overflow-x-auto">
+            <table className="table min-w-[520px] w-full">
                 <tbody>
                     {carts.map((item, idx) => (
                         <tr key={item.product || idx} className="text-sm">
@@ -212,8 +213,9 @@ function POS() {
                     ))}
                 </tbody>
             </table>
+            </div>
             <div className="text-xl font-bold mt-4">TOTAL: {totalCost.toLocaleString()}៛</div>
-            <button onClick={() => setOpen(true)} disabled={carts.length === 0 || isLoading} className="btn btn-neutral w-full mt-4">PURCHASE</button>
+            <button onClick={() => setOpen(true)} disabled={carts.length === 0 || isLoading} className="btn btn-neutral min-h-11 w-full mt-4">PURCHASE</button>
         </div>
       </div>
       <Modal open={open} onClose={() => setOpen(false)} title="Payment">

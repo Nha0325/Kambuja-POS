@@ -40,10 +40,10 @@ function EditCategory() {
   }, [data]);
 
   return (
-    <div className="p-4">
+    <div className="w-full max-w-full p-3 sm:p-4">
       <h1 className="text-xl font-semibold text-black">Edit Category</h1>
 
-      <div className="max-w-lg bg-white p-4 rounded-lg mt-4 border border-gray-200">
+      <div className="mt-4 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-4">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="category-name" className="block text-sm font-medium mb-1">
@@ -75,11 +75,11 @@ function EditCategory() {
             ></textarea>
           </div>
 
-          <div className="flex justify-end items-center space-x-2 mt-4">
-            <Link to="/admin/categories" className="btn btn-sm">
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <Link to="/admin/categories" className="btn btn-sm w-full sm:w-auto">
               Cancel
             </Link>
-            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral">
+            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-auto">
               Save
             </button>
           </div>

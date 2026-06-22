@@ -1,7 +1,7 @@
 function Table({ children, className = "" }) {
   return (
-    <div className="overflow-x-auto border border-gray-200 bg-white">
-      <table className={`table ${className}`}>{children}</table>
+    <div className="max-w-full overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <table className={`table min-w-full ${className}`}>{children}</table>
     </div>
   )
 }

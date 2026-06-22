@@ -17,7 +17,6 @@ const useCollection = (collection) => {
             const msg = formatApiError(error)
             toast.error(msg)
             console.error("Create Error:", error.response?.data || error.message)
-            throw error
         }finally{
             setIsLoading(false)
         }
@@ -32,7 +31,6 @@ const useCollection = (collection) => {
             const msg = formatApiError(error)
             toast.error(msg)
             console.error("Update Error:", error.response?.data || error.message)
-            throw error
         }finally{
             setIsLoading(false)
         }
@@ -47,7 +45,6 @@ const useCollection = (collection) => {
             const msg = formatApiError(error)
             toast.error(msg)
             console.error("Remove Error:", error.response?.data || error.message)
-            throw error
         }finally{
             setIsLoading(false)
         }

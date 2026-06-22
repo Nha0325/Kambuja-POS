@@ -73,28 +73,28 @@ function CreateAdmin() {
                 <option value="">Unassigned admin</option>
                 {shops.map((shop) => <option key={shop._id} value={shop._id}>{shop.name}</option>)}
               </select>
-              <span className="block text-xs leading-5 text-gray-500">Unassigned admins can be selected as a new shop owner.</span>
+              <span className="block text-xs leading-5 text-slate-500">Unassigned admins can be selected as a new shop owner.</span>
             </label>
           </div>
 
-          <div className="flex justify-end gap-4 border-t border-gray-200 pt-6">
-            <Link className={secondaryButtonClass} to="/admin-manager/admins">Cancel</Link>
-            <button className={primaryButtonClass} type="submit" disabled={isSaving}>
+          <div className="flex flex-col-reverse gap-3 border-t border-violet-100 pt-6 sm:flex-row sm:justify-end">
+            <Link className={`${secondaryButtonClass} w-full sm:w-auto`} to="/admin-manager/admins">Cancel</Link>
+            <button className={`${primaryButtonClass} w-full sm:w-auto`} type="submit" disabled={isSaving}>
               {isSaving ? "Saving..." : "Save Admin Account"}
             </button>
           </div>
         </form>
 
         <aside className="space-y-6 lg:col-span-4">
-          <div className="rounded-xl border border-gray-300 bg-[#f3f4f5] p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-gray-950">
+          <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-900">
               <FaCircleInfo />
               Role Permissions
             </h3>
-            <p className="mb-4 text-sm leading-6 text-gray-600">
+            <p className="mb-4 text-sm leading-6 text-slate-600">
               New administrators receive the standard ADMIN role. Shop ownership is optional during account creation.
             </p>
-            <ul className="space-y-3 text-sm text-gray-700">
+            <ul className="space-y-3 text-sm text-slate-700">
               <li className="flex items-start gap-3"><FaUserShield className="mt-1" /> Manage assigned shop operations</li>
               <li className="flex items-start gap-3"><FaUserShield className="mt-1" /> Review shop analytics</li>
               <li className="flex items-start gap-3"><FaUserShield className="mt-1" /> Generate platform reports</li>

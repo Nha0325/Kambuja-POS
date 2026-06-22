@@ -130,15 +130,15 @@ function CreatePurchase() {
   }, [carts]);
 
   return (
-    <div className="p-4">
+    <div className="w-full max-w-full p-3 sm:p-4">
       <h1 className="text-xl font-semibold">Create Purchase</h1>
 
-      <form onSubmit={handleSubmit} className="p-4 mt-5 bg-white rounded-lg intro-y">
+      <form onSubmit={handleSubmit} className="intro-y mt-5 rounded-lg bg-white p-4">
         <h3 className="text-base font-medium mt-1 w-fit mb-4 border-b border-slate-400 border-dashed">
           Import Product
         </h3>
-        <div className="grid grid-cols-12 gap-4">
-          <fieldset className="col-span-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <fieldset>
             <label className="block">Supplier</label>
             <select
               onChange={(e) => setSupplier(e.target.value)}
@@ -156,7 +156,7 @@ function CreatePurchase() {
               ))}
             </select>
           </fieldset>
-          <fieldset className="col-span-3">
+          <fieldset>
             <label className="block">Invoice Number</label>
             <div className="flex items-center">
               <input
@@ -167,7 +167,7 @@ function CreatePurchase() {
               />
             </div>
           </fieldset>
-          <fieldset className="col-span-3">
+          <fieldset>
             <label className="block">Import Date</label>
             <div className="flex items-center">
               <input
@@ -178,7 +178,7 @@ function CreatePurchase() {
               />
             </div>
           </fieldset>
-          <fieldset className="col-span-3">
+          <fieldset>
             <label className="block">Status</label>
             <div className="flex items-center">
               <select
@@ -197,7 +197,7 @@ function CreatePurchase() {
             </div>
           </fieldset>
 
-          <fieldset className="col-span-3">
+          <fieldset className="md:col-span-2 xl:col-span-4">
             <label className="block">Note</label>
             <textarea
               onChange={(e) => setNote(e.target.value)}
@@ -211,8 +211,8 @@ function CreatePurchase() {
           Product Details
         </h3>
 
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4 space-y-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="min-w-0 space-y-2 lg:col-span-4">
             <fieldset>
               <label className="block">Product Code</label>
               <div className="flex items-center relative">
@@ -238,7 +238,7 @@ function CreatePurchase() {
               </div>
             </fieldset>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <fieldset>
                 <label className="block">Quantity</label>
                 <div className="flex items-center">
@@ -272,16 +272,16 @@ function CreatePurchase() {
               <button
                 onClick={handleAddToCart}
                 type="button"
-                className="btn btn-sm btn-neutral w-20"
+                className="btn btn-sm btn-neutral w-full sm:w-20"
               >
                 Add
               </button>
             </fieldset>
           </div>
 
-          <div className="col-span-8">
-            <div className="mt-3 overflow-auto lg:overflow-visible">
-              <table className="w-full">
+          <div className="min-w-0 lg:col-span-8">
+            <div className="mt-3 max-w-full overflow-x-auto rounded-lg border border-gray-200">
+              <table className="min-w-[760px] w-full">
                 <thead>
                   <tr className="bg-gray-200 text-sm">
                     <th className="text-left whitespace-nowrap p-4">Image</th>
@@ -334,11 +334,11 @@ function CreatePurchase() {
           </div>
         </div>
 
-        <fieldset className="col-span-12 mt-4 flex items-center justify-end space-x-2">
-          <button type="button" className="w-20 btn btn-sm">
+        <fieldset className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <button type="button" className="btn btn-sm w-full sm:w-20">
             Cancel
           </button>
-          <button type="submit" disabled={isLoading} className="w-20 btn btn-sm btn-neutral">
+          <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-20">
             Save
           </button>
         </fieldset>

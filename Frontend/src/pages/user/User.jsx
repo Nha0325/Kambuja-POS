@@ -5,6 +5,7 @@ import { IoPencilSharp } from "react-icons/io5";
 import { IoMdTrash } from "react-icons/io";
 import useCollection from "../../hooks/useCollection";
 import toast from "react-hot-toast";
+import { adminSurface } from "../admin/adminPageUi";
 
 function User() {
   const [search, setSearch] = useState("");
@@ -14,6 +15,8 @@ function User() {
 
   const { data, totalPage, isLoading } = useFetchData("users", page, limit, search, refetch);
   const { remove, isLoading: isDeleting } = useCollection("users");
+  const userCount = data?.length || 0;
+  const cashierCount = data?.filter((user) => user?.role === "cashier")?.length || 0;
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this user?")) {
@@ -30,79 +33,102 @@ function User() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mt-2">
-        <h1 className="text-xl font-semibold text-black">User Management</h1>
-        <Link to="/admin/cashiers/create" className="btn btn-sm btn-neutral">
+    <div className={adminSurface.page}>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>Staff</p>
+          <h1 className={adminSurface.title}>Cashiers</h1>
+          <p className={adminSurface.description}>
+            Manage cashier accounts, user roles, and shop access for the POS team.
+          </p>
+        </div>
+        <Link to="/admin/cashiers/create" className={adminSurface.primaryButton}>
           + Add Cashier
         </Link>
       </div>
 
-      <div className="bg-white mt-4 p-4 rounded-md border border-gray-200">
-        <div className="flex items-center justify-between">
+      <div className={adminSurface.statGrid}>
+        {[
+          ["Users", userCount],
+          ["Cashiers", cashierCount],
+          ["Page", page],
+          ["Rows per page", limit],
+        ].map(([label, value]) => (
+          <div key={label} className={adminSurface.statCard}>
+            <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className={adminSurface.statValue}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className={adminSurface.tableShell}>
+        <div className={adminSurface.toolbar}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <fieldset className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Show</span>
+            <span className="text-sm text-[#45464d]">Show</span>
             <select
               onChange={(e) => setLimit(Number(e.target.value))}
               value={limit}
-              className="select select-bordered select-sm h-9 min-h-0"
+              className={`${adminSurface.select} w-20`}
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-sm text-gray-600">entries</span>
+            <span className="text-sm text-[#45464d]">entries</span>
           </fieldset>
 
-          <fieldset>
+          <fieldset className="w-full lg:max-w-sm">
             <input
               type="text"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search users..."
-              className="input input-bordered input-sm h-9 w-64"
+              className={`${adminSurface.input} w-full`}
             />
           </fieldset>
         </div>
+        </div>
 
-        <div className="overflow-x-auto mt-4 border border-gray-200 rounded-lg">
-          <table className="table w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700 text-sm border-b border-gray-200">
-                <th className="p-4 text-center font-semibold w-12">N.o</th>
-                <th className="p-4 text-left font-semibold">Username</th>
-                <th className="p-4 text-left font-semibold">Email</th>
-                <th className="p-4 text-left font-semibold">Role</th>
-                <th className="p-4 text-center font-semibold w-24">Action</th>
+        <div className={adminSurface.tableWrap}>
+          <table className={`${adminSurface.table} min-w-[760px]`}>
+            <thead className={adminSurface.tableHead}>
+              <tr>
+                <th className={`${adminSurface.th} w-12 text-center`}>N.o</th>
+                <th className={adminSurface.th}>Username</th>
+                <th className={adminSurface.th}>Email</th>
+                <th className={adminSurface.th}>Role</th>
+                <th className={`${adminSurface.th} w-24 text-center`}>Action</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-8 text-gray-500">
+                  <td colSpan="5" className="p-8 text-center text-[#45464d]">
                     Loading users...
                   </td>
                 </tr>
               ) : data?.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-8 text-gray-400">
+                  <td colSpan="5" className="p-8 text-center text-[#5b6472]">
                     No users found.
                   </td>
                 </tr>
               ) : (
                 data?.map((user, index) => (
-                  <tr key={user?._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm text-gray-800">
-                    <td className="p-4 text-center font-medium text-gray-500">
+                  <tr key={user?._id} className={adminSurface.row}>
+                    <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
                       {(page - 1) * limit + index + 1}
                     </td>
-                    <td className="p-4 font-medium">{user?.username || "-"}</td>
-                    <td className="p-4 text-gray-600">{user?.email || "-"}</td>
-                    <td className="p-4 capitalize text-gray-600">{user?.role || "-"}</td>
-                    <td className="p-4 text-center">
+                    <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>{user?.username || "-"}</td>
+                    <td className={`${adminSurface.td} text-[#45464d]`}>{user?.email || "-"}</td>
+                    <td className={`${adminSurface.td} capitalize text-[#45464d]`}>{user?.role || "-"}</td>
+                    <td className={`${adminSurface.td} text-center`}>
                       <div className="flex items-center justify-center space-x-1.5">
                         <Link
                           to={`/admin/cashiers/${user._id}/edit`}
-                          className="btn btn-square btn-xs btn-outline border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          className={adminSurface.iconButton}
                         >
                           <IoPencilSharp className="w-3.5 h-3.5" />
                         </Link>
@@ -110,7 +136,7 @@ function User() {
                           type="button"
                           onClick={() => handleDelete(user._id)}
                           disabled={isDeleting}
-                          className="btn btn-square btn-xs btn-outline border-gray-200 text-red-600 hover:bg-red-100 hover:text-red-700"
+                          className={adminSurface.dangerIconButton}
                         >
                           <IoMdTrash className="w-3.5 h-3.5" />
                         </button>
@@ -123,25 +149,25 @@ function User() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between mt-4 border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-600">
+        <div className={adminSurface.footer}>
+          <p className="text-sm text-[#45464d]">
             Page {page}/{totalPage || 1}
           </p>
           <div className="join">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {"<<"}
             </button>
-            <button className="join-item btn btn-sm btn-active bg-gray-100 border-gray-200 pointer-events-none">
+            <button className="join-item btn btn-sm pointer-events-none border-[#0058be] bg-[#d8e2ff] text-[#0058be]">
               Page {page}
             </button>
             <button
               onClick={() => setPage(page + 1)}
               disabled={page >= totalPage}
-              className="join-item btn btn-sm btn-outline border-gray-200"
+              className="join-item btn btn-sm border-[#c6c6cd] bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
             >
               {">>"}
             </button>

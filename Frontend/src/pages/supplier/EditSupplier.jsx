@@ -52,12 +52,12 @@ function EditSupplier() {
   }, [supplier, isFinding]);
 
   return (
-    <div className="p-4">
+    <div className="w-full max-w-full p-3 sm:p-4">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold text-black">Edit Supplier</h1>
       </div>
 
-      <div className="max-w-lg bg-white p-4 rounded-lg mt-4 border border-gray-200">
+      <div className="mt-4 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-4">
         <form onSubmit={handleSubmit}>
    
 <div className="mb-3">
@@ -135,11 +135,11 @@ function EditSupplier() {
             ></textarea>
           </div>
 
-          <div className="flex justify-end items-center space-x-2 mt-4">
-            <Link to="/admin/suppliers" className="btn btn-sm">
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <Link to="/admin/suppliers" className="btn btn-sm w-full sm:w-auto">
               Cancel
             </Link>
-            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral">
+            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-auto">
               {isLoading ? (
                 <span className="loading loading-spinner loading-xs"></span>
               ) : (

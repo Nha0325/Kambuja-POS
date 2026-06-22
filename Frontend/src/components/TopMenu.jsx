@@ -33,28 +33,31 @@ function TopMenu({ onShowSidebar }) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  return (
-    <div className="relative z-40 h-[56px] border-b border-gray-400 bg-white flex items-center justify-between w-full px-4">
-      {normalizeRole(user?.role) === ROLES.CASHIER && <h1 className="text-sm font-bold">Master POS</h1>}
+  const isCashier = normalizeRole(user?.role) === ROLES.CASHIER
 
-      {normalizeRole(user?.role) !== ROLES.CASHIER && (
+  return (
+    <div className="relative z-40 flex h-[60px] w-full min-w-0 items-center justify-between gap-3 border-b border-[#d7dced] bg-white px-3 shadow-sm sm:px-5">
+      <div className="flex min-w-0 items-center gap-3">
+      {onShowSidebar && (
         <button
           onClick={onShowSidebar || undefined}
           type="button"
-          className="text-xl text-gray-900"
+          className="shrink-0 rounded-lg p-2 text-xl text-[#0b1c30] hover:bg-[#eff4ff]"
           aria-label="Toggle sidebar"
         >
           <FaListUl />
         </button>
       )}
+      {isCashier && <h1 className="min-w-0 truncate text-sm font-bold">Master POS</h1>}
+      </div>
 
       <div className="flex min-w-0 items-center gap-2">
      
-        {normalizeRole(user?.role) === ROLES.CASHIER && (
+        {isCashier && (
           <button
             type="button"
             onClick={() => navigate("/cashier/pos")}
-            className="btn btn-outline btn-neutral btn-sm min-h-0 h-8 rounded-sm px-3 text-xs"
+            className="btn btn-outline btn-sm hidden h-9 min-h-0 rounded-lg border-[#c6c6cd] px-3 text-xs text-[#0b1c30] hover:border-[#0058be] hover:bg-[#eff4ff] hover:text-[#0058be] sm:inline-flex"
           >
             <span>
               <GiTwoCoins />
@@ -68,7 +71,7 @@ function TopMenu({ onShowSidebar }) {
           <button
             type="button"
             onClick={() => setIsAccountOpen((prev) => !prev)}
-            className="btn btn-neutral btn-sm min-h-0 h-8 max-w-40 rounded-sm px-3 text-xs"
+            className="btn btn-sm h-9 min-h-0 max-w-32 rounded-lg border-0 bg-[#0b1c30] px-2 text-xs text-white hover:bg-[#213145] sm:max-w-40 sm:px-3"
           >
           <span>
             <FaUserCog />
@@ -76,8 +79,8 @@ function TopMenu({ onShowSidebar }) {
           <span className="truncate capitalize">{user?.username}</span>
         </button>
           {isAccountOpen && (
-            <ul className="menu absolute right-0 top-full z-50 mt-2 w-64 rounded-box border border-gray-200 bg-base-100 p-2 shadow-lg">
-              <li className="border-b border-gray-200">
+            <ul className="menu absolute right-0 top-full z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-[#d7dced] bg-white p-2 shadow-lg">
+              <li className="border-b border-[#e5eeff]">
                 <div className="flex items-center gap-2 p-2">
                   <span className="shrink-0"><MdEmail/></span>
                   <span className="min-w-0 truncate">{user?.email}</span>

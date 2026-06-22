@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { adminService } from "../../services/admin.service"
+import { adminSurface } from "./adminPageUi"
 
 function ShopSettings() {
   const [form, setForm] = useState({ name: "", phone: "", address: "", province: "", city: "" })
@@ -22,9 +23,33 @@ function ShopSettings() {
   }
 
   return (
-    <section className="max-w-2xl">
-      <h1 className="text-xl font-semibold">Shop Settings</h1>
-      <form onSubmit={submit} className="mt-4 grid grid-cols-1 gap-4 border border-gray-200 bg-white p-5 sm:grid-cols-2">
+    <section className={adminSurface.page}>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>Configuration</p>
+          <h1 className={adminSurface.title}>Shop Settings</h1>
+          <p className={adminSurface.description}>
+            Update the shop profile used across admin, reporting, and receipt workflows.
+          </p>
+        </div>
+      </div>
+
+      <div className={adminSurface.statGrid}>
+        {[
+          ["Shop", form.name || "-"],
+          ["Phone", form.phone || "-"],
+          ["Province", form.province || "-"],
+          ["City", form.city || "-"],
+        ].map(([label, value]) => (
+          <div key={label} className={adminSurface.statCard}>
+            <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className="mt-3 truncate text-xl font-bold text-[#0b1c30]">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <form onSubmit={submit} className={`${adminSurface.card} grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2`}>
         {[
           ["name", "Name"],
           ["phone", "Phone"],
@@ -33,12 +58,12 @@ function ShopSettings() {
           ["city", "City"],
         ].map(([name, label]) => (
           <label key={name} className="form-control">
-            <span className="mb-1 text-sm">{label}</span>
-            <input className="input input-bordered" value={form[name] || ""} onChange={(event) => setForm({ ...form, [name]: event.target.value })} />
+            <span className="mb-2 text-sm font-semibold text-[#0b1c30]">{label}</span>
+            <input className={`${adminSurface.input} h-12 w-full`} value={form[name] || ""} onChange={(event) => setForm({ ...form, [name]: event.target.value })} />
           </label>
         ))}
         <div className="flex justify-end sm:col-span-2">
-          <button className="btn btn-sm btn-neutral" type="submit">Save</button>
+          <button className={adminSurface.primaryButton} type="submit">Save</button>
         </div>
       </form>
     </section>

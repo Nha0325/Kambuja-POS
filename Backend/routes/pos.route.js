@@ -4,7 +4,7 @@ const shopScopeGuard = require("../guards/shop-scope.guard")
 const { lookup } = require("../controller/product-code.controller")
 
 const router = express.Router()
-router.use(restrict("CASHIER"), shopScopeGuard)
+router.use(restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), shopScopeGuard)
 router.get("/scan/:code", lookup)
 
 module.exports = router

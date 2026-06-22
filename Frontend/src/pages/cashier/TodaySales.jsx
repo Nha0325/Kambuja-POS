@@ -12,10 +12,10 @@ function TodaySales() {
   }, [])
 
   return (
-    <section className="p-4">
+    <section className="w-full max-w-full p-3 sm:p-4">
       <h1 className="text-xl font-semibold">Today Sales</h1>
       <div className="mt-4 overflow-x-auto border border-gray-200 bg-white">
-        <table className="table">
+        <table className="table min-w-[720px]">
           <thead><tr><th>Invoice</th><th>Time</th><th>Total</th><th>Payment</th><th /></tr></thead>
           <tbody>
             {sales.map((sale) => (
