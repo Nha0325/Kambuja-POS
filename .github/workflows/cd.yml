@@ -18,13 +18,13 @@ jobs:
     steps:
       # Download the repository code into the GitHub Actions runner.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      # Use Node.js 20 for Backend and Frontend validation.
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      # Use Node.js 24 for Backend and Frontend validation.
+      - name: Use Node.js 24
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: |
             Backend/package-lock.json
