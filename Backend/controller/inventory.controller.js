@@ -64,6 +64,7 @@ const updateStock = async (req, res, next, movementType) => {
 exports.list = async (req, res, next) => {
     try {
         const docs = await Inventory.find(req.shopFilter)
+            .populate("shopId", "name code")
             .populate("product", "name code imageUrl costPrice salePrice currentStock")
             .sort({ updatedAt: -1 })
         res.status(200).json({ success: true, result: docs })

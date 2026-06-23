@@ -31,5 +31,13 @@ export const adminSurface = {
   select:
     "h-10 min-h-0 rounded-lg border border-[#c6c6cd] bg-white px-3 py-2 text-sm text-[#0b1c30] outline-none transition focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/15",
   footer: "flex flex-col gap-3 border-t border-[#e5eeff] bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between",
+  pageSizeSelect:
+    "h-10 min-h-0 w-20 rounded-lg border border-[#c6c6cd] bg-white px-3 py-2 text-sm font-semibold text-[#0b1c30] outline-none transition focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/15",
+  paginationMeta:
+    "inline-flex min-h-10 items-center rounded-lg border border-[#d7dced] bg-[#f8f9ff] px-3 text-sm font-semibold text-[#45464d]",
+  paginationButton:
+    "inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white text-[#0b1c30] transition hover:border-[#0058be] hover:bg-[#eff4ff] hover:text-[#0058be] disabled:cursor-not-allowed disabled:text-[#76777d] disabled:opacity-50",
+  paginationCurrent:
+    "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-[#0058be] bg-[#d8e2ff] px-3 text-sm font-bold text-[#0058be]",
   badge: "inline-flex items-center rounded-full border border-[#d7dced] bg-[#f8f9ff] px-2.5 py-1 text-xs font-semibold text-[#213145]",
 }

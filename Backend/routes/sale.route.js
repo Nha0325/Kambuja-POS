@@ -9,7 +9,7 @@ router.use(shopScopeGuard)
 
 router
     .route("/")
-    .post(restrict("CASHIER"), create)
+    .post(restrict("ADMIN", "CASHIER"), create)
     .get(restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findAll)
 
 router.get("/checkStock", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), checkStock)

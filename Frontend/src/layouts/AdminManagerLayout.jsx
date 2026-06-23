@@ -15,6 +15,8 @@ const pageTitles = [
   ["/admin-manager/shops/create", "Create Shop"],
   ["/admin-manager/shops/", "Edit Shop"],
   ["/admin-manager/shops", "Shops"],
+  ["/admin-manager/stock", "Stock"],
+  ["/admin-manager/pos", "POS"],
   ["/admin-manager/admins/create", "Create Admin"],
   ["/admin-manager/admins", "Admin Accounts"],
   ["/admin-manager/reports", "Platform Reports"],

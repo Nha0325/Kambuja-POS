@@ -1,23 +1,23 @@
 import { NavLink } from "react-router-dom"
 import {
+  FaBoxesStacked,
   FaBuilding,
+  FaCashRegister,
   FaChartColumn,
   FaGear,
   FaGaugeHigh,
   FaTerminal,
   FaUserShield,
-  FaBoxesStacked,
-  FaCashRegister,
 } from "react-icons/fa6"
 
 const primaryItems = [
   { to: "/admin-manager/dashboard", label: "Dashboard", icon: FaGaugeHigh },
   { to: "/admin-manager/shops", label: "Shops", icon: FaBuilding },
+  { to: "/admin-manager/stock", label: "Stock", icon: FaBoxesStacked },
+  { to: "/admin-manager/pos", label: "POS", icon: FaCashRegister },
   { to: "/admin-manager/admins", label: "User Management", icon: FaUserShield },
   { to: "/admin-manager/reports", label: "Platform Reports", icon: FaChartColumn },
   { to: "/admin-manager/system-logs", label: "System Logs", icon: FaTerminal },
-  { to: "/admin/inventory", label: "Stock", icon: FaBoxesStacked },
-  { to: "/cashier/pos", label: "POS", icon: FaCashRegister },
 ]
 
 const footerItems = [

@@ -8,6 +8,8 @@ import SalePaymentModal from "./SalePaymentModal";
 import Loading from "../../components/Loading";
 import useCurrent from "../../hooks/auth/useCurrent";
 import { ROLES, normalizeRole } from "../../utils/role";
+import AdminPagination from "../../components/admin/AdminPagination";
+import { adminSurface } from "../admin/adminPageUi";
 
 function ListSale() {
   const { data: currentUser } = useCurrent()
@@ -40,7 +42,9 @@ function ListSale() {
             <select
               onChange={(e) => setLimit(Number(e.target.value))}
               value={limit}
-              className="select select-sm select-bordered"
+              aria-label="Page size"
+              title="Page size"
+              className={adminSurface.pageSizeSelect}
             >
               <option value="25">25</option>
               <option value="50">50</option>
@@ -159,28 +163,14 @@ function ListSale() {
             </table>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-gray-500">
-              Page {page}/{totalPage || 1}
-            </p>
-            <div className="join">
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-                className="join-item btn btn-sm btn-outline border-gray-200"
-              >
-                {"<<"}
-              </button>
-              <button className="join-item btn btn-sm btn-active bg-gray-100 border-gray-200 pointer-events-none">{page}</button>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={page >= totalPage}
-                className="join-item btn btn-sm btn-outline border-gray-200"
-              >
-                {">>"}
-              </button>
-            </div>
-          </div>
+          <AdminPagination
+            page={page}
+            totalPage={totalPage}
+            onPrevious={() => setPage(page - 1)}
+            onNext={() => setPage(page + 1)}
+            previousDisabled={page === 1}
+            nextDisabled={page >= (totalPage || 1)}
+          />
         </div>
       </div>
 
