@@ -49,9 +49,9 @@ function SaleReport() {
         <div className={adminSurface.statGrid}>
           {[
             ["Sales", data.length],
-            ["Total amount", `${totalAmount?.toLocaleString()}៛`],
-            ["Paid amount", `${paidAmount.toLocaleString()}៛`],
-            ["Due amount", `${dueAmount.toLocaleString()}៛`],
+            ["Total amount", `$${Number(totalAmount || 0).toFixed(2)}`],
+            ["Paid amount", `$${Number(paidAmount || 0).toFixed(2)}`],
+            ["Due amount", `$${Number(dueAmount || 0).toFixed(2)}`],
           ].map(([label, value]) => (
             <div key={label} className={adminSurface.statCard}>
               <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
@@ -140,16 +140,16 @@ function SaleReport() {
                       <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>{item?.invoiceNumber}</td>
                       <td className={`${adminSurface.td} capitalize text-[#45464d]`}>{item?.user?.username}</td>
                       <td className={`${adminSurface.td} font-semibold text-red-600`}>
-                        {item?.totalCost?.toLocaleString()}៛
+                        ${Number(item?.totalCost || 0).toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} font-semibold text-red-600`}>
-                        {item?.paidAmount?.toLocaleString()}៛
+                        ${Number(item?.paidAmount || 0).toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} font-semibold text-red-600`}>
-                        {item?.dueAmount?.toLocaleString()}៛
+                        ${Number(item?.dueAmount || 0).toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} font-semibold text-red-600`}>
-                        {item?.changeAmount?.toLocaleString()}៛
+                        ${Number(item?.changeAmount || 0).toFixed(2)}
                       </td>
                       <td className={adminSurface.td}>
                         <span
@@ -196,7 +196,7 @@ function SaleReport() {
           <div className={adminSurface.footer}>
             <h1 className="text-sm font-semibold text-[#0b1c30]">
               Total Amount:{" "}
-              <span className="text-red-500 font-semibold">{totalAmount?.toLocaleString()}៛
+              <span className="text-red-500 font-semibold">${Number(totalAmount || 0).toFixed(2)}
               </span>
             </h1>
           </div>

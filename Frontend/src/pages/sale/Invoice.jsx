@@ -3,7 +3,8 @@ import useFetchOne from "../../hooks/useFetchOne";
 import formatDate from "../../utils/formatDate";
 
 function Invoice() {
-  const { id } = useParams(); 
+  const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`;
+  const { id } = useParams();
   const { data } = useFetchOne("sales", id);
 
   return (
@@ -33,8 +34,7 @@ function Invoice() {
             <tr key={item.productId || idx} className="border-b border-gray-100">
               <td className="text-left py-1">{item?.product?.name || item?.name}</td>
               <td className="text-center py-1">{item?.quantity}</td>
-              {/* បង្ហាញជា លុយរៀល ៛ */}
-              <td className="text-right py-1">{(Number(item?.totalPrice || 0)).toLocaleString()}៛</td>
+              <td className="text-right py-1">{formatUsd(item?.totalPrice)}</td>
             </tr>
           ))}
         </tbody>
@@ -44,7 +44,7 @@ function Invoice() {
 
       <div className="flex justify-between font-bold text-sm bg-black text-white p-1 rounded">
         <span>Total</span>
-        <span>{(Number(data?.totalCost || 0)).toLocaleString()}៛</span>
+        <span>{formatUsd(data?.totalCost)}</span>
       </div>
 
       <div className="border-b border-dashed border-black my-2"></div>

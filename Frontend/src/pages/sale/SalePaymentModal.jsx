@@ -76,16 +76,16 @@ function SalePaymentModal({ open, editId, onClose }) {
           <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm space-y-1">
             <div className="flex justify-between">
               <span>Total Cost:</span>
-              <span className="font-bold">{Number(data?.totalCost || 0).toLocaleString()} ៛</span>
+              <span className="font-bold">${Number(data?.totalCost || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-green-700">
               <span>Already Paid:</span>
-              <span className="font-bold">{Number(data?.paidAmount || 0).toLocaleString()} ៛</span>
+              <span className="font-bold">${Number(data?.paidAmount || 0).toFixed(2)}</span>
             </div>
           </div>
 
           <div className="mb-3">
-            <label className="block text-sm font-medium mb-1">Paid Amount (៛)</label>
+            <label className="block text-sm font-medium mb-1">Paid Amount ($)</label>
             <input 
               onChange={(e) => setPaidAmount(e.target.value)} 
               value={paidAmount} 
@@ -95,8 +95,8 @@ function SalePaymentModal({ open, editId, onClose }) {
             />
           </div>
           <div className="mb-4 space-y-2">
-            <div className="text-red-600 font-semibold">Due: {dueAmount.toLocaleString()} ៛</div>
-            <div className="text-green-600 font-semibold">Change: {changeAmount.toLocaleString()} ៛</div>
+            <div className="text-red-600 font-semibold">Due: ${dueAmount.toFixed(2)}</div>
+            <div className="text-green-600 font-semibold">Change: ${changeAmount.toFixed(2)}</div>
           </div>
           <button
             type="submit"

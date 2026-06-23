@@ -5,7 +5,8 @@ body {
 }
 
 .invoice {
-  font-family: "Courier New", monospace; /* Better readability */
+  font-family: "Courier New", monospace;
+  /* Better readability */
   font-size: 12px;
   /* width:100%; */
   display: flex;

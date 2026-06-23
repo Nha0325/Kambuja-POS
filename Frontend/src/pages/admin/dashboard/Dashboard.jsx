@@ -7,9 +7,9 @@ import useFetchGeneralReport from "../../../hooks/useFetchGeneralReport";
 import { use30DaysAgoReport } from "../../../hooks/use30DaysAgoReport";
 import formatDate from "../../../utils/formatDate";
 
-const currency = "៛";
+const currency = "$";
 
-const formatCurrency = (value) => `${Number(value || 0).toLocaleString()} ${currency}`;
+const formatCurrency = (value) => `${currency}${Number(value || 0).toFixed(2)}`;
 
 function DashboardMetric({ label, value, icon: Icon, accent = "bg-[#eff4ff] text-[#0058be]" }) {
   return (

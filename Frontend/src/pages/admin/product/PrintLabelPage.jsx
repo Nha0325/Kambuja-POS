@@ -19,7 +19,7 @@ function PrintLabelPage() {
     <div className="print-area">
       {products?.map((el) => (
         <div key={el.id} className="label">
-          <p className="label-text">{el.productName} |<span className="price">{el.salePrice?.toLocaleString()}៛</span>
+          <p className="label-text">{el.productName} |<span className="price">${Number(el.salePrice || 0).toFixed(2)}</span>
           </p>
           <div className="barcode-container">
             <Barcode

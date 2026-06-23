@@ -162,6 +162,10 @@ exports.findAll = async (req, res, next) => {
         const skip = (page - 1) * limit
         const querySearch = { ...req.shopFilter }
 
+        if (req.user && req.user.role === 'CASHIER') {
+            querySearch.user = req.user._id;
+        }
+
         if(req.query.search){
             querySearch["$or"] = [
                 { $expr: { 
@@ -311,6 +315,7 @@ exports.findToday = async (req, res, next) => {
 
         const docs = await Sale.find({
             ...req.shopFilter,
+            ...(req.user && req.user.role === 'CASHIER' ? { user: req.user._id } : {}),
             createdAt: { $gte: start, $lte: end },
         })
             .populate("user", "username role")

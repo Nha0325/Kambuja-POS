@@ -251,7 +251,7 @@ function CreatePurchase() {
                 </div>
               </fieldset>
               <fieldset>
-                <label className="label-b">Unit Price (៛)</label>
+                <label className="label-b">Unit Price ($)</label>
                 <div className="flex items-center">
                   <input
                     onChange={(e) => setUnitPrice(Number(e.target.value))}
@@ -265,7 +265,7 @@ function CreatePurchase() {
 
             <fieldset>
               <label className="label-b">
-                Total : <span className="text-red-600 font-semibold">{total.toLocaleString()} ៛</span>
+                Total : <span className="text-red-600 font-semibold">${total.toFixed(2)}</span>
               </label>
             </fieldset>
             <fieldset className="flex justify-end">
@@ -306,11 +306,11 @@ function CreatePurchase() {
 
                      
                       <td className="text-right text-red-600">
-                        {el?.unitPrice?.toLocaleString()} ៛
+                        ${Number(el?.unitPrice || 0).toFixed(2)}
                       </td>
                       <td className="text-right">{el?.quantity}</td>
                       <td className="text-right text-red-600">
-                        {el?.totalPrice?.toLocaleString()} ៛
+                        ${Number(el?.totalPrice || 0).toFixed(2)}
                       </td>
                       <td className="text-center px-4">
                         <p
@@ -325,7 +325,7 @@ function CreatePurchase() {
 
                   <tr className="bg-gray-200 border-t">
                     <td colSpan="6" className="text-right p-4 font-semibold uppercase">
-                      Total Cost : <span className="text-red-600">{totalCost?.toLocaleString()} ៛</span>
+                      Total Cost : <span className="text-red-600">${Number(totalCost || 0).toFixed(2)}</span>
                     </td>
                   </tr>
                 </tbody>

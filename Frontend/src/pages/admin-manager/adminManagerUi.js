@@ -12,7 +12,7 @@ export const tableHeadClass = "border-b border-violet-100 bg-violet-50/70 text-l
 export const tableHeadCellClass = "whitespace-nowrap px-4 py-3 align-middle sm:px-5"
 export const tableCellClass = "whitespace-nowrap px-4 py-4 align-middle text-sm text-slate-700 sm:px-5"
 
-export const formatRiel = (value) => `${Number(value || 0).toLocaleString()} ៛`
+export const formatRiel = (value) => `$${Number(value || 0).toFixed(2)}`
 
 export const getInitials = (value = "") => {
   const words = String(value).trim().split(/\s+/).filter(Boolean)

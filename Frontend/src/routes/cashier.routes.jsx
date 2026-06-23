@@ -5,6 +5,9 @@ import POS from "../pages/cashier/POS"
 import RoleAwarePOS from "../pages/cashier/RoleAwarePOS"
 import Checkout from "../pages/cashier/Checkout"
 import TodaySales from "../pages/cashier/TodaySales"
+import HoldBills from "../pages/cashier/HoldBills"
+import StockCheck from "../pages/cashier/StockCheck"
+import DailyClose from "../pages/cashier/DailyClose"
 import Invoice from "../pages/cashier/Invoice"
 import { ROLES } from "../utils/role"
 
@@ -27,7 +30,10 @@ export const cashierRoutes = (
     </Route>
     <Route path="/cashier" element={cashierLayout}>
       <Route path="checkout" element={<Checkout />} />
-      <Route path="today-sales" element={<TodaySales />} />
+      <Route path="sales-today" element={<TodaySales />} />
+      <Route path="hold-bills" element={<HoldBills />} />
+      <Route path="stock-check" element={<StockCheck />} />
+      <Route path="daily-close" element={<DailyClose />} />
     </Route>
     <Route
       path="/cashier/invoice/:id"

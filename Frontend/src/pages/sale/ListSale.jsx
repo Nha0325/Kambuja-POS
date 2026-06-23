@@ -115,12 +115,12 @@ function ListSale() {
                         <td className="px-2 py-3">{(page - 1) * limit + idx + 1}</td>
                         <td className="px-2 font-semibold text-gray-800 uppercase">{item?.invoiceNumber || "-"}</td>
                         <td className="px-2 capitalize text-gray-700">{item?.user?.username || "-"}</td>
-                        <td className="px-2 text-gray-800 font-medium">{totalCost.toLocaleString()}៛</td>
-                        <td className="px-2 text-green-600 font-medium">{paidAmount.toLocaleString()}៛</td>
+                        <td className="px-2 text-gray-800 font-medium">${totalCost.toFixed(2)}</td>
+                        <td className="px-2 text-green-600 font-medium">${paidAmount.toFixed(2)}</td>
                         <td className={`px-2 font-semibold ${dueAmount > 0 ? "text-error" : "text-gray-500"}`}>
-                          {dueAmount.toLocaleString()}៛
+                          ${dueAmount.toFixed(2)}
                         </td>
-                        <td className="px-2 text-blue-600 font-medium">{changeAmount.toLocaleString()}៛</td>
+                        <td className="px-2 text-blue-600 font-medium">${changeAmount.toFixed(2)}</td>
                         <td className="px-2">
                           <span
                             className={`px-2 py-1 rounded-full text-[10px] font-semibold uppercase ${

@@ -44,7 +44,7 @@ function Purchase() {
         <div className={adminSurface.statGrid}>
           {[
             ["Purchases", purchaseCount],
-            ["Total cost", `${totalCost.toLocaleString()} ៛`],
+            ["Total cost", `$${Number(totalCost || 0).toFixed(2)}`],
             ["Due", dueCount],
             ["Pending", pendingCount],
           ].map(([label, value]) => (
@@ -135,17 +135,17 @@ function Purchase() {
 
                       {/* Total Cost */}
                       <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>
-                        {(el?.totalCost || 0).toLocaleString()} ៛
+                        ${Number(el?.totalCost || 0).toFixed(2)}
                       </td>
 
                       {/* Due Amount */}
                       <td className={`${adminSurface.td} text-right font-medium text-orange-600`}>
-                        {(el?.dueAmount || 0).toLocaleString()} ៛
+                        ${Number(el?.dueAmount || 0).toFixed(2)}
                       </td>
 
                       {/* Change Amount */}
                       <td className={`${adminSurface.td} text-right font-medium text-green-600`}>
-                        {(el?.changeAmount || 0).toLocaleString()} ៛
+                        ${Number(el?.changeAmount || 0).toFixed(2)}
                       </td>
 
                       {/* Payment Status Badges */}

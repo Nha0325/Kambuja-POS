@@ -4,6 +4,18 @@ const { generateProductCode } = require("./counter.controller")
 const Inventory = require("../models/Inventory.model")
 const ProductCode = require("../models/ProductCode.model")
 
+const cashierSafeProduct = (product) => {
+    const safe = product.toObject ? product.toObject() : { ...product };
+    delete safe.costPrice;
+    delete safe.purchasePrice;
+    delete safe.supplierPrice;
+    delete safe.profit;
+    delete safe.margin;
+    delete safe.supplier;
+    delete safe.stockValue;
+    return safe;
+}
+
 exports.create = async (req, res,next) => {
     try {
         const code = await generateProductCode()
@@ -83,10 +95,15 @@ exports.findAll = async (req, res, next) => {
         const totalItem = await Product.countDocuments({...querySearch, ...filters, ...req.shopFilter});
         const totalPage = Math.ceil(totalItem / limit);
 
+        let resultDocs = docs;
+        if (req.user && req.user.role === 'CASHIER') {
+            resultDocs = docs.map(cashierSafeProduct);
+        }
+
         res.status(200).json({
             success: true,
             totalPage,
-            result:docs,
+            result: resultDocs,
         })
 
     } catch (error) {
@@ -104,9 +121,12 @@ exports.findOne = async (req, res, next) => {
                 error: "Document not found with that ID!"
             })
         }
+        
+        const resultDoc = (req.user && req.user.role === 'CASHIER') ? cashierSafeProduct(doc) : doc;
+        
         res.status(200).json({
             success: true,
-            result: doc
+            result: resultDoc
         })
     } catch (error) {
         next(error)
@@ -123,9 +143,12 @@ exports.findOneByCode = async (req, res, next) => {
                 error: "Document not found with that ID!"
             })
         }
+        
+        const resultDoc = (req.user && req.user.role === 'CASHIER') ? cashierSafeProduct(doc) : doc;
+
         res.status(200).json({
             success: true,
-            result: doc
+            result: resultDoc
         })
     } catch (error) {
         next(error)

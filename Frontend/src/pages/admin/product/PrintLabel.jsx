@@ -97,7 +97,7 @@ function PrintLabel() {
                   <td className="py-2 !p-4 capitalize">{el?.code}</td>
 
                   <td className="text-right text-red-600">
-                    {el?.salePrice?.toLocaleString()}៛
+                    ${Number(el?.salePrice || 0).toFixed(2)}
                   </td>
    
                   <td className="text-center px-4">

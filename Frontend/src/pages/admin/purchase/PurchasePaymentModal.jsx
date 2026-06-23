@@ -76,13 +76,13 @@ function PurchasePaymentModal({ open, editId, onClose }) {
         ) : (
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="block text-sm font-medium mb-1">Paid Amount (៛)</label>
+            <label className="block text-sm font-medium mb-1">Paid Amount ($)</label>
             <input
               onChange={(e) => setPaidAmount(e.target.value)}
               value={paidAmount}
               type="number"
               className="input input-bordered w-full"
-              placeholder="Enter amount in ៛"
+              placeholder="Enter amount in $"
             />
           </div>
           
@@ -94,20 +94,20 @@ function PurchasePaymentModal({ open, editId, onClose }) {
               className="btn block btn-sm btn-ghost border border-gray-200 w-full text-left justify-between px-3"
             >
               <span>Due Amount:</span>
-              <span className="text-red-600 font-semibold">{(data?.dueAmount || 0).toLocaleString()} ៛</span>
+              <span className="text-red-600 font-semibold">${Number(data?.dueAmount || 0).toFixed(2)}</span>
             </button>
             
             <div className="flex justify-between items-center btn-sm px-3 bg-gray-50 rounded-lg text-gray-700">
               <span>Remaining Due:</span>
               <span className="text-orange-600 font-semibold">
-                {Math.max(0, (data?.totalCost || 0) - ((data?.paidAmount || 0) + Number(paidAmount || 0))).toLocaleString()} ៛
+                ${Math.max(0, (data?.totalCost || 0) - ((data?.paidAmount || 0) + Number(paidAmount || 0))).toFixed(2)}
               </span>
             </div>
 
             <div className="flex justify-between items-center btn-sm px-3 bg-gray-50 rounded-lg text-gray-700">
               <span>Change Amount:</span>
               <span className="text-green-600 font-semibold">
-                {changeAmount.toLocaleString()} ៛
+                ${Number(changeAmount || 0).toFixed(2)}
               </span>
             </div>
           </div>

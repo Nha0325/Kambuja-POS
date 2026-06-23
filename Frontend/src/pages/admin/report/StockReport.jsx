@@ -129,8 +129,8 @@ function StockReport() {
                         <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>{item.name}</td>
                         <td className={`${adminSurface.td} font-semibold uppercase text-[#213145]`}>{item.code}</td>
                         <td className={`${adminSurface.td} text-[#45464d]`}>{item.category?.name}</td>
-                        <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>{Number(item.costPrice).toLocaleString()}៛</td>
-                        <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>{Number(item.salePrice).toLocaleString()}៛</td>
+                        <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>${Number(item.costPrice).toFixed(2)}</td>
+                        <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>${Number(item.salePrice).toFixed(2)}</td>
                         <td className={`${adminSurface.td} text-center font-bold text-[#0b1c30]`}>{item.currentStock}</td>
                     </tr>
                     );

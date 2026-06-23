@@ -17,7 +17,7 @@ function Product() {
 
   const { data: products, totalPage, isLoading } = useQuery("products", search, page, limit, refetch);
   const { remove, isLoading: isDeleting } = useCollection("products");
-  const currency = "៛";
+  const currency = "$";
   const productCount = products?.length || 0;
   const stockTotal = products?.reduce((sum, item) => sum + Number(item?.currentStock || 0), 0) || 0;
   const zeroStockCount = products?.filter((item) => Number(item?.currentStock || 0) <= 0).length || 0;
@@ -171,10 +171,10 @@ function Product() {
                       </td>
                       <td className={`${adminSurface.td} min-w-36 text-[#45464d]`}>{item?.category?.name || "-"}</td>
                       <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
-                        {cost.toLocaleString()} {currency}
+                        {currency}{cost.toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
-                        {sale.toLocaleString()} {currency}
+                        {currency}{sale.toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} min-w-32 text-center text-[#45464d]`}>{item?.currentStock ?? 0}</td>
                       <td className={`${adminSurface.td} min-w-48 max-w-xs truncate text-[#45464d]`}>{item?.note || "-"}</td>

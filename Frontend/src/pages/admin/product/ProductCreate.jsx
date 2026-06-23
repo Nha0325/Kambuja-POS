@@ -160,7 +160,7 @@ function CreateProduct() {
                 </div>
 
                 <div>
-                  <label className={labelClass}>Cost Price*</label>
+                  <label className={labelClass}>Cost Price ($)*</label>
                   <div className="relative">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#76777d]">$</span>
                     <input 
@@ -176,7 +176,7 @@ function CreateProduct() {
                 </div>
 
                 <div>
-                  <label className={labelClass}>Sale Price*</label>
+                  <label className={labelClass}>Sale Price ($)*</label>
                   <div className="relative">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#76777d]">$</span>
                     <input 
