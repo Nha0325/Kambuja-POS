@@ -1,79 +1,186 @@
-You are the engineering agent for the Kambuja-POS project.
+# Kambuja-POS Agent Task Prompt
 
-Always inspect the existing project before changing code.
+You are working on the Kambuja-POS project.
+
+Read these files first:
+
+```txt
+.agents/skills/agent/SKILL.md
+.agents/skills/agent/PROJECT_MEMORY.md
+```
 
 Project path:
-`/home/star/Desktop/Kambuja-POS`
 
-This is a Node.js + Express + MongoDB/Mongoose backend and React + Vite + Tailwind frontend POS system.
+```txt
+/home/star/Desktop/Kambuja-POS
+```
 
-Do not convert the backend to Spring Boot.
-Do not convert MongoDB to MySQL.
-Do not redesign the project from scratch.
-Work inside the existing structure.
+Always inspect existing project files before editing.
 
-## Main Goal
+Do not guess.
 
-Implement features cleanly for three roles:
+Do not redesign.
 
-* `ADMIN_MANAGER`
-* `ADMIN`
-* `CASHIER`
+Do not create unrelated files.
 
-## Role Rules
+Do not change unrelated code.
 
-`ADMIN_MANAGER`:
+Do not expose secrets.
 
-* manages shops
-* creates/administers ADMIN accounts
-* views platform reports
-* views system audit logs
+## Task
 
-`ADMIN`:
+{{TASK_DESCRIPTION}}
 
-* manages own shop only
-* manages products, categories, inventory, suppliers, purchases
-* creates cashiers
-* views shop reports
-* manages shop settings and notification channels
+## Required First Step: Code Analysis
 
-`CASHIER`:
+Before writing code, inspect the existing codebase.
 
-* scans products
-* creates sales
-* receives payment
-* prints receipts
-* views own today sales only
+Analyze backend pattern from related files:
 
-## Frontend Rules
+```txt
+Backend/app.js
+Backend/server.js
+Backend/models
+Backend/controller
+Backend/routes
+Backend/guards
+Backend/helper
+Backend/database
+Backend/services
+```
+
+Analyze frontend pattern from related files:
+
+```txt
+Frontend/src/main.jsx
+Frontend/src/App.jsx
+Frontend/src/layouts
+Frontend/src/components
+Frontend/src/pages
+Frontend/src/hooks
+Frontend/src/configs
+Frontend/src/utils
+```
+
+For new UI pages, inspect similar existing pages first.
+
+For new backend modules, inspect similar existing model/controller/route first.
+
+For route/layout changes, inspect current layouts, sidebars, protected routes, and auth flow first.
+
+## Code Style Requirement
+
+Generated code must match the existing project.
+
+Backend must match existing backend style:
+
+- same folder structure
+- same route style
+- same controller style
+- same Mongoose model style
+- same response format
+- same error handling style
+- same guard/role pattern
+- same shop-scope pattern where applicable
+
+Frontend must match existing frontend style:
+
+- same React style
+- same component style
+- same route style
+- same layout style
+- same sidebar/menu style
+- same Tailwind/daisyUI classes
+- same table/list style
+- same form style
+- same modal style
+- same loading style
+- same toast style
+- same hook/API style
+
+Do not introduce:
+
+- new architecture
+- new UI library
+- Redux
+- Zustand
+- TypeScript conversion
+- Spring Boot
+- MySQL
+- SQL migrations
+- mock production data
+
+## Role Requirement
+
+Use exactly these roles for new code:
+
+```txt
+ADMIN_MANAGER
+ADMIN
+CASHIER
+```
+
+Role rules:
+
+```txt
+ADMIN_MANAGER:
+- manages shops
+- creates/administers ADMIN accounts
+- views platform reports
+- views system audit logs
+
+ADMIN:
+- manages own shop only
+- manages products, categories, inventory, suppliers, purchases
+- creates cashiers
+- views shop reports
+- manages shop settings and notification channels
+
+CASHIER:
+- scans products
+- creates sales
+- receives payment
+- prints receipts
+- views own today sales only
+```
+
+Do not use mixed role names like:
+
+```txt
+super
+super_admin
+adminmanage
+admin manager
+manager
+```
+
+If old role names exist, inspect before changing.
+
+## Frontend Layout Requirement
 
 Keep one frontend app, but separate layouts:
 
-* `AuthLayout`
-* `AdminManagerLayout`
-* `AdminLayout`
-* `CashierLayout`
+```txt
+AuthLayout
+AdminManagerLayout
+AdminLayout
+CashierLayout
+```
 
 Use route groups:
 
-* `/admin-manager/*`
-* `/admin/*`
-* `/cashier/*`
-* `/login`
+```txt
+/admin-manager/*
+/admin/*
+/cashier/*
+/login
+```
 
 Do not mix Admin Manager pages into Admin layout.
+
 Do not show Admin pages to Cashier.
 
-## Backend Rules
-
-Use existing backend structure:
-
-* `Backend/models`
-* `Backend/controller`
-* `Backend/routes`
-* `Backend/guards`
-* `Backend/helper`
-* `Backend/services` if needed
+## Backend Security Requirement
 
 Every protected endpoint must enforce:
 
@@ -83,67 +190,92 @@ Every protected endpoint must enforce:
 
 Do not rely on frontend permissions only.
 
-## Database Rules
+`ADMIN_MANAGER` can access platform-level resources.
+
+`ADMIN` can access only own shop resources.
+
+`CASHIER` can access only own shop and cashier features.
+
+## Database Requirement
 
 Use MongoDB/Mongoose models.
+
 Use ObjectId references where needed.
+
 Do not add SQL migrations.
 
 Core collections:
 
-* users
-* shops
-* categories
-* products
-* product_codes
-* inventory
-* stock_movements
-* sales
-* payments
-* receipts
-* audit_logs
-* notification_channels
-* notification_logs
+```txt
+users
+shops
+categories
+products
+product_codes
+inventory
+stock_movements
+sales
+payments
+receipts
+audit_logs
+notification_channels
+notification_logs
+```
 
-Avoid unnecessary tables/collections.
-Do not add customers unless requested.
+Do not add `customers` unless explicitly requested.
+
 Use `notification_channels`, not `telegram_settings`.
 
-## Create Shop Feature Rules
+## Create Shop Feature Requirement
 
 Only `ADMIN_MANAGER` can create shops.
 
-Shop form:
+Shop form fields:
 
-* name
-* code readonly, generated by backend
-* phone
-* ownerAdminId
-* address picker
-* address detail
-* status
+```txt
+name
+code readonly, generated by backend
+phone
+ownerAdminId
+address picker
+address detail
+status
+```
 
-Owner Admin:
-Fetch only available ADMIN users:
+Owner Admin select must fetch only available ADMIN users:
 
-* role = `ADMIN`
-* status = `ACTIVE`
-* shopId = null
+```txt
+role = ADMIN
+status = ACTIVE
+shopId = null
+```
 
-Address picker:
-Use one modal with levels:
-Province → District/Municipality/Khan → Commune/Sangkat → Village
+Address picker must use one modal with levels:
 
-Cambodia is breadcrumb/root only, not selectable.
+```txt
+Province
+  -> District/Municipality/Khan
+    -> Commune/Sangkat
+      -> Village
+```
+
+Cambodia is breadcrumb/root only.
+
+Cambodia is not selectable.
 
 Search behavior:
 
-* English input filters/displays English only.
-* Khmer input filters/displays Khmer only.
-* Empty search displays English + Khmer.
-* Khmer detection: `/[\u1780-\u17FF]/`
+- English input filters and displays English only.
+- Khmer input filters and displays Khmer only.
+- Empty search displays English + Khmer.
 
-## Sale Checkout Rules
+Khmer detection:
+
+```js
+/[\u1780-\u17FF]/
+```
+
+## Sale Checkout Requirement
 
 During checkout:
 
@@ -161,29 +293,118 @@ During checkout:
 
 Stock/payment/inventory changes must stay consistent.
 
-Telegram/notification sending must be asynchronous.
-Telegram failure must not fail sale.
+Stock update fail = sale fail.
 
-## Implementation Behavior
+Payment save fail = sale fail.
+
+Inventory update fail = sale fail.
+
+Telegram/notification failure must not fail sale.
+
+Receipt print failure must not fail sale.
+
+Telegram/notification sending must be asynchronous.
+
+## General Implementation Behavior
 
 Before writing:
 
-* Read related files.
-* Identify current patterns.
-* Reuse existing helpers/components when possible.
+1. Read related files.
+2. Identify current patterns.
+3. Reuse existing helpers/components when possible.
+4. Identify role rules.
+5. Identify shop-scope rules.
+6. Identify UI consistency requirements.
 
 When writing:
 
-* Make minimal targeted changes.
-* Keep style consistent.
-* Do not remove unrelated code.
-* Do not break existing Admin/Cashier pages.
-* Do not expose secrets.
-* Do not commit `.env`.
+1. Make minimal targeted changes.
+2. Keep style consistent.
+3. Do not remove unrelated code.
+4. Do not break existing Admin/Cashier pages.
+5. Do not expose secrets.
+6. Do not commit `.env`.
+7. Do not add unnecessary dependencies.
 
 After writing:
 
-* Run relevant lint/build/test command if available.
-* Report files changed.
-* Report what was tested.
-* Report any remaining issue clearly.
+1. Run relevant lint/build/test command if available.
+2. Report files changed.
+3. Report what was tested.
+4. Report any remaining issue clearly.
+
+## Output Required Before Editing
+
+Before editing files, briefly report:
+
+```txt
+CODE ANALYSIS
+- Relevant backend files inspected
+- Relevant frontend files inspected
+- Existing pattern found
+- Planned files to change
+```
+
+## Final Report Format
+
+After implementation, report:
+
+```txt
+DONE
+- What was changed
+
+FILES CHANGED
+- path/to/file
+
+VALIDATION
+- command run
+- result
+
+NOTES
+- remaining issue, if any
+```
+
+If unable to verify something, write:
+
+```txt
+Insufficient data to verify.
+```
+
+## Example Task Format
+
+Use this style when giving a task:
+
+```txt
+Read .agents/skills/agent/SKILL.md and .agents/skills/agent/PROJECT_MEMORY.md first.
+
+Task:
+Create Shop feature for ADMIN_MANAGER.
+
+Requirements:
+- Backend shop model/controller/routes
+- Backend generated shop code
+- Owner admin select API
+- Frontend /admin-manager/shops page
+- Frontend create shop page
+- Address picker modal
+- Same UI style as existing pages
+- Same backend style as existing controllers/routes/models
+- Do not change unrelated files
+```
+## Important UI Rule
+
+Use `tools/full_stack project` only for code flow and implementation pattern.
+
+Do not copy its UI design.
+
+Frontend UI must follow the current active project UI style.
+
+When creating frontend pages:
+
+1. Inspect current active project pages first.
+2. Reuse current layout/components/classes.
+3. Keep UI consistent with current app.
+4. Do not redesign existing UI.
+5. Do not replace existing good UI with old `full_stack project` UI.
+6. If `full_stack project` UI conflicts with current UI, ignore `full_stack project` UI and keep current UI.
+7. Backend/code flow can follow `full_stack project`; visual UI cannot.

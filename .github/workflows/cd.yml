@@ -1,0 +1,196 @@
+# CD runs only after a push to main.
+# It repeats the CI checks first, then deploys to the VPS over SSH.
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Backend and Frontend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download the repository code into the GitHub Actions runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Use Node.js 20 for Backend and Frontend validation.
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            Backend/package-lock.json
+            Frontend/package-lock.json
+
+      # Install Backend dependencies from package-lock.json.
+      - name: Install Backend dependencies
+        working-directory: Backend
+        run: npm ci --no-audit --no-fund
+
+      # This repository's Backend test script checks JavaScript syntax with node --check.
+      - name: Check Backend JavaScript syntax
+        working-directory: Backend
+        run: npm test
+
+      # Install Frontend dependencies from package-lock.json.
+      - name: Install Frontend dependencies
+        working-directory: Frontend
+        run: npm ci --no-audit --no-fund
+
+      # Run the existing Frontend lint script.
+      - name: Run Frontend lint
+        working-directory: Frontend
+        run: npm run lint
+
+      # Build the production Frontend bundle before deploying.
+      - name: Build Frontend production
+        working-directory: Frontend
+        run: npm run build
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: checks
+
+    steps:
+      # Create a private key file from the GitHub Secret.
+      - name: Prepare SSH key
+        shell: bash
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -Eeuo pipefail
+
+          if [ -z "$VPS_SSH_KEY" ]; then
+            echo "Missing required GitHub Secret: VPS_SSH_KEY" >&2
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+
+      # Connect to the VPS and run deployment commands inside PROJECT_PATH.
+      - name: Deploy application over SSH
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+        run: |
+          set -Eeuo pipefail
+
+          for secret_name in VPS_HOST VPS_USER VPS_PORT PROJECT_PATH; do
+            if [ -z "${!secret_name}" ]; then
+              echo "Missing required GitHub Secret: ${secret_name}" >&2
+              exit 1
+            fi
+          done
+
+          # Encode PROJECT_PATH so spaces or shell characters in the path are handled safely.
+          PROJECT_PATH_B64="$(printf '%s' "$PROJECT_PATH" | base64 -w0)"
+
+          ssh \
+            -i ~/.ssh/vps_key \
+            -p "$VPS_PORT" \
+            -o StrictHostKeyChecking=accept-new \
+            "$VPS_USER@$VPS_HOST" \
+            "PROJECT_PATH_B64='$PROJECT_PATH_B64' bash -s" <<'REMOTE'
+          set -Eeuo pipefail
+
+          PROJECT_PATH="$(printf '%s' "$PROJECT_PATH_B64" | base64 -d)"
+
+          if [ ! -d "$PROJECT_PATH" ]; then
+            echo "PROJECT_PATH does not exist on the VPS." >&2
+            exit 1
+          fi
+
+          cd "$PROJECT_PATH"
+
+          echo "Pulling latest main branch..."
+          git pull origin main
+
+          echo "Installing Backend production dependencies..."
+          cd Backend
+          npm ci --omit=dev --no-audit --no-fund
+
+          echo "Installing Frontend dependencies and building production bundle..."
+          cd ../Frontend
+          npm ci --no-audit --no-fund
+          npm run build
+
+          cd ..
+
+          echo "Restarting application..."
+          restarted=0
+
+          # Prefer Docker Compose when a valid compose file exists on the VPS.
+          if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+            for compose_file in \
+              docker-compose.yml \
+              docker-compose.yaml \
+              compose.yml \
+              compose.yaml \
+              infra/docker-compose.yml \
+              infra/docker-compose.yaml
+            do
+              if [ -f "$compose_file" ]; then
+                if docker compose -f "$compose_file" config >/dev/null 2>&1; then
+                  docker compose -f "$compose_file" up -d --build
+                  restarted=1
+                  break
+                fi
+
+                echo "Found ${compose_file}, but Docker Compose config validation failed."
+              fi
+            done
+          fi
+
+          # Use PM2 when Docker Compose is not available or no valid compose file exists.
+          if [ "$restarted" -eq 0 ]; then
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "No valid Docker Compose file found and PM2 is not installed." >&2
+              exit 1
+            fi
+
+            if [ -f ecosystem.config.js ]; then
+              pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js --update-env
+            elif [ -f ecosystem.config.cjs ]; then
+              pm2 reload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs --update-env
+            elif [ -f ecosystem.config.json ]; then
+              pm2 reload ecosystem.config.json --update-env || pm2 start ecosystem.config.json --update-env
+            else
+              pm2 restart kambuja-pos-backend --update-env || \
+                pm2 start Backend/server.js --name kambuja-pos-backend --update-env
+            fi
+          fi
+
+          echo "Running health check when available..."
+          health_url="${HEALTH_CHECK_URL:-}"
+
+          # If HEALTH_CHECK_URL is not set on the VPS, use Backend/.env PORT when present.
+          if [ -z "$health_url" ] && [ -f Backend/.env ]; then
+            backend_port="$(awk -F= '/^PORT=/{print $2}' Backend/.env | tail -n 1 | tr -d ' "\047\r')"
+            if [ -n "$backend_port" ]; then
+              health_url="http://127.0.0.1:${backend_port}/"
+            fi
+          fi
+
+          if [ -z "$health_url" ]; then
+            echo "No HEALTH_CHECK_URL or Backend PORT found; health check skipped."
+          elif ! command -v curl >/dev/null 2>&1; then
+            echo "curl is not installed on the VPS; health check skipped."
+          else
+            curl --fail --silent --show-error --max-time 20 "$health_url" >/dev/null
+            echo "Health check passed."
+          fi
+          REMOTE

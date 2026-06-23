@@ -8,6 +8,7 @@ const router = express.Router()
 router.use(restrict("ADMIN_MANAGER", "ADMIN"), shopScopeGuard)
 router.get("/", controller.list)
 router.get("/low-stock", controller.lowStock)
+router.get("/low-stock-50", controller.lowStock50)
 router.post("/stock-in", controller.stockIn)
 router.post("/adjust", controller.adjust)
 

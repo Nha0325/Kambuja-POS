@@ -8,10 +8,12 @@ import useCollection from "../../../hooks/useCollection";
 function CreateProduct() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
-  const [salePrice, setSalePrice] = useState(0);
-  const [costPrice, setCostPrice] = useState(0);
+  const [salePrice, setSalePrice] = useState("");
+  const [costPrice, setCostPrice] = useState("");
   const [currentStock, setCurrentStock] = useState(0);
   const [note, setNote] = useState("");
+  const [reorderLevel, setReorderLevel] = useState(10);
+  const [status, setStatus] = useState(true);
   
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -27,6 +29,24 @@ function CreateProduct() {
       setImage(file);
       setPreview(URL.createObjectURL(file));
     }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -53,11 +73,11 @@ function CreateProduct() {
         costPrice: Number(costPrice),
         currentStock: Number(currentStock),
         note,
+        reorderLevel: Number(reorderLevel),
         imageUrl: filename
       });
       if (res) {
         toast.success("Created successfully!!");
-        clearForm();
         navigate("/admin/products");
       }
     } catch (error) {
@@ -65,174 +85,209 @@ function CreateProduct() {
     }
   };
 
-  function clearForm() {
-    setName("");
-    setCategory("");
-    setSalePrice(0);
-    setCostPrice(0);
-    setCurrentStock(0);
-    setNote("");
-    handleRemoveImage();
-  }
-
-  function handleRemoveImage() {
-    setImage(null);
-    setPreview(null);
-  }
+  const inputClass = "h-11 w-full rounded-lg border border-[#c6c6cd] bg-white px-3 text-sm text-[#0b1c30] outline-none transition placeholder:text-[#8a8d96] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10";
+  const selectClass = "h-11 w-full rounded-lg border border-[#c6c6cd] bg-white px-3 text-sm text-[#0b1c30] outline-none transition focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10";
+  const textareaClass = "min-h-32 w-full resize-none rounded-lg border border-[#c6c6cd] bg-white p-3 text-sm text-[#0b1c30] outline-none transition placeholder:text-[#8a8d96] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10";
+  const labelClass = "mb-2 block text-xs font-bold uppercase tracking-[0.04em] text-[#45464d]";
 
   return (
-    <div className="w-full max-w-full p-3 sm:p-4">
-      <h1 className="text-xl font-semibold text-black">Create New Product</h1>
+    <div className="min-h-screen bg-[#f8f9ff] px-3 py-4 text-[#0b1c30] sm:px-4 lg:px-6">
+      <div className="mx-auto max-w-6xl">
+        <nav className="mb-2 flex items-center gap-2 text-sm text-[#45464d]">
+          <Link to="/admin/products" className="hover:text-[#0058be]">Products</Link>
+          <span className="text-[#c6c6cd]">&gt;</span>
+          <span className="font-semibold text-[#0b1c30]">Create New</span>
+        </nav>
+        <h1 className="text-2xl font-bold text-[#0b1c30] sm:text-3xl">Create New Product</h1>
 
-      <form onSubmit={handleSubmit} className="mt-4 grid w-full max-w-5xl grid-cols-1 items-start gap-4 md:grid-cols-2">
-        {/* Left Form Controls */}
-        <div className="bg-white p-4 rounded-lg border border-gray-200"> 
-          <div className="mb-3">
-            <label htmlFor="product-name" className="block text-sm font-medium mb-1">
-              Name*
-            </label>
-            <input
-              id="product-name"
-              name="name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input input-sm input-bordered w-full rounded"
-              placeholder="Enter name"
-            />
+        <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+          
+          {/* Left card: Product Details */}
+          <div className="rounded-xl border border-[#d7dced] bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-[#e5e7ef] px-5 py-4 text-sm font-bold text-[#0b1c30]">
+              Product Details
+            </div>
+            
+            <div className="p-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className={labelClass}>Product Name*</label>
+                  <input 
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    type="text" 
+                    placeholder="Enter product name" 
+                    className={inputClass} 
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Category*</label>
+                  <select 
+                    required
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={selectClass}
+                  >
+                    <option value="" disabled>Choose Category</option>
+                    {categories?.map(item => (
+                      <option value={item._id} key={item._id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>SKU / Product Code</label>
+                  <input 
+                    type="text"
+                    disabled
+                    readOnly
+                    value="Auto-generated"
+                    className={`${inputClass} cursor-not-allowed bg-[#f8f9ff] text-[#8a8d96]`}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Current Stock</label>
+                  <input 
+                    type="number"
+                    min="0"
+                    value={currentStock}
+                    onChange={(e) => setCurrentStock(e.target.value)}
+                    className={inputClass} 
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Cost Price*</label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#76777d]">$</span>
+                    <input 
+                      required
+                      type="number"
+                      step="0.01"
+                      value={costPrice}
+                      onChange={(e) => setCostPrice(e.target.value)}
+                      className={`${inputClass} pl-8`}
+                      placeholder="0.00" 
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Sale Price*</label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#76777d]">$</span>
+                    <input 
+                      required
+                      type="number"
+                      step="0.01"
+                      value={salePrice}
+                      onChange={(e) => setSalePrice(e.target.value)}
+                      className={`${inputClass} pl-8`}
+                      placeholder="0.00" 
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className={labelClass}>Note</label>
+                  <textarea 
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className={textareaClass}
+                    placeholder="Type product notes here..."
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="mb-3">
-            <label htmlFor="product-category" className="block text-sm font-medium mb-1">
-              Category*
-            </label>
-            <select
-              id="product-category"
-              name="category"
-              required
-              onChange={(e) => setCategory(e.target.value)}
-              className="select select-sm select-bordered w-full rounded"
-              value={category}
+          {/* Right column: Product Media & Settings */}
+          <div className="flex flex-col gap-6">
+            <div className="rounded-xl border border-[#d7dced] bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-[#e5e7ef] px-5 py-4 text-sm font-bold text-[#0b1c30]">
+                Product Media
+              </div>
+              <div className="p-5">
+                {!preview ? (
+                  <label 
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    className="flex h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#c6c6cd] bg-[#f8f9ff] transition-colors hover:border-[#0058be] hover:bg-[#eff4ff]"
+                  >
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#dce9ff] text-[#0058be]">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </div>
+                    <span className="text-sm font-semibold text-[#0b1c30]">Click to upload</span>
+                    <span className="mt-1 text-xs text-[#76777d]">PNG, JPG up to 2MB</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </label>
+                ) : (
+                  <div className="relative flex h-[180px] w-full items-center justify-center rounded-lg border border-[#d7dced] bg-[#f8f9ff] p-2">
+                    <img src={preview} alt="Preview" className="h-full w-full object-contain" />
+                    <button 
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-[#d7dced] text-red-600 hover:bg-red-50 transition-colors"
+                      title="Remove image"
+                    >
+                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[#d7dced] bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-[#e5e7ef] px-5 py-4 text-sm font-bold text-[#0b1c30]">
+                Settings
+              </div>
+              <div className="p-5 flex flex-col gap-5">
+                <div className="flex items-center justify-between rounded-lg border border-[#d7dced] p-3 bg-[#f8f9ff]">
+                  <div>
+                    <div className="text-sm font-semibold text-[#0b1c30]">Product Status</div>
+                    <div className="text-xs text-[#45464d]">Set product visibility</div>
+                  </div>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" className="peer sr-only" checked={status} onChange={(e) => setStatus(e.target.checked)} />
+                    <div className="peer h-6 w-11 rounded-full bg-[#c6c6cd] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#0b1c30] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Low Stock Alert Threshold</label>
+                  <input 
+                    type="number"
+                    min="1"
+                    value={reorderLevel}
+                    onChange={(e) => setReorderLevel(e.target.value)}
+                    className={inputClass}
+                  />
+                  <p className="mt-1 text-xs text-[#76777d]">You'll be notified when stock falls below this level.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 flex items-center justify-end gap-3 border-t border-[#d7dced] bg-white px-5 py-4">
+            <Link 
+              to="/admin/products"
+              className="flex h-11 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white px-6 text-sm font-semibold text-[#0b1c30] transition hover:bg-[#eff4ff]"
             >
-              <option value="" disabled>Choose Category</option>
-              {categories?.map(item => (
-                <option value={item._id} key={item._id}>{item.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="product-costPrice" className="block text-sm font-medium mb-1">
-              Cost Price*
-            </label>
-            <input
-              id="product-costPrice"
-              name="costPrice"
-              type="number"
-              required
-              step="0.01"
-              onChange={(e) => setCostPrice(e.target.value)}
-              value={costPrice}
-              className="input input-sm input-bordered w-full rounded"
-              placeholder="0.00"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="product-salePrice" className="block text-sm font-medium mb-1">
-              Sale Price*
-            </label>
-            <input
-              id="product-salePrice"
-              name="salePrice"
-              type="number"
-              required
-              step="0.01"
-              onChange={(e) => setSalePrice(e.target.value)}
-              value={salePrice}
-              className="input input-sm input-bordered w-full rounded"
-              placeholder="0.00"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="product-stock" className="block text-sm font-medium mb-1">
-              Current Stock
-            </label>
-            <input
-              id="product-stock"
-              name="currentStock"
-              type="number"
-              onChange={(e) => setCurrentStock(e.target.value)}
-              value={currentStock}
-              className="input input-sm input-bordered w-full rounded"
-              placeholder="0"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="product-note" className="block text-sm font-medium mb-1">
-              Note
-            </label>
-            <textarea
-              id="product-note"
-              name="note"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="textarea textarea-sm textarea-bordered w-full rounded h-20"
-              placeholder="Type product note here..."
-            ></textarea>
-          </div>
-
-          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
-            <Link to="/admin/products" className="btn btn-sm w-full sm:w-auto">Cancel</Link>
-            <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-auto">
-              {isLoading ? <span className="loading loading-spinner loading-xs"></span> : "Save"}
+              Cancel
+            </Link>
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="flex h-11 items-center justify-center rounded-lg bg-[#0b1c30] px-6 text-sm font-semibold text-white transition hover:bg-[#213145] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Saving..." : "Save Product"}
             </button>
           </div>
-        </div>
-
-        {/* Right Image Upload View */}
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <label className="block text-sm font-medium mb-2">Product Image*</label>
-          {preview ? (
-            <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50 sm:h-64">
-              <img
-                src={preview}
-                alt="Preview"
-                className="object-contain max-w-full max-h-full p-2"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 bg-error text-white rounded-full w-7 h-7 flex items-center justify-center text-xs hover:bg-red-600 transition"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition hover:border-neutral hover:bg-gray-50 sm:h-64">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                <p className="text-xs text-gray-400">PNG, JPG, JPEG (Max. 2MB)</p>
-              </div>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-            </label>
-          )}
-          {image && (
-            <div className="text-center mt-2">
-              <p className="text-xs text-gray-500 bg-gray-100 py-1 px-2 rounded truncate">{image.name}</p>
-            </div>
-          )}
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

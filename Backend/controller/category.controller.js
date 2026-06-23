@@ -40,15 +40,16 @@ exports.findAllCategory = async (req, res, next) => {
                 { note: searchRegex }
             ];
         }
-
         const docs = await CategoryModel.find(querySearch).skip(skip).limit(limit).sort({ _id: -1 });
         const total = await CategoryModel.countDocuments(querySearch);
+        const totalWithNotes = await CategoryModel.countDocuments({ ...querySearch, note: { $exists: true, $nin: ["", null] } });
 
         res.status(200).json({
             success: true,
             message: 'Categories retrieved successfully',
             result: docs,
             total,
+            totalWithNotes,
             totalPages: Math.ceil(total / limit),
             currentPage: page
         }); 

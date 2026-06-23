@@ -1,6 +1,8 @@
 const Inventory = require("../models/Inventory.model")
 const Product = require("../models/Product.model")
 const StockMovement = require("../models/StockMovement.model")
+const NotificationLog = require("../models/NotificationLog.model")
+const Shop = require("../models/Shop.model")
 const { writeAuditLog } = require("../helper/audit")
 
 const updateStock = async (req, res, next, movementType) => {
@@ -36,9 +38,29 @@ const updateStock = async (req, res, next, movementType) => {
                 ...(req.body.reorderLevel !== undefined
                     ? { reorderLevel: Number(req.body.reorderLevel) }
                     : {}),
+                ...(req.body.maxStock !== undefined
+                    ? { maxStock: Number(req.body.maxStock) }
+                    : {}),
             },
             { new: true, upsert: true, runValidators: true }
         ).populate("product", "name code imageUrl salePrice")
+
+        const maxStock = Number(inventory.maxStock || 0);
+        const reorderLevel = Number(inventory.reorderLevel || 0);
+        const isLowNow = maxStock > 0 ? (quantityAfter <= maxStock * 0.5) : (quantityAfter <= reorderLevel);
+        const wasLowBefore = maxStock > 0 ? (quantityBefore <= maxStock * 0.5) : (quantityBefore <= reorderLevel);
+
+        if (isLowNow && !wasLowBefore) {
+            const shop = await Shop.findById(req.shopId);
+            if (shop) {
+                await NotificationLog.create({
+                    shopId: req.shopId,
+                    eventType: "LOW_STOCK_50",
+                    status: "PENDING",
+                    message: `${product.name} stock is below 50% in ${shop.name}`
+                });
+            }
+        }
 
         await StockMovement.create({
             shopId: req.shopId,
@@ -79,6 +101,21 @@ exports.lowStock = async (req, res, next) => {
             ...req.shopFilter,
             $expr: { $lte: ["$quantity", "$reorderLevel"] },
         }).populate("product", "name code imageUrl salePrice")
+        res.status(200).json({ success: true, result: docs })
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.lowStock50 = async (req, res, next) => {
+    try {
+        const docs = await Inventory.find({
+            ...req.shopFilter,
+            $or: [
+                { $and: [ { maxStock: { $gt: 0 } }, { $expr: { $lte: ["$quantity", { $multiply: ["$maxStock", 0.5] }] } } ] },
+                { $and: [ { $or: [{ maxStock: { $exists: false } }, { maxStock: 0 }] }, { $expr: { $lte: ["$quantity", "$reorderLevel"] } } ] }
+            ]
+        }).populate("product", "name code imageUrl salePrice").populate("shopId", "name code")
         res.status(200).json({ success: true, result: docs })
     } catch (error) {
         next(error)

@@ -5,6 +5,7 @@ const qs = require("qs")
 const cookieParser = require("cookie-parser")
 const categoryRouter = require('./routes/category.routes');
 const supplierRouter = require("./routes/supplier.routes")
+const customerRouter = require("./routes/customer.route")
 const uploadRouter   = require("./routes/upload.routes")
 const productRouter  = require("./routes/product.route")
 const authRouter = require("./routes/auth.route")
@@ -85,6 +86,7 @@ app.get('/', (req, res) => {
 
 app.use("/api/v1/categories",authGuard,categoryRouter)
 app.use("/api/v1/suppliers",authGuard,supplierRouter)
+app.use("/api/v1/customers",authGuard,customerRouter)
 app.use("/api/v1/upload"   ,authGuard,uploadRouter)
 app.use("/api/v1/products",authGuard,productRouter)
 app.use("/api/v1/purchases",authGuard, purchaseRouter)

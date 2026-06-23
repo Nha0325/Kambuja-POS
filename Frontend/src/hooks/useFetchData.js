@@ -4,6 +4,8 @@ import { api } from "../configs/api"
 const useFetchData = (collection, page = 1, limit =25, search="", refetch = false, condition="") => {
     const [data, setData] = useState([])
     const [totalPage, setTotalPage] = useState(0)
+    const [total, setTotal] = useState(0)
+    const [totalWithNotes, setTotalWithNotes] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
     const queryParts = []
 
@@ -22,6 +24,8 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
                 const res = await api.get(path)
                 setData(res.data.result)
                 setTotalPage(res.data.totalPages || res.data.totalPage || 0)
+                setTotal(res.data.total || res.data.result?.length || 0)
+                setTotalWithNotes(res.data.totalWithNotes || 0)
             } catch (error) {
                 // If the endpoint was not found, attempt a simple pluralization/singularization fallback
                 const status = error?.response?.status
@@ -32,6 +36,8 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
                         const altRes = await api.get(altPath)
                         setData(altRes.data.result)
                         setTotalPage(altRes.data.totalPages || altRes.data.totalPage || 0)
+                        setTotal(altRes.data.total || altRes.data.result?.length || 0)
+                        setTotalWithNotes(altRes.data.totalWithNotes || 0)
                         return
                     } catch (err) {
                         console.log('Fallback fetch failed:', err.message)
@@ -48,7 +54,9 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
     return {
         data,
         totalPage,
-        isLoading
+        isLoading,
+        total,
+        totalWithNotes
     }
 }
 

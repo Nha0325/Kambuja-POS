@@ -18,6 +18,24 @@ function getShopName(row) {
   return row.shopId || "-"
 }
 
+const getStockPercent = (row) => {
+  const maxStock = Number(row.maxStock || 0);
+  const quantity = Number(row.quantity || 0);
+
+  if (maxStock <= 0) return null;
+
+  return Math.round((quantity / maxStock) * 100);
+};
+
+const isLow50 = (row) => {
+  const maxStock = Number(row.maxStock || 0);
+  const quantity = Number(row.quantity || 0);
+
+  if (maxStock > 0) return quantity <= maxStock * 0.5;
+
+  return quantity <= Number(row.reorderLevel || 0);
+};
+
 function Stock() {
   const [rows, setRows] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -53,7 +71,7 @@ function Stock() {
   }, [rows, search])
 
   const totalQuantity = displayedRows.reduce((sum, row) => sum + Number(row.quantity || 0), 0)
-  const lowStockCount = displayedRows.filter((row) => Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length
+  const lowStockCount = displayedRows.filter(isLow50).length
   const healthyCount = displayedRows.length - lowStockCount
 
   const exportStock = () => {
@@ -64,8 +82,13 @@ function Stock() {
         { label: "Product", value: (row) => row.product?.name || "" },
         { label: "Code", value: (row) => row.product?.code || "" },
         { label: "Quantity", value: (row) => Number(row.quantity || 0) },
+        { label: "Max Stock", value: (row) => Number(row.maxStock || 0) },
+        { label: "Stock %", value: (row) => {
+            const p = getStockPercent(row);
+            return p !== null ? `${p}%` : "N/A";
+        } },
         { label: "Reorder Level", value: (row) => Number(row.reorderLevel || 0) },
-        { label: "Status", value: (row) => Number(row.quantity || 0) <= Number(row.reorderLevel || 0) ? "LOW" : "OK" },
+        { label: "Status", value: (row) => isLow50(row) ? "LOW" : "OK" },
       ],
       displayedRows
     )
@@ -83,6 +106,13 @@ function Stock() {
           </button>
         )}
       />
+
+      {lowStockCount > 0 && (
+        <div className="mb-6 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700 flex items-center gap-2">
+          <FaTriangleExclamation />
+          <strong>Low stock alert:</strong> {lowStockCount} products are below 50% stock.
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -106,7 +136,7 @@ function Stock() {
         {[
           ["Products", displayedRows.length],
           ["Total Quantity", totalQuantity],
-          ["Low Stock", lowStockCount],
+          ["Low Stock 50%", lowStockCount],
           ["Healthy", healthyCount],
         ].map(([label, value]) => (
           <article key={label} className={`${cardClass} p-5`}>
@@ -125,15 +155,18 @@ function Stock() {
                 <th className={tableHeadCellClass}>Product</th>
                 <th className={tableHeadCellClass}>Code</th>
                 <th className={`${tableHeadCellClass} text-right`}>Quantity</th>
+                <th className={`${tableHeadCellClass} text-right`}>Max Stock</th>
+                <th className={`${tableHeadCellClass} text-right`}>Stock %</th>
                 <th className={`${tableHeadCellClass} text-right`}>Reorder Level</th>
                 <th className={`${tableHeadCellClass} text-center`}>Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-violet-100">
               {isLoading ? (
-                <TableEmpty colSpan="6">Loading stock...</TableEmpty>
+                <TableEmpty colSpan="8">Loading stock...</TableEmpty>
               ) : displayedRows.map((row) => {
-                const isLow = Number(row.quantity || 0) <= Number(row.reorderLevel || 0)
+                const isLow = isLow50(row)
+                const percent = getStockPercent(row)
 
                 return (
                   <tr key={row._id} className="transition-colors hover:bg-violet-50/50">
@@ -141,17 +174,19 @@ function Stock() {
                     <td className={`${tableCellClass} font-semibold text-slate-900`}>{row.product?.name || "-"}</td>
                     <td className={`${tableCellClass} font-semibold uppercase`}>{row.product?.code || "-"}</td>
                     <td className={`${tableCellClass} text-right`}>{Number(row.quantity || 0).toLocaleString()}</td>
+                    <td className={`${tableCellClass} text-right`}>{Number(row.maxStock || 0).toLocaleString()}</td>
+                    <td className={`${tableCellClass} text-right`}>{percent !== null ? `${percent}%` : "-"}</td>
                     <td className={`${tableCellClass} text-right`}>{Number(row.reorderLevel || 0).toLocaleString()}</td>
                     <td className={`${tableCellClass} text-center`}>
                       <span className={isLow ? "inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700" : "inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700"}>
                         {isLow && <FaTriangleExclamation />}
-                        {isLow ? "LOW" : "OK"}
+                        {isLow ? "LOW 50%" : "OK"}
                       </span>
                     </td>
                   </tr>
                 )
               })}
-              {!isLoading && displayedRows.length === 0 && <TableEmpty colSpan="6">No stock data</TableEmpty>}
+              {!isLoading && displayedRows.length === 0 && <TableEmpty colSpan="8">No stock data</TableEmpty>}
             </tbody>
           </table>
         </div>

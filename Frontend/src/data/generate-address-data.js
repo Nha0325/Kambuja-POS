@@ -1,6 +1,10 @@
-const fs = require('fs');
-const https = require('https');
-const path = require('path');
+import fs from 'fs';
+import https from 'https';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function fetchJson(url) {
   return new Promise((resolve, reject) => {
@@ -82,16 +86,39 @@ async function main() {
     }
   }
 
-  const outputPath = path.join(__dirname, 'Frontend', 'src', 'data', 'cambodiaAddress.js');
+  const outputPath = path.join(__dirname, 'cambodiaAddress.js');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
   const fileContent = `/* Auto-generated from cambodia-gazetteer dataset */
 export const cambodiaAddress = ${JSON.stringify(transformed, null, 2)};
 
-export const isKhmerText = (text) => /[\u1780-\u17FF]/.test(text);
+export const isKhmerInput = (text = "") => /[\\u1780-\\u17FF]/.test(text);
+
+export const getDisplayName = (item, search = "") => {
+  if (!item) return "";
+
+  if (!search) {
+    return \`\${item.nameEn || ""} \${item.nameKm || ""}\`.trim();
+  }
+
+  return isKhmerInput(search) ? item.nameKm || "" : item.nameEn || "";
+};
+
+export const filterAddressOptions = (items = [], search = "") => {
+  const value = search.trim().toLowerCase();
+
+  if (!value) return items;
+
+  const key = isKhmerInput(search) ? "nameKm" : "nameEn";
+
+  return items.filter((item) =>
+    String(item[key] || "").toLowerCase().includes(value)
+  );
+};
 
 export const cleanAddressItem = (item) => {
-  if (!item || typeof item !== "object") return null;
+  if (!item) return null;
+
   return {
     code: item.code || "",
     nameEn: item.nameEn || "",
@@ -107,42 +134,17 @@ export const emptyShopAddress = () => ({
   detail: "",
 });
 
-export const getAddressSummary = (address, language = "en") => {
+export const getAddressSummary = (address) => {
   if (!address) return "";
-  const parts = [];
-  if (address.province) parts.push(language === "km" ? address.province.nameKm || address.province.nameEn : address.province.nameEn || address.province.nameKm);
-  if (address.district) parts.push(language === "km" ? address.district.nameKm || address.district.nameEn : address.district.nameEn || address.district.nameKm);
-  if (address.commune) parts.push(language === "km" ? address.commune.nameKm || address.commune.nameEn : address.commune.nameEn || address.commune.nameKm);
-  if (address.village) parts.push(language === "km" ? address.village.nameKm || address.village.nameEn : address.village.nameEn || address.village.nameKm);
-  return parts.join(", ");
-};
 
-export const getAddressOptions = (address, level) => {
-  if (level === "province") return cambodiaAddress;
-  if (level === "district") return address?.province?.districts || [];
-  if (level === "commune") return address?.district?.communes || [];
-  if (level === "village") return address?.commune?.villages || [];
-  return [];
-};
-
-export const filterAddressOptions = (options, search) => {
-  if (!search || !search.trim()) return options || [];
-  const term = search.trim().toLowerCase();
-  return (options || []).filter((option) => {
-    const en = option.nameEn?.toLowerCase() || "";
-    const km = option.nameKm?.toLowerCase() || "";
-    return en.includes(term) || km.includes(term);
-  });
-};
-
-export const getAddressItemName = (item, language, search) => {
-  if (!item) return "";
-  if (search && search.trim()) {
-    return isKhmerText(search) ? (item.nameKm || item.nameEn) : (item.nameEn || item.nameKm);
-  }
-  if (language === "km" || language === "kh") return item.nameKm || item.nameEn;
-  if (language === "en") return item.nameEn || item.nameKm;
-  return item.nameEn ? \`\${item.nameEn} \${item.nameKm || ""}\`.trim() : (item.nameKm || "");
+  return [
+    address.province?.nameEn,
+    address.district?.nameEn,
+    address.commune?.nameEn,
+    address.village?.nameEn,
+  ]
+    .filter(Boolean)
+    .join(", ");
 };
 `;
 

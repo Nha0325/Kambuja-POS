@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { IoMdTrash } from "react-icons/io";
 import { IoPencilSharp } from "react-icons/io5";
-import { apiUrl } from "../../../configs/env";
+import { baseUrl } from "../../../configs/env";
 import { useCollection } from "../../../hooks/useCollection";
 import { useQuery } from "../../../hooks/useQuery";
 import { adminSurface } from "../adminPageUi";
@@ -156,7 +156,7 @@ function Product() {
                           {item?.imageUrl ? (
                             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#d7dced] bg-[#f8f9ff]">
                               <img
-                                src={`${apiUrl}/upload/${item.imageUrl}`}
+                                src={`${baseUrl}/upload/${item.imageUrl}`}
                                 alt={item?.name || "Product"}
                                 className="h-full w-full object-cover"
                               />

@@ -11,13 +11,13 @@ import AdminPagination from "../../../components/admin/AdminPagination";
 function Category() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [refetch, setRefetch] = useState(false);
 
-  const { data, totalPage, isLoading } = useFetchData("categories", page, limit, search, refetch);
+  const { data, totalPage, isLoading, total, totalWithNotes } = useFetchData("categories", page, limit, search, refetch);
   const { remove, isLoading: isDeleting } = useCollection("categories");
-  const categoryCount = data?.length || 0;
-  const notedCount = data?.filter((item) => item?.note).length || 0;
+  const categoryCount = total || data?.length || 0;
+  const notedCount = totalWithNotes !== undefined && totalWithNotes > 0 ? totalWithNotes : (data?.filter((item) => item?.note).length || 0);
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure? you want to delete!")) {
@@ -72,9 +72,11 @@ function Category() {
               className={adminSurface.pageSizeSelect}
             >
               <option value="10">10</option>
+              <option value="20">20</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
+              <option value="9999">All</option>
             </select>
           </fieldset>
 

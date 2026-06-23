@@ -6,7 +6,7 @@ import useCollection from "../../hooks/useCollection";
 import Modal from "../../components/Modal";
 import useFetchOneByCode from "../../hooks/useFetchOneByCode";
 import { LuScanBarcode } from "react-icons/lu";
-import { apiUrl } from "../../configs/env";
+import { baseUrl } from "../../configs/env";
 import Loading from "../../components/Loading";
 
 function POS() {
@@ -170,7 +170,7 @@ function POS() {
                   <div className="w-full aspect-square overflow-hidden rounded-md bg-gray-50 flex items-center justify-center mb-2 border border-gray-100">
                     {item.imageUrl ? (
                       <img
-                        src={`${apiUrl}/upload/${item.imageUrl}`}
+                        src={`${baseUrl}/upload/${item.imageUrl}`}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />

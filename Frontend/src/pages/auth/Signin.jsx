@@ -190,7 +190,7 @@ const SignIn = () => {
               </div>
               <div>
                 <h1 style={{ color: "#fff", fontWeight: 700, fontSize: 20, lineHeight: "28px", margin: 0 }}>
-                  Master POS
+                  Kambuja POS
                 </h1>
                 <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, margin: 0 }}>Admin Suite v4.2</p>
               </div>
@@ -249,7 +249,7 @@ const SignIn = () => {
               }}>
                 <span className="material-symbols-outlined" style={{ color: "#fff", fontSize: 36 }}>point_of_sale</span>
               </div>
-              <h1 style={{ fontWeight: 700, fontSize: 20, color: "#0b1c30", margin: 0 }}>Master POS</h1>
+              <h1 style={{ fontWeight: 700, fontSize: 20, color: "#0b1c30", margin: 0 }}>Kambuja POS</h1>
             </div>
 
             {/* Heading */}

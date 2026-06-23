@@ -1,4 +1,4 @@
-import { FaListUl } from "react-icons/fa6";
+import { FaBars } from "react-icons/fa6";
 import { GiTwoCoins } from "react-icons/gi";
 import { FaUserCog } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
@@ -51,13 +51,10 @@ function TopMenu({ onShowSidebar, title, eyebrow }) {
           <button
             onClick={onShowSidebar || undefined}
             type="button"
-            className={isAdminShell
-              ? "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg text-[#0b1c30] transition hover:bg-[#eff4ff] hover:text-[#0058be]"
-              : "shrink-0 rounded-lg p-2 text-xl text-[#0b1c30] hover:bg-[#eff4ff]"
-            }
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-700 transition-colors hover:bg-violet-50 hover:text-violet-700"
             aria-label="Toggle sidebar"
           >
-            <FaListUl />
+            <FaBars className="text-lg" />
           </button>
         )}
         {isAdminShell && (

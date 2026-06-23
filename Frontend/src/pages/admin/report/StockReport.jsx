@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStockReport } from "../../../hooks/useStockReport";
 import toast from "react-hot-toast";
-import { apiUrl } from "../../../configs/env";
+import { baseUrl } from "../../../configs/env";
 import { adminSurface } from "../adminPageUi";
 
 function StockReport() {
@@ -119,7 +119,7 @@ function StockReport() {
                           <div className="avatar">
                             <div className="h-9 w-9 overflow-hidden rounded-lg border border-[#d7dced] bg-[#f8f9ff]">
                               <img
-                                src={`${apiUrl}/upload/${item.imageUrl}`}
+                                src={`${baseUrl}/upload/${item.imageUrl}`}
                                 alt={item.name}
                                 className="object-cover"
                               />

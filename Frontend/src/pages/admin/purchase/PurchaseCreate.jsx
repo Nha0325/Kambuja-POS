@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import useFetchData from "../../../hooks/useFetchData";
 import useCollection from "../../../hooks/useCollection";
 import { useNavigate } from "react-router";
-import { apiUrl } from "../../../configs/env";
+import { baseUrl } from "../../../configs/env";
 
 function CreatePurchase() {
   const [productCode, setProductCode] = useState("");
@@ -298,7 +298,7 @@ function CreatePurchase() {
                       <td className="py-2 p-4">
                         <img
                           className="w-10 h-10 object-cover rounded"
-                          src={`${apiUrl}/upload/${el?.image}`}
+                          src={`${baseUrl}/upload/${el?.image}`}
                           alt=""
                         />
                       </td>

@@ -22,6 +22,11 @@ const schema = new mongoose.Schema({
         min: 0,
         default: 5,
     },
+    maxStock: {
+        type: Number,
+        min: 0,
+        default: 0,
+    },
 }, { timestamps: true })
 
 schema.index({ shopId: 1, product: 1 }, { unique: true })
