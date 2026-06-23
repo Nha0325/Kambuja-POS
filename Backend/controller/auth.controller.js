@@ -46,10 +46,10 @@ exports.signin = async (req, res, next) => {
     try {
         const { email, password } = req.body || {}
 
-        if(!email || !password){
+        if(typeof email !== "string" || typeof password !== "string" || !email.trim() || !password){
             return res.status(400).json({
                 success: false,
-                error: "username email and password are required!"
+                error: "Email and password must be valid strings."
             })
 
         }

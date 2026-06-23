@@ -1,29 +1,50 @@
 const multer = require("multer")
 const fs = require("fs")
 const path = require("path")
-const { error } = require("console")
+
+const uploadDir = path.resolve(__dirname, "../upload")
+const allowedImageTypes = {
+    "image/jpeg": [".jpg", ".jpeg"],
+    "image/png": [".png"],
+    "image/webp": [".webp"],
+}
+
+const getSafeUploadPath = (filename) => {
+    if (!filename || filename !== path.basename(filename)) {
+        throw new Error("Invalid file path")
+    }
+
+    const filePath = path.resolve(uploadDir, filename)
+    const relativePath = path.relative(uploadDir, filePath)
+    if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+        throw new Error("Invalid file path")
+    }
+
+    return filePath
+}
 
 const diskStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const folderPath = path.join(__dirname, "../upload")
-        fs.mkdirSync(folderPath, {recursive: true})
-        cb(null, folderPath)
+        fs.mkdirSync(uploadDir, {recursive: true})
+        cb(null, uploadDir)
     },
     filename: (req, file, cb) => {
-        const extName = path.extname(file.originalname)
-        const filename = Date.now() + extName
+        const extName = path.extname(file.originalname).toLowerCase()
+        const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extName}`
         cb(null, filename)
     }
-    
+
 })
 
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"]
-    if(allowedTypes.includes(file.mimetype)){
+    const extName = path.extname(file.originalname).toLowerCase()
+    const allowedExtensions = allowedImageTypes[file.mimetype]
+
+    if(allowedExtensions?.includes(extName)){
         cb(null, true)
     }
     else{
-        cb( new Error("Only JPEG, PNG, JPG, GIF are allowed"), false)
+        cb( new Error("Only JPEG, PNG, and WebP images are allowed"), false)
     }
 }
 
@@ -31,7 +52,7 @@ const upload = multer({
     storage: diskStorage,
     fileFilter: fileFilter,
     limits: {
-        fieldSize: 5 * 1024 * 1024
+        fileSize: 2 * 1024 * 1024
     }
 })
 
@@ -73,7 +94,7 @@ exports.removeFile = (req, res) => {
                 error: "Image is required!"
             })
         }
-        const imagePath = path.join(__dirname, "../upload", req.params.imageUrl)
+        const imagePath = getSafeUploadPath(req.params.imageUrl)
 
         if(fs.existsSync(imagePath)){
             fs.unlinkSync(imagePath)
@@ -89,6 +110,12 @@ exports.removeFile = (req, res) => {
             })     
         }
     } catch (error) {
+        if (error.message === "Invalid file path") {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid file path"
+            })
+        }
         res.status(500).json({
             success: false,
             error: "Error while deleting image!"

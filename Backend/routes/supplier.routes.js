@@ -11,17 +11,17 @@ const {
 const restrict = require("../guards/restrict.guard")
 const shopScopeGuard = require("../guards/shop-scope.guard")
 
-router.use(restrict("ADMIN_MANAGER", "ADMIN"), shopScopeGuard)
+router.use(shopScopeGuard)
 
 router
     .route('/')
-    .post(createSupplier)
-    .get(findAllSuppliers);
+    .post(restrict("ADMIN"), createSupplier)
+    .get(restrict("ADMIN_MANAGER", "ADMIN"), findAllSuppliers);
 
 router
     .route('/:id')
-    .get(findOneSupplier)
-    .patch(updateSupplier)
-    .delete(removeSupplier);
+    .get(restrict("ADMIN_MANAGER", "ADMIN"), findOneSupplier)
+    .patch(restrict("ADMIN"), updateSupplier)
+    .delete(restrict("ADMIN"), removeSupplier);
 
 module.exports = router;

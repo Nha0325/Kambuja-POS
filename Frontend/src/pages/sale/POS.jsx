@@ -8,6 +8,7 @@ import Modal from "../../components/Modal";
 import useFetchOneByCode from "../../hooks/useFetchOneByCode";
 import { LuScanBarcode } from "react-icons/lu";
 import { baseUrl } from "../../configs/env";
+import { api } from "../../configs/api";
 import Loading from "../../components/Loading";
 
 function POS() {
@@ -38,12 +39,8 @@ function POS() {
       const heldId = searchParams.get('heldBill');
       if (!heldId) return;
       try {
-        const res = await fetch(`${baseUrl}/api/v1/held-bills/${heldId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const data = await res.json();
+        const res = await api.get(`/held-bills/${heldId}`);
+        const data = res.data;
         if (data.success && data.result) {
           setCarts(data.result.items.map(item => ({
             product: item.product,
@@ -170,14 +167,7 @@ function POS() {
       if (res) {
         if (searchParams.get('heldBill')) {
           try {
-            await fetch(`${baseUrl}/api/v1/held-bills/${searchParams.get('heldBill')}/complete`, {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // fallback if auth header is needed
-              },
-              body: JSON.stringify({ completedSale: res._id })
-            });
+            await api.patch(`/held-bills/${searchParams.get('heldBill')}/complete`, { completedSale: res._id });
           } catch (e) { console.error("Failed to complete held bill", e); }
         }
 

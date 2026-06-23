@@ -14,7 +14,7 @@ router
 
 router.get("/checkStock", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), checkStock)
 router.get("/today", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findToday)
-router.patch("/addPayment/:id", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), addPayment)
+router.patch("/addPayment/:id", restrict("ADMIN", "CASHIER"), addPayment)
 
 router // Moved to bottom so it doesn't shadow other routes
     .route("/:id")

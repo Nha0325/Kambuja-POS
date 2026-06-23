@@ -1,8 +1,8 @@
 
 
 const errorHandler = (err, req, res, next) => {
-    let statusCode = 500
-    let errMessage = "Server Error!"
+    let statusCode = err.statusCode || err.status || 500
+    let errMessage = statusCode === 500 ? "Server Error!" : err.message || "Server Error!"
 
     if(err.name === "ValidationError"){
         const errors = Object.values(err.errors).map(el => {

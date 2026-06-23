@@ -16,13 +16,53 @@ const cashierSafeProduct = (product) => {
     return safe;
 }
 
+const normalizeProductPayload = (body) => {
+    const payload = { ...(body || {}) }
+    delete payload._id
+    delete payload.shopId
+    delete payload.code
+
+    ;["costPrice", "salePrice", "currentStock"].forEach((field) => {
+        if (payload[field] !== undefined) {
+            payload[field] = Number(payload[field])
+        }
+    })
+
+    return payload
+}
+
+const validateProductNumbers = (payload) => {
+    if (payload.salePrice !== undefined && (!Number.isFinite(payload.salePrice) || payload.salePrice <= 0)) {
+        return "Sale price must be greater than zero."
+    }
+
+    if (payload.costPrice !== undefined && (!Number.isFinite(payload.costPrice) || payload.costPrice < 0)) {
+        return "Cost price must be greater than or equal zero."
+    }
+
+    if (payload.currentStock !== undefined && (!Number.isFinite(payload.currentStock) || payload.currentStock < 0)) {
+        return "Current stock must be greater than or equal zero."
+    }
+
+    return null
+}
+
 exports.create = async (req, res,next) => {
     try {
+        const payload = normalizeProductPayload(req.body)
+        const validationError = validateProductNumbers(payload)
+        if (validationError) {
+            return res.status(400).json({
+                success: false,
+                error: validationError,
+            })
+        }
+
         const code = await generateProductCode()
         const newDoc = await Product.create({
-            ...req.body,
+            ...payload,
             code,
-            currentStock: req.body.currentStock ?? 0,
+            currentStock: payload.currentStock ?? 0,
             shopId: req.shopId,
         })
         await Promise.all([
@@ -30,7 +70,7 @@ exports.create = async (req, res,next) => {
                 shopId: req.shopId,
                 product: newDoc._id,
                 quantity: newDoc.currentStock,
-                reorderLevel: Number(req.body.reorderLevel || 5),
+                reorderLevel: Number(payload.reorderLevel || 5),
             }),
             ProductCode.create({
                 shopId: req.shopId,
@@ -158,9 +198,18 @@ exports.findOneByCode = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     try {
         const id = req.params.id
+        const payload = normalizeProductPayload(req.body)
+        const validationError = validateProductNumbers(payload)
+        if (validationError) {
+            return res.status(400).json({
+                success: false,
+                error: validationError,
+            })
+        }
+
         const doc =await Product.findOneAndUpdate(
             { _id: id, ...req.shopFilter },
-            req.body,
+            payload,
             { new: true, runValidators: true }
         )
         if(!doc){

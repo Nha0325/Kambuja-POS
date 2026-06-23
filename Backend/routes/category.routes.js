@@ -9,13 +9,13 @@ router.use(shopScopeGuard)
 
 router
     .route('/')
-    .post(restrict("ADMIN_MANAGER","ADMIN"), createCategory)
+    .post(restrict("ADMIN"), createCategory)
     .get(restrict("ADMIN_MANAGER","ADMIN", "CASHIER"), findAllCategory);
 
 router
     .route('/:id')
     .get(restrict("ADMIN_MANAGER","ADMIN", "CASHIER"), findOneCategory)
-    .patch(restrict("ADMIN_MANAGER","ADMIN"), UpdateCategory)
-    .delete(restrict("ADMIN_MANAGER","ADMIN"), RemoveCategory);
+    .patch(restrict("ADMIN"), UpdateCategory)
+    .delete(restrict("ADMIN"), RemoveCategory);
 
 module.exports = router;

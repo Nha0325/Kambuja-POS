@@ -10,12 +10,17 @@ const AuditLog = require("../models/AuditLog.model")
 const runTransaction = require("../helper/runTransaction")
 const { notifySaleCreated } = require("../services/notification.service")
 
+const createHttpError = (statusCode, message) => {
+    const error = new Error(message)
+    error.statusCode = statusCode
+    return error
+}
+
 exports.create = async (req, res, next) => {
     try {
-        let {items, totalCost, paidAmount} = req.body
+        let {items, paidAmount} = req.body
         
         paidAmount = Number(paidAmount || 0);
-        totalCost = Number(totalCost || 0);
 
         // Ensure user is authenticated
         if (!req.user || !req.user._id) {
@@ -32,37 +37,85 @@ exports.create = async (req, res, next) => {
             });
         }
 
-        if (!Number.isFinite(totalCost) || totalCost <= 0) {
+        if (!Number.isFinite(paidAmount) || paidAmount < 0) {
             return res.status(400).json({
                 success: false,
-                message: "Total cost must be greater than zero."
+                message: "Paid amount must be greater than or equal zero."
             });
         }
 
-        //step 1: Fetch all products at once to validate stock
-        const productIds = items.map(it => it.product).filter(id => id);
+        const normalizedItems = []
+        const quantityByProduct = new Map()
+
+        for (const item of items) {
+            const product = item?.product || item?.productId
+            const quantity = Number(item?.quantity ?? item?.qty)
+
+            if (!product || !Number.isFinite(quantity) || quantity <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Each sale item must include a valid product and quantity."
+                })
+            }
+
+            const productKey = String(product)
+            normalizedItems.push({ product, quantity })
+            quantityByProduct.set(productKey, (quantityByProduct.get(productKey) || 0) + quantity)
+        }
+
+        //step 1: Fetch all products at once to validate stock and price
+        const productIds = Array.from(quantityByProduct.keys());
         const products = await Product.find({
             _id: { $in: productIds },
             ...req.shopFilter,
         })
 
-        //step 2: Validate stock for each product
-        for(const item of items){
-            const product = products.find(
-                (p) => p._id.toString() === item.product.toString()
-            )
+        const productById = new Map(products.map((product) => [product._id.toString(), product]))
+        const saleItems = []
+        let totalCost = 0
+
+        //step 2: Validate stock and backend-owned prices for each product
+        for(const [productId, quantity] of quantityByProduct.entries()){
+            const product = productById.get(productId)
             if(!product){
                 return res.status(404).json({
                     success:false,
-                    message: `Product not found with ID: ${item.product}`
+                    message: `Product not found with ID: ${productId}`
                 })
             }
-            if(product.currentStock < item.quantity){
+            if(product.currentStock < quantity){
                 return res.status(400).json({
                     success: false,
                     message: `Insufficient stock for product: ${product.name}`
                 })
             }
+            if(!Number.isFinite(Number(product.salePrice)) || Number(product.salePrice) < 0){
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid sale price for product: ${product.name}`
+                })
+            }
+        }
+
+        for (const item of normalizedItems) {
+            const product = productById.get(String(item.product))
+            const unitPrice = Number(product.salePrice)
+            const totalPrice = unitPrice * item.quantity
+
+            saleItems.push({
+                product: product._id,
+                quantity: item.quantity,
+                unitPrice,
+                totalPrice,
+            })
+            totalCost += totalPrice
+        }
+
+        if (!Number.isFinite(totalCost) || totalCost <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Total cost must be greater than zero."
+            });
         }
         
         //Step 3: Calculate payment status and generate invoice
@@ -73,7 +126,7 @@ exports.create = async (req, res, next) => {
             const sale = new Sale({
                 shopId: req.shopId,
                 user: req.user._id,
-                items,
+                items: saleItems,
                 invoiceNumber,
                 paymentStatus,
                 dueAmount: Math.max(0, totalCost - paidAmount),
@@ -83,12 +136,16 @@ exports.create = async (req, res, next) => {
             })
             await sale.save(session ? { session } : undefined)
 
-            for (const item of items) {
+            for (const item of saleItems) {
                 const product = await Product.findOneAndUpdate(
-                    { _id: item.product, ...req.shopFilter },
+                    { _id: item.product, ...req.shopFilter, currentStock: { $gte: item.quantity } },
                     { $inc: { currentStock: -item.quantity } },
                     { new: true, ...(session ? { session } : {}) }
                 )
+                if (!product) {
+                    const productName = productById.get(String(item.product))?.name || item.product
+                    throw createHttpError(400, `Insufficient stock for product: ${productName}`)
+                }
                 const quantityAfter = Number(product.currentStock)
                 const quantityBefore = quantityAfter + Number(item.quantity)
 

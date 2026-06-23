@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const dailyCloseController = require("../controller/dailyClose.controller");
 const shopScopeGuard = require("../guards/shop-scope.guard");
+const restrict = require("../guards/restrict.guard");
 
-router.use(shopScopeGuard);
+router.use(restrict("ADMIN", "CASHIER"), shopScopeGuard);
 
 router.get("/current", dailyCloseController.getCurrent);
 router.post("/open", dailyCloseController.open);

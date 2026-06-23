@@ -28,10 +28,12 @@ const schema = new mongoose.Schema({
     },
     costPrice: {
         type: Number,
+        min: [0, "Cost price must be greater than or equal zero"],
         required: [true,"Cost price is required"]
     },
     salePrice: {
         type: Number,
+        min: [0, "Sale price must be greater than or equal zero"],
         required: [true,"Sale price is required"]
 
     },

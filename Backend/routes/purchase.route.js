@@ -5,18 +5,18 @@ const shopScopeGuard = require("../guards/shop-scope.guard")
 
 const router = express.Router()
 
-router.use(restrict("ADMIN_MANAGER", "ADMIN"), shopScopeGuard)
+router.use(shopScopeGuard)
 
 router
     .route("/")
-    .post(create)
-    .get(findAll)
+    .post(restrict("ADMIN"), create)
+    .get(restrict("ADMIN_MANAGER", "ADMIN"), findAll)
 
-router.patch("/updatePurchaseStatus/:id", updatePurchaseStatus)
-router.patch("/addPayment/:id", addPayment)
+router.patch("/updatePurchaseStatus/:id", restrict("ADMIN"), updatePurchaseStatus)
+router.patch("/addPayment/:id", restrict("ADMIN"), addPayment)
 
 router
     .route("/:id")
-    .get(findOne)
-    .patch(updatePurchaseStatus)
+    .get(restrict("ADMIN_MANAGER", "ADMIN"), findOne)
+    .patch(restrict("ADMIN"), updatePurchaseStatus)
 module.exports = router

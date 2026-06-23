@@ -4,7 +4,7 @@ import formatUsd from "../../utils/formatCurrency";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../configs/env";
+import { api } from "../../configs/api";
 import { FaUser, FaClipboardList } from "react-icons/fa";
 
 function HoldBills() {
@@ -19,14 +19,8 @@ function HoldBills() {
   const handleCancel = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this held bill?")) return;
     try {
-      const res = await fetch(`${baseUrl}/api/v1/held-bills/${id}/cancel`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const result = await res.json();
+      const res = await api.patch(`/held-bills/${id}/cancel`);
+      const result = res.data;
       if (result.success) {
         toast.success("Held bill cancelled!");
         refetch();
