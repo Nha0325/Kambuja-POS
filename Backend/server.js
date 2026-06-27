@@ -18,7 +18,21 @@ app.router.stack.forEach(function(layer) {
 console.log('[DEBUG] Auth routes mounted: ' + (authRoutes.length > 0 ? 'YES (' + authRoutes.join(', ') + ')' : 'NO'));
 
 // connect to the database
-connectToDatabase().then(function() {
+connectToDatabase().then(async function() {
+    const Alert = require('./models/Alert.model');
+    const alertCount = await Alert.countDocuments();
+    if (alertCount === 0) {
+        await Alert.insertMany([
+            { type: 'LOGIN', severity: 'INFO', title: 'System Login', message: 'Admin logged in successfully.' },
+            { type: 'FAILED_LOGIN', severity: 'WARNING', title: 'Failed Login Attempt', message: 'Multiple failed logins from 192.168.1.1' },
+            { type: 'LOW_STOCK', severity: 'INFO', title: 'Low Stock: Cola', message: 'Cola has only 10 items left.' },
+            { type: 'CRITICAL_STOCK', severity: 'WARNING', title: 'Critical Stock: Pepsi', message: 'Pepsi has only 2 items left.' },
+            { type: 'OUT_OF_STOCK', severity: 'CRITICAL', title: 'Out of Stock: Water', message: 'Water is completely out of stock.' },
+            { type: 'SUSPICIOUS_ACTIVITY', severity: 'CRITICAL', title: 'Suspicious Activity Detected', message: 'Unusual amount of voided receipts.' }
+        ]);
+        console.log('Seeded sample alerts');
+    }
+
     app.listen(port, function() {
         console.log('Server is running on port ' + port);
     });

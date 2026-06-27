@@ -94,7 +94,7 @@ function DailyClose() {
     <div className="min-h-[calc(100vh-64px)] bg-[#f8f9ff] p-4 lg:p-8 text-[#0b1c30]">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Daily Close</h1>
+          <h1 className="text-2xl font-bold">My Shift</h1>
           <p className="text-sm text-[#45464d] mt-1">Review your shift sales and balance your cash drawer.</p>
         </div>
         {isClosed && (

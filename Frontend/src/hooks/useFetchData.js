@@ -6,6 +6,7 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
     const [totalPage, setTotalPage] = useState(0)
     const [total, setTotal] = useState(0)
     const [totalWithNotes, setTotalWithNotes] = useState(0)
+    const [meta, setMeta] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const queryParts = []
 
@@ -26,6 +27,7 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
                 setTotalPage(res.data.totalPages || res.data.totalPage || 0)
                 setTotal(res.data.total || res.data.result?.length || 0)
                 setTotalWithNotes(res.data.totalWithNotes || 0)
+                setMeta(res.data)
             } catch (error) {
                 // If the endpoint was not found, attempt a simple pluralization/singularization fallback
                 const status = error?.response?.status
@@ -38,6 +40,7 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
                         setTotalPage(altRes.data.totalPages || altRes.data.totalPage || 0)
                         setTotal(altRes.data.total || altRes.data.result?.length || 0)
                         setTotalWithNotes(altRes.data.totalWithNotes || 0)
+                        setMeta(altRes.data)
                         return
                     } catch (err) {
                         console.log('Fallback fetch failed:', err.message)
@@ -56,7 +59,8 @@ const useFetchData = (collection, page = 1, limit =25, search="", refetch = fals
         totalPage,
         isLoading,
         total,
-        totalWithNotes
+        totalWithNotes,
+        meta
     }
 }
 

@@ -105,63 +105,63 @@ function Purchase() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="10" className="p-8 text-center text-[#45464d]">
-                      កំពុងទាញយកទិន្នន័យ...
+                    <td colSpan="10" className="p-8 text-center text-[#A9A6BB]">
+                      Loading data...
                     </td>
                   </tr>
                 ) : data?.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="p-8 text-center text-[#5b6472]">
-                      មិនមានទិន្នន័យទិញទំនិញឡើយ។
+                    <td colSpan="10" className="p-8 text-center text-[#6B7280]">
+                      No purchases found.
                     </td>
                   </tr>
                 ) : (
                   data?.map((el, index) => (
                     <tr key={el?._id} className={adminSurface.row}>
                       {/* Row Auto-Increment Index Number */}
-                      <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
+                      <td className={`${adminSurface.td} text-center font-medium text-[#6B7280]`}>
                         {(page - 1) * limit + index + 1}
                       </td>
 
                       {/* Supplier */}
-                      <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>
+                      <td className={`${adminSurface.td} font-semibold text-[#F8FAFC]`}>
                         {el?.supplier?.businessName || el?.supplier?.name || "—"}
                       </td>
 
                       {/* Purchased By (User Account Name) */}
-                      <td className={`${adminSurface.td} font-medium text-[#45464d]`}>
+                      <td className={`${adminSurface.td} font-medium text-[#A9A6BB]`}>
                         {el?.user?.username || el?.user?.name || "Admin"}
                       </td>
 
                       {/* Total Cost */}
-                      <td className={`${adminSurface.td} text-right font-semibold text-red-600`}>
+                      <td className={`${adminSurface.td} text-right font-semibold text-[#F8FAFC]`}>
                         ${Number(el?.totalCost || 0).toFixed(2)}
                       </td>
 
                       {/* Due Amount */}
-                      <td className={`${adminSurface.td} text-right font-medium text-orange-600`}>
+                      <td className={`${adminSurface.td} text-right font-medium text-[#EF4444]`}>
                         ${Number(el?.dueAmount || 0).toFixed(2)}
                       </td>
 
                       {/* Change Amount */}
-                      <td className={`${adminSurface.td} text-right font-medium text-green-600`}>
+                      <td className={`${adminSurface.td} text-right font-medium text-[#22D3EE]`}>
                         ${Number(el?.changeAmount || 0).toFixed(2)}
                       </td>
 
                       {/* Payment Status Badges */}
                       <td className={`${adminSurface.td} text-center`}>
                         {el?.paymentStatus === "paid" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] rounded-full">
                             Paid
                           </span>
                         )}
                         {el?.paymentStatus === "due" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] rounded-full">
                             Due
                           </span>
                         )}
                         {el?.paymentStatus === "partial" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] rounded-full">
                             Partial
                           </span>
                         )}
@@ -170,24 +170,24 @@ function Purchase() {
                       {/* Purchase Operational Status Badges */}
                       <td className={`${adminSurface.td} text-center`}>
                         {el?.purchaseStatus === "received" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] rounded-full">
                             Received
                           </span>
                         )}
                         {el?.purchaseStatus === "pending" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] rounded-full">
                             Pending
                           </span>
                         )}
                         {el?.purchaseStatus === "ordered" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#3350BF]/20 border border-[#3350BF]/50 text-[#22D3EE] rounded-full">
                             Ordered
                           </span>
                         )}
                       </td>
 
                       {/* Purchase Date */}
-                      <td className={`${adminSurface.td} text-center text-[#45464d]`}>
+                      <td className={`${adminSurface.td} text-center text-[#A9A6BB]`}>
                         {el?.purchaseDate ? formatDate(el.purchaseDate) : "N/A"}
                       </td>
 

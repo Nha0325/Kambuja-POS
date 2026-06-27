@@ -1,84 +1,72 @@
-import { NavLink, useLocation } from "react-router";
-import { AiFillHome } from "react-icons/ai";
-import { TbActivityHeartbeat } from "react-icons/tb";
-import { GoChevronDown } from "react-icons/go";
-import { FaHandshake, FaUsers } from "react-icons/fa6";
-import { MdCategory, MdInventory2, MdNotifications, MdSettings } from "react-icons/md";
-import { PiPackageFill } from "react-icons/pi";
-import { IoBagHandle } from "react-icons/io5";
-import { FaUserGear } from "react-icons/fa6";
-import { IoStatsChart } from "react-icons/io5";
+import { useState } from "react"
+import { NavLink, useLocation } from "react-router"
+import { GoChevronDown } from "react-icons/go"
+import {
+  LuBadgeDollarSign,
+  LuBoxes,
+  LuLayoutDashboard,
+  LuPackage,
+  LuPackagePlus,
+  LuReceiptText,
+  LuSettings,
+  LuSlidersHorizontal,
+  LuTags,
+  LuTruck,
+  LuUsers,
+  LuFileText,
+  LuContact,
+} from "react-icons/lu"
 
-import { useState } from "react";
-
-const primaryItems = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: AiFillHome },
-  { to: "/admin/suppliers", label: "Suppliers", icon: FaHandshake },
-  { to: "/admin/categories", label: "Categories", icon: MdCategory },
-  { to: "/admin/customers", label: "Customers", icon: FaUsers },
-  { to: "/admin/products", label: "Products", icon: PiPackageFill },
-]
-
-const operationItems = [
-  { to: "/admin/purchases", label: "Purchases", icon: IoBagHandle },
-  { to: "/admin/sales", label: "Sales", icon: TbActivityHeartbeat },
-  { to: "/admin/cashiers", label: "Cashiers", icon: FaUserGear },
+const mainItems1 = [
+  { to: "/admin/dashboard", label: "Dashboard", icon: LuLayoutDashboard },
+  { to: "/admin/products", label: "Products", icon: LuPackage },
+  { to: "/admin/categories", label: "Categories", icon: LuTags },
 ]
 
 const inventoryItems = [
-  { to: "/admin/inventory", label: "Stock Overview", icon: MdInventory2, end: true },
-  { to: "/admin/inventory/stock-in", label: "Stock In", icon: MdInventory2 },
-  { to: "/admin/inventory/adjust", label: "Adjustment", icon: MdInventory2 },
+  { to: "/admin/inventory", label: "Stock Overview", icon: LuLayoutDashboard, end: true },
+  { to: "/admin/inventory/stock-in", label: "Stock In", icon: LuPackagePlus },
+  { to: "/admin/inventory/adjustment", label: "Adjustment", icon: LuSlidersHorizontal },
 ]
 
-const notificationItems = [
-  { to: "/admin/notifications/channels", label: "Channels", icon: MdNotifications },
-  { to: "/admin/notifications/logs", label: "Logs", icon: MdNotifications },
+const mainItems2 = [
+  { to: "/admin/purchases", label: "Purchases", icon: LuReceiptText },
+  { to: "/admin/suppliers", label: "Suppliers", icon: LuTruck },
+  { to: "/admin/customers", label: "Customers", icon: LuContact },
+  { to: "/admin/cashiers", label: "Cashiers", icon: LuUsers },
 ]
 
 const reportItems = [
-  { to: "/admin/reports/sales", label: "Sale Report", icon: IoStatsChart },
-  { to: "/admin/reports/stock", label: "Stock Report", icon: TbActivityHeartbeat },
+  { to: "/admin/reports/sales", label: "Sales Report", icon: LuBadgeDollarSign },
+  { to: "/admin/reports/stock", label: "Stock Report", icon: LuBoxes },
 ]
 
 const footerItems = [
-  { to: "/admin/shop-settings", label: "Shop Settings", icon: MdSettings },
+  { to: "/admin/settings", label: "Settings", icon: LuSettings },
 ]
 
 const navLinkClass = ({ isActive }) =>
-  `${
-    isActive
-      ? "bg-[#0b1c30] text-white shadow-sm shadow-slate-200"
-      : "text-[#45464d] hover:bg-[#eff4ff] hover:text-[#0058be]"
-  } flex min-h-11 w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-all`
+  `${isActive
+    ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-[#3350BF] dark:to-[#AF68E0] text-white shadow-md shadow-violet-200 dark:shadow-[#3350BF]/20"
+    : "text-slate-600 dark:text-[#A9A6BB] hover:bg-slate-50 dark:hover:bg-[#22262D] hover:text-slate-900 dark:hover:text-white"
+  } flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all`
 
 const subNavLinkClass = ({ isActive }) =>
-  `${
-    isActive
-      ? "border-[#0058be] bg-[#eff4ff] text-[#0058be]"
-      : "border-transparent text-[#5b6472] hover:border-[#d7dced] hover:bg-[#f8f9ff] hover:text-[#0058be]"
-  } flex min-h-10 w-full items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold transition-all`
+  `${isActive
+    ? "text-violet-700 dark:text-white font-medium"
+    : "text-slate-600 dark:text-[#A9A6BB] hover:text-slate-900 dark:hover:text-white"
+  } flex min-h-10 w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all relative`
 
 const groupButtonClass = (isActive) =>
-  `${
-    isActive
-      ? "bg-[#0b1c30] text-white shadow-sm shadow-slate-200"
-      : "text-[#45464d] hover:bg-[#eff4ff] hover:text-[#0058be]"
-  } flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-all`
-
-function Section({ label, children }) {
-  return (
-    <div className="space-y-1.5">
-      <p className="px-3 text-[11px] font-bold uppercase text-[#76777d]">{label}</p>
-      {children}
-    </div>
-  )
-}
+  `${isActive
+    ? "bg-slate-100 text-slate-900 dark:bg-[#22262D] dark:text-white"
+    : "text-slate-600 dark:text-[#A9A6BB] hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-[#22262D] dark:hover:text-white"
+  } flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all`
 
 function NavItems({ items, onNavigate }) {
   return items.map(({ to, label, icon: Icon }) => (
     <NavLink key={to} to={to} className={navLinkClass} onClick={onNavigate}>
-      <Icon className="shrink-0 text-base" />
+      <Icon className="h-[18px] w-[18px] shrink-0" />
       <span className="min-w-0 truncate">{label}</span>
     </NavLink>
   ))
@@ -89,19 +77,24 @@ function CollapsibleGroup({ id, label, icon: Icon, items, isActive, isOpen, onTo
     <div className="space-y-1.5">
       <button type="button" onClick={() => onToggle(id)} className={groupButtonClass(isActive)}>
         <span className="flex min-w-0 items-center gap-3">
-          <Icon className="shrink-0 text-base" />
+          <Icon className="h-[18px] w-[18px] shrink-0" />
           <span className="min-w-0 truncate">{label}</span>
         </span>
-        <GoChevronDown className={`${isOpen ? "rotate-180" : ""} shrink-0 transition-transform duration-200`} />
+        <GoChevronDown className={`${isOpen ? "rotate-180" : ""} h-4 w-4 shrink-0 transition-transform duration-200`} />
       </button>
 
       {isOpen && (
-        <ul className="space-y-1 border-l border-[#d7dced] pl-3">
+        <ul className="space-y-1 mt-1 pl-11 relative before:absolute before:left-[21px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-200 dark:before:bg-[#22262D]">
           {items.map(({ to, label: itemLabel, icon: ItemIcon, end }) => (
-            <li key={to}>
+            <li key={to} className="relative">
               <NavLink to={to} end={end} className={subNavLinkClass} onClick={onNavigate}>
-                <ItemIcon className="shrink-0 text-base" />
-                <span className="min-w-0 truncate">{itemLabel}</span>
+                {({ isActive }) => (
+                  <>
+                    <span className={`absolute left-[-23px] top-1/2 h-[1px] w-3 -translate-y-1/2 ${isActive ? 'bg-violet-500 dark:bg-[#3350BF]' : 'bg-slate-200 dark:bg-[#22262D]'}`}></span>
+                    <ItemIcon className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-violet-600 dark:text-[#AF68E0]' : ''}`} />
+                    <span className="min-w-0 truncate">{itemLabel}</span>
+                  </>
+                )}
               </NavLink>
             </li>
           ))}
@@ -113,15 +106,13 @@ function CollapsibleGroup({ id, label, icon: Icon, items, isActive, isOpen, onTo
 
 function Sidebar({ isShowSidebar, onNavigate }) {
   const [openGroups, setOpenGroups] = useState({
-    inventory: false,
-    notifications: false,
-    reports: false,
-  });
-  const { pathname } = useLocation();
+    inventory: true,
+    reports: true,
+  })
+  const { pathname } = useLocation()
 
   const isInventoryRoute = pathname.startsWith("/admin/inventory")
-  const isNotificationRoute = pathname.startsWith("/admin/notifications")
-  const isReportRoute = pathname.startsWith("/admin/reports") || pathname.startsWith("/report")
+  const isReportsRoute = pathname.startsWith("/admin/reports")
 
   const toggleGroup = (id) => {
     setOpenGroups((value) => ({ ...value, [id]: !value[id] }))
@@ -129,70 +120,51 @@ function Sidebar({ isShowSidebar, onNavigate }) {
 
   return (
     <aside
-      className={`${
-        isShowSidebar ? "translate-x-0" : "-translate-x-full"
-      } fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col overflow-hidden border-r border-[#d7dced] bg-white shadow-sm transition-transform duration-300`}
+      className={`${isShowSidebar ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-y-0 left-0 z-50 flex h-screen w-[292px] flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-700 dark:border-[#2A2E36] dark:bg-[#0A0B0D] dark:text-slate-300 transition-transform duration-300`}
     >
-      <div className="border-b border-[#e5eeff] px-5 py-5">
+      <div className="shrink-0 border-b border-slate-200 dark:border-[#2A2E36] px-6 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0b1c30] text-sm font-bold text-white">
-            KP
-          </div>
           <div className="min-w-0">
-            <h1 className="truncate text-2xl font-bold leading-tight text-[#0b1c30]">Kambuja</h1>
-            <p className="mt-0.5 text-[11px] font-bold uppercase text-[#0058be]">Shop Management</p>
+            <h1 className="truncate text-xl font-bold tracking-tight text-slate-900 dark:text-white">Kambuja</h1>
+            <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Shop POS Admin</p>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-5 overflow-y-auto px-4 py-5">
-        <Section label="Main">
-          <NavItems items={primaryItems} onNavigate={onNavigate} />
-        </Section>
+      <nav className="sidebar-scroll flex-1 space-y-2 overflow-y-auto px-4 py-5">
+        <NavItems items={mainItems1} onNavigate={onNavigate} />
 
-        <Section label="Operations">
-          <CollapsibleGroup
-            id="inventory"
-            label="Inventory"
-            icon={MdInventory2}
-            items={inventoryItems}
-            isActive={isInventoryRoute}
-            isOpen={openGroups.inventory || isInventoryRoute}
-            onToggle={toggleGroup}
-            onNavigate={onNavigate}
-          />
-          <NavItems items={operationItems} onNavigate={onNavigate} />
-        </Section>
+        <CollapsibleGroup
+          id="inventory"
+          label="Inventory"
+          icon={LuBoxes}
+          items={inventoryItems}
+          isActive={isInventoryRoute}
+          isOpen={openGroups.inventory || isInventoryRoute}
+          onToggle={toggleGroup}
+          onNavigate={onNavigate}
+        />
 
-        <Section label="Monitoring">
-          <CollapsibleGroup
-            id="notifications"
-            label="Notifications"
-            icon={MdNotifications}
-            items={notificationItems}
-            isActive={isNotificationRoute}
-            isOpen={openGroups.notifications || isNotificationRoute}
-            onToggle={toggleGroup}
-            onNavigate={onNavigate}
-          />
-          <CollapsibleGroup
-            id="reports"
-            label="Reports"
-            icon={IoStatsChart}
-            items={reportItems}
-            isActive={isReportRoute}
-            isOpen={openGroups.reports || isReportRoute}
-            onToggle={toggleGroup}
-            onNavigate={onNavigate}
-          />
-        </Section>
+        <NavItems items={mainItems2} onNavigate={onNavigate} />
+
+        <CollapsibleGroup
+          id="reports"
+          label="Reports"
+          icon={LuFileText}
+          items={reportItems}
+          isActive={isReportsRoute}
+          isOpen={openGroups.reports || isReportsRoute}
+          onToggle={toggleGroup}
+          onNavigate={onNavigate}
+        />
       </nav>
-      
-      <nav className="border-t border-[#e5eeff] px-4 py-4">
+
+      <div className="shrink-0 border-t border-slate-200 dark:border-[#2A2E36] px-4 py-4">
         <NavItems items={footerItems} onNavigate={onNavigate} />
-      </nav>
+      </div>
     </aside>
-  );
+  )
 }
 
-export default Sidebar;
+export default Sidebar

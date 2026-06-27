@@ -44,14 +44,13 @@ function PurchaseStatusModal({ open, onClose, editId }) {
           setPurchaseStatus("");
         }}
       >
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="block text-sm font-medium mb-1">Status</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2">Status</label>
             <select
               required
-              className="select w-full select-bordered"
+              className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
               disabled={isLoading || isUpdating}
-
               value={purchaseStatus}
               onChange={(e) => setPurchaseStatus(e.target.value)}
             >
@@ -67,9 +66,9 @@ function PurchaseStatusModal({ open, onClose, editId }) {
           <button 
             disabled={isUpdating || isLoading} 
             type="submit" 
-            className="btn btn-neutral w-full"
+            className="mt-4 bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full"
           >
-            {isUpdating ? "Updating..." : "Save"}
+            {isUpdating ? "Updating..." : "Save Status"}
           </button>
         </form>
       </Modal>

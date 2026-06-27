@@ -1,4 +1,3 @@
-
 const Product = require("../models/Product.model")
 const Purchase = require("../models/Purchase.model")
 const Sale = require("../models/Sale.model")
@@ -9,8 +8,11 @@ exports.generalReport = async (req, res, next) => {
         // 1). find revenue today
         const startOfToday = new Date( new Date().setHours(0,0,0,0))
         const endOfToday = new Date( new Date().setHours(23,59,59,999))
+        const filter = { ...req.shopFilter }
+        if (req.query.locationId) filter.locationId = req.query.locationId
+
         const todaySales = await Sale.find({
-            ...req.shopFilter,
+            ...filter,
             createdAt: {
                  $gte: startOfToday,
                  $lte: endOfToday
@@ -25,7 +27,7 @@ exports.generalReport = async (req, res, next) => {
 
         // 2). total due amount
         const dueSales = await Sale.find({
-            ...req.shopFilter,
+            ...filter,
             paymentStatus: 'due'
         },{
             totalCost: 1
@@ -37,7 +39,7 @@ exports.generalReport = async (req, res, next) => {
 
         //3). total due amount purchase
         const duePurchaes = await Purchase.find({
-            ...req.shopFilter,
+            ...filter,
             paymentStatus: 'due'
         },{totalCost: 1})
         const totalDueAmountPurchase = duePurchaes.reduce((sum, purchase) => {
@@ -58,7 +60,7 @@ exports.generalReport = async (req, res, next) => {
         ).setHours(23,59,59,999)
 
         const monthlySales = await Sale.find({
-            ...req.shopFilter,
+            ...filter,
             createdAt: {
                 $gte: monthStart,
                 $lte: monthEnd
@@ -70,11 +72,11 @@ exports.generalReport = async (req, res, next) => {
         },0)
 
         //5). count all suppliers
-        const totalSuppliers = await Supplier.countDocuments(req.shopFilter)
+        const totalSuppliers = await Supplier.countDocuments(filter)
         //6). count all due purchase
-        const totalPurchase = await Purchase.countDocuments({...req.shopFilter, paymentStatus: "due"})
+        const totalPurchase = await Purchase.countDocuments({...filter, paymentStatus: "due"})
         //7). count all due sale
-        const totalSaleDue = await Sale.countDocuments({...req.shopFilter, paymentStatus: "due"})
+        const totalSaleDue = await Sale.countDocuments({...filter, paymentStatus: "due"})
 
         res.status(200).json({
             success: true,
@@ -105,10 +107,13 @@ exports.saleReport = async (req, res, next) => {
         
     }
 
+        const filter = { ...req.shopFilter }
+        if (req.query.locationId) filter.locationId = req.query.locationId
+
         const startDate = new Date(req.query.startDate).setHours(0,0,0,0)
         const endDate = new Date(req.query.endDate).setHours(23,59,59,999)
         const sales = await Sale.find({
-            ...req.shopFilter,
+            ...filter,
             createdAt: {
                 $gte: startDate,
                 $lte: endDate
@@ -140,8 +145,11 @@ exports.stockReport = async (req, res, next) => {
             })
         }
 
+        const filter = { ...req.shopFilter }
+        if (req.query.locationId) filter.locationId = req.query.locationId
+
         const docs = await Product.find({
-            ...req.shopFilter,
+            ...filter,
             currentStock: {
                 $lte: req.query.stockQty * 1
             }
@@ -163,10 +171,13 @@ exports.salereportIn30Days = async (req, res, next) => {
         thirtyDaysAgo.setDate( thirtyDaysAgo.getDate() - 30 )
         thirtyDaysAgo.setHours(0, 0, 0, 0)
 
+        const filter = { ...req.shopFilter }
+        if (req.query.locationId) filter.locationId = req.query.locationId
+
         const sales = await Sale.aggregate([
             {
                 $match: {
-                    ...req.shopFilter,
+                    ...filter,
                     createdAt: {
                         $gte: thirtyDaysAgo
                     }

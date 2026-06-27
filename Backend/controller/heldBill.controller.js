@@ -1,5 +1,7 @@
 const HeldBill = require("../models/HeldBill.model");
 
+const cashierProjection = "username role";
+
 const generateHoldNumber = () => {
   return "HB-" + Math.floor(100000 + Math.random() * 900000);
 }
@@ -37,7 +39,9 @@ exports.findAll = async (req, res, next) => {
             query.cashier = req.user._id;
         }
 
-        const docs = await HeldBill.find(query).sort({ createdAt: -1 });
+        const docs = await HeldBill.find(query)
+            .populate("cashier", cashierProjection)
+            .sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, result: docs });
     } catch (error) {
@@ -52,7 +56,8 @@ exports.findOne = async (req, res, next) => {
             query.cashier = req.user._id;
         }
 
-        const doc = await HeldBill.findOne(query);
+        const doc = await HeldBill.findOne(query)
+            .populate("cashier", cashierProjection);
         if (!doc) {
             return res.status(404).json({ success: false, message: "Held bill not found" });
         }

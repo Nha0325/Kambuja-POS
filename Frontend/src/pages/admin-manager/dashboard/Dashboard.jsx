@@ -1,62 +1,51 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import {
-  FaBuilding,
-  FaChartColumn,
-  FaGaugeHigh,
-  FaListCheck,
-  FaUserShield,
-} from "react-icons/fa6"
 import { adminManagerService } from "../../../services/adminManager.service"
-import { downloadCsv } from "../../../utils/downloadCsv"
-import { formatApiError } from "../../../utils/formatApiError"
 import formatDate from "../../../utils/formatDate"
 import {
-  cardClass,
-  formatRiel,
-  getInitials,
-  pageHeaderDescriptionClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "../adminManagerUi"
-import { PageHeader } from "../components/AdminManagerUi"
-
-const metrics = [
-  { key: "totalShops", label: "Total Shops", icon: FaBuilding },
-  { key: "totalAdmins", label: "Platform Admins", icon: FaUserShield },
-  { key: "totalCashiers", label: "Active Cashiers", icon: FaListCheck },
-  { key: "totalSales", label: "Total Sales", icon: FaChartColumn },
-]
+  FaStore,
+  FaUserShield,
+  FaUsers,
+  FaBoxOpen,
+  FaArrowUp,
+  FaArrowRight,
+  FaCircleCheck,
+  FaMoneyBillWave
+} from "react-icons/fa6"
+import {
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
+} from "recharts"
 
 function Dashboard() {
   const [data, setData] = useState({})
-  const [reports, setReports] = useState([])
-  const [logs, setLogs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
-  const [lastUpdated, setLastUpdated] = useState(null)
+  const [isDark, setIsDark] = useState(
+    () => typeof window !== "undefined" && window.document.documentElement.classList.contains('dark')
+  )
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const observer = new MutationObserver(() => {
+      setIsDark(window.document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(window.document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const loadDashboard = useCallback(() => {
     let isMounted = true
-
     setIsLoading(true)
     setError("")
 
-    Promise.all([
-      adminManagerService.dashboard(),
-      adminManagerService.reports(),
-      adminManagerService.auditLogs(),
-    ])
-      .then(([dashboardResponse, reportsResponse, logsResponse]) => {
+    adminManagerService.getDashboard()
+      .then((res) => {
         if (!isMounted) return
-        setData(dashboardResponse.data.result || {})
-        setReports(reportsResponse.data.result || [])
-        setLogs(logsResponse.data.result || [])
-        setLastUpdated(new Date())
+        setData(res.data.result || {})
       })
-      .catch((loadError) => {
-        if (isMounted && loadError?.response?.status !== 401) {
-          setError(formatApiError(loadError) || "Unable to load dashboard")
+      .catch((err) => {
+        if (isMounted && err?.response?.status !== 401) {
+          setError("Unable to load dashboard")
         }
       })
       .finally(() => {
@@ -70,180 +59,259 @@ function Dashboard() {
 
   useEffect(() => loadDashboard(), [loadDashboard])
 
-  const exportDashboard = () => {
-    downloadCsv(
-      "admin-manager-dashboard.csv",
-      [
-        { label: "Metric", value: (row) => row.label },
-        { label: "Value", value: (row) => row.value },
-      ],
-      [
-        { label: "Total Shops", value: data.totalShops || 0 },
-        { label: "Platform Admins", value: data.totalAdmins || 0 },
-        { label: "Active Cashiers", value: data.totalCashiers || 0 },
-        { label: "Total Sales", value: data.totalSales || 0 },
-        { label: "Total Revenue", value: data.totalRevenue || 0 },
-      ]
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+             <div key={i} className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-5 h-[120px] animate-pulse"></div>
+          ))}
+        </div>
+      </div>
     )
   }
 
-  const topReports = reports.slice(0, 3)
-  const maxRevenue = Math.max(...topReports.map((row) => Number(row.totalRevenue || 0)), 1)
-  const recentLogs = logs.slice(0, 3)
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 rounded-xl text-center font-bold">
+        Failed to load dashboard data
+      </div>
+    )
+  }
+
+  const formatRiel = (val) => `$${Number(val || 0).toLocaleString()}`
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  
+  const platformData = months.map((month, index) => ({
+    name: month,
+    sales: data.salesRevenueTrend?.[index] || 0,
+    subscriptions: data.subscriptionRevenueTrend?.[index] || 0
+  }))
+
+  const categories = data.categoryPerformance || []
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4']
 
   return (
-    <section>
-      <PageHeader
-        title="Platform Dashboard"
-        description="Real-time performance across the Kambuja shop management ecosystem."
-        action={(
-          <div className="flex flex-wrap gap-3">
-            <button className={secondaryButtonClass} type="button" onClick={loadDashboard} disabled={isLoading}>
-              {isLoading ? "Loading..." : "Refresh"}
-            </button>
-            <button className={primaryButtonClass} type="button" onClick={exportDashboard} disabled={isLoading}>
-              Export View
-            </button>
-          </div>
-        )}
-      />
-
-      {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
+    <div className="flex flex-col gap-6 text-[#020617] dark:text-[#f8fafc] max-w-[1600px] mx-auto">
+      
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Kambuja POS Dashboard</h1>
+          <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Monitor platform shops, subscriptions, users, and sales performance.</p>
         </div>
-      )}
+        <button onClick={loadDashboard} className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] text-[#020617] dark:text-[#f8fafc] text-sm font-semibold rounded-xl hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors inline-flex items-center justify-center gap-2">
+          Refresh
+        </button>
+      </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map(({ key, label, icon: Icon }) => (
-          <article key={key} className={`${cardClass} p-6 transition-transform active:scale-[0.98]`}>
-            <div className="mb-4 flex items-start justify-between">
-              <span className="rounded-xl bg-violet-50 p-2 text-violet-700">
-                <Icon />
-              </span>
-              <span className="text-xs font-bold uppercase tracking-[0.05em] text-slate-500">
-                {isLoading ? "Loading" : "Live"}
-              </span>
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+        {[
+          { label: "Total Shops", value: data.totalShops || 0, sub: "Registered shops", icon: FaStore, color: "text-[#3b82f6]" },
+          { label: "Active Shops", value: data.activeShops || 0, sub: "Currently operational", icon: FaCircleCheck, color: "text-[#10b981]" },
+          { label: "Total Admins", value: data.totalAdmins || 0, sub: "Across all instances", icon: FaUserShield, color: "text-[#8b5cf6]" },
+          { label: "Total Cashiers", value: data.totalCashiers || 0, sub: "Active accounts", icon: FaUsers, color: "text-[#f59e0b]" },
+          { label: "Monthly Sales", value: formatRiel(data.monthlySales), sub: "Current month", icon: FaMoneyBillWave, color: "text-[#ef4444]" },
+          { label: "Total Products", value: data.totalProducts || 0, sub: "Across platform", icon: FaBoxOpen, color: "text-[#06b6d4]" },
+        ].map((card, i) => (
+          <div key={i} className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-5 flex flex-col justify-between h-[120px]">
+            <div className="flex justify-between items-start">
+              <div className={`p-1.5 rounded-lg bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] ${card.color}`}>
+                <card.icon className="h-4 w-4" />
+              </div>
+              <div className="flex items-center gap-1 text-[10px] font-bold text-[#10b981] bg-[#10b981]/10 px-1.5 py-0.5 rounded">
+                <FaArrowUp /> 0%
+              </div>
             </div>
-            <p className="mb-1 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">{label}</p>
-            <strong className="block text-3xl font-bold text-slate-900">
-              {Number(data[key] || 0).toLocaleString()}
-            </strong>
-          </article>
+            <div>
+              <h3 className="text-2xl font-bold tracking-tight">{card.value}</h3>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{card.label}</span>
+                <span className="text-[10px] text-[#94a3b8] dark:text-[#71717a] truncate">· {card.sub}</span>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
-      <section className={`${cardClass} mt-6 overflow-hidden lg:flex`}>
-        <div className="flex-1 p-6 md:p-8">
-          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-start">
-            <div>
-              <h3 className="text-base font-semibold text-slate-900">Platform Revenue</h3>
-              <p className={pageHeaderDescriptionClass}>Aggregate processing volume from the dashboard endpoint.</p>
-            </div>
-            <div className="rounded-xl border border-violet-100 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-800">
-              {formatRiel(data.totalRevenue)}
-            </div>
+      {/* Main Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Left Chart: Platform Performance */}
+        <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Platform Performance</h3>
+            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Monthly platform performance this year</p>
           </div>
+          
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={platformData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#27272a" : "#e5e7eb"} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isDark ? '#a1a1aa' : '#64748b', fontSize: 12 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? '#a1a1aa' : '#64748b', fontSize: 12 }} tickFormatter={(val) => `$${val >= 1000 ? (val/1000)+'k' : val}`} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: isDark ? "#111113" : "#ffffff",
+                  border: `1px solid ${isDark ? "#27272a" : "#e5e7eb"}`,
+                  borderRadius: "12px",
+                  color: isDark ? "#f8fafc" : "#020617",
+                  boxShadow: "none"
+                }}
+                labelStyle={{ color: isDark ? "#f8fafc" : "#020617" }}
+                itemStyle={{ color: isDark ? "#f8fafc" : "#020617" }}
+                cursor={{ fill: isDark ? "rgba(255,255,255,0.04)" : "rgba(2,6,23,0.04)" }}
+                formatter={(value) => formatRiel(value)}
+              />
+              <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: isDark ? '#a1a1aa' : '#64748b' }} />
+              <Line type="monotone" name="Shop Sales Revenue" dataKey="sales" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+              <Line type="monotone" name="Subscription Revenue" dataKey="subscriptions" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
 
-          <div className="space-y-4">
-            {topReports.length > 0 ? topReports.map((row) => {
-              const width = `${Math.max((Number(row.totalRevenue || 0) / maxRevenue) * 100, 4)}%`
-              return (
-                <div key={row._id || row.shop?._id || "unassigned"} className="space-y-2">
-                  <div className="flex justify-between gap-3 text-sm">
-                    <span className="font-semibold text-slate-900">{row.shop?.name || "Unassigned"}</span>
-                    <span className="text-slate-600">{formatRiel(row.totalRevenue)}</span>
-                  </div>
-                  <div className="h-3 rounded-full bg-violet-100">
-                    <div className="h-full rounded-full bg-violet-600" style={{ width }} />
-                  </div>
-                </div>
-              )
-            }) : (
-              <div className="rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-6 text-sm text-slate-500">
-                No shop revenue rows available.
-              </div>
-            )}
+        <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Sales by Category</h3>
+            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Product distribution across platform</p>
+          </div>
+          
+          {categories.length > 0 ? (
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={categories} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#27272a" : "#e5e7eb"} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isDark ? '#a1a1aa' : '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: isDark ? '#a1a1aa' : '#64748b', fontSize: 12 }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: isDark ? "#111113" : "#ffffff",
+                    border: `1px solid ${isDark ? "#27272a" : "#e5e7eb"}`,
+                    borderRadius: "12px",
+                    color: isDark ? "#f8fafc" : "#020617",
+                    boxShadow: "none"
+                  }}
+                  labelStyle={{ color: isDark ? "#f8fafc" : "#020617" }}
+                  itemStyle={{ color: isDark ? "#f8fafc" : "#020617" }}
+                  cursor={{ fill: isDark ? "rgba(255,255,255,0.04)" : "rgba(2,6,23,0.04)" }}
+                />
+                <Bar dataKey="value" name="Products" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                  {categories.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[320px] text-sm text-[#94a3b8]">No category data available</div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Recent Shop Registrations */}
+        <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Shop Registrations</h3>
+            <Link to="/admin-manager/shops" className="text-sm font-semibold text-[#7033ff] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
+              View all <FaArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#f8fafc] dark:bg-[#09090b] border-b border-[#e5e7eb] dark:border-[#27272a]">
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Shop Name</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Plan</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Date</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
+                {data.recentShops?.length > 0 ? data.recentShops.map((shop) => (
+                  <tr key={shop._id} className="hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors">
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-100 dark:border-blue-900/50">
+                          {shop.name ? shop.name.substring(0, 2).toUpperCase() : "SH"}
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm text-[#020617] dark:text-[#f8fafc]">{shop.name}</p>
+                          <p className="text-xs text-[#64748b] dark:text-[#a1a1aa]">{shop.code}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3 text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{shop.subscriptionPlan || "Free"}</td>
+                    <td className="px-5 py-3 text-sm text-[#64748b] dark:text-[#a1a1aa]">{formatDate(shop.createdAt, "MMM DD, YYYY")}</td>
+                    <td className="px-5 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${shop.status === 'ACTIVE' ? 'bg-[#10b981]/10 text-[#10b981]' : 'bg-[#ef4444]/10 text-[#ef4444]'}`}>
+                         {shop.status}
+                      </span>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="4" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">No recent shops</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <aside className="w-full border-t border-violet-100 bg-violet-50/60 p-6 md:p-8 lg:w-80 lg:border-l lg:border-t-0">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Revenue Summary</p>
-          <h4 className="text-2xl font-bold text-slate-900">{formatRiel(data.totalRevenue)}</h4>
-          <div className="mt-5 rounded-xl border border-violet-100 bg-white p-4">
-            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <FaGaugeHigh />
-              Dashboard endpoint
-            </div>
-            <p className="mt-2 text-xs leading-5 text-slate-500">
-              {lastUpdated ? `Last refreshed ${formatDate(lastUpdated, "DD/MMM/YYYY HH:mm")}` : "Waiting for live dashboard data."}
-            </p>
-          </div>
-        </aside>
-      </section>
-
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <section className={`${cardClass} p-6 md:p-8 lg:col-span-2`}>
-          <div className="mb-6 flex items-center justify-between gap-4">
-            <h3 className="text-base font-semibold text-slate-900">Recent Platform Activity</h3>
-            <Link
-              to="/admin-manager/system-logs"
-              className="text-xs font-bold uppercase tracking-[0.05em] text-violet-700 transition-colors hover:text-violet-900"
-            >
-              Latest logs
+        {/* Recent Admin Owners */}
+        <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Admin Owners</h3>
+            <Link to="/admin-manager/admin-owners" className="text-sm font-semibold text-[#7033ff] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
+              View all <FaArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="space-y-4">
-            {recentLogs.length > 0 ? recentLogs.map((log) => (
-              <article key={log._id} className="flex items-start gap-4 rounded-xl border border-transparent p-4 transition-colors hover:border-violet-200 hover:bg-violet-50/60">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-                  <FaListCheck />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-800">
-                    <span className="font-bold">{log.action}</span> on {log.entityType || "record"}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {log.createdAt ? formatDate(log.createdAt, "DD/MMM/YYYY HH:mm") : "-"} • {log.user?.username || "System"} • {log.shopId?.name || "Platform"}
-                  </p>
-                </div>
-              </article>
-            )) : (
-              <div className="rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-6 text-sm text-slate-500">
-                No audit logs available.
-              </div>
-            )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#f8fafc] dark:bg-[#09090b] border-b border-[#e5e7eb] dark:border-[#27272a]">
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Admin Name</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Contact</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
+                {data.recentAdmins?.length > 0 ? data.recentAdmins.map((admin) => (
+                  <tr key={admin._id} className="hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors">
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] flex items-center justify-center font-bold text-xs border border-[#e5e7eb] dark:border-[#27272a]">
+                          {admin.username ? admin.username.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        <p className="font-bold text-sm text-[#020617] dark:text-[#f8fafc]">{admin.username}</p>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
+                      <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{admin.email}</p>
+                      {admin.phone && <p className="text-xs text-[#64748b] dark:text-[#71717a]">{admin.phone}</p>}
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${admin.status === 'ACTIVE' ? 'bg-[#10b981]/10 text-[#10b981]' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
+                         {admin.status}
+                      </span>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="3" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">No recent admins</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </section>
+        </div>
 
-        <section className={`${cardClass} p-6 md:p-8`}>
-          <h3 className="mb-6 text-base font-semibold text-slate-900">Top Performing Shops</h3>
-          <div className="space-y-6">
-            {topReports.length > 0 ? topReports.map((row) => {
-              const width = `${Math.max((Number(row.totalRevenue || 0) / maxRevenue) * 100, 4)}%`
-              return (
-                <div key={row._id || row.shop?._id || "unassigned"} className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-sm font-bold text-violet-800">
-                    {getInitials(row.shop?.name || "Unassigned")}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900">{row.shop?.name || "Unassigned"}</p>
-                    <div className="mt-2 h-1.5 rounded-full bg-violet-100">
-                      <div className="h-full rounded-full bg-violet-600" style={{ width }} />
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-slate-700">{formatRiel(row.totalRevenue)}</span>
-                </div>
-              )
-            }) : (
-              <div className="rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-6 text-sm text-slate-500">
-                No report data available.
-              </div>
-            )}
-          </div>
-        </section>
       </div>
-    </section>
+
+    </div>
   )
 }
 

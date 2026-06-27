@@ -9,6 +9,7 @@ const Receipt = require("../models/Receipt.model")
 const AuditLog = require("../models/AuditLog.model")
 const runTransaction = require("../helper/runTransaction")
 const { notifySaleCreated } = require("../services/notification.service")
+const { checkStockAndAlert } = require("../helper/alert.helper")
 
 const createHttpError = (statusCode, message) => {
     const error = new Error(message)
@@ -148,6 +149,8 @@ exports.create = async (req, res, next) => {
                 }
                 const quantityAfter = Number(product.currentStock)
                 const quantityBefore = quantityAfter + Number(item.quantity)
+
+                void checkStockAndAlert(product);
 
                 await Inventory.findOneAndUpdate(
                     { shopId: req.shopId, product: product._id },

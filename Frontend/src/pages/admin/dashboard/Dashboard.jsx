@@ -1,38 +1,46 @@
 import SalesReportChart from "../../../components/RevenueChart.jsx";
 import { Link } from "react-router";
-import { FaChartLine, FaFileInvoice, FaHandshake, FaMoneyBillTrendUp } from "react-icons/fa6";
-import { IoCalendarOutline, IoReceiptOutline, IoStatsChart } from "react-icons/io5";
+import { 
+  LuBanknote, 
+  LuFileText, 
+  LuTrendingUp, 
+  LuTruck, 
+  LuShoppingCart, 
+  LuPackage, 
+  LuTriangleAlert,
+  LuCalendar,
+  LuListChecks
+} from "react-icons/lu";
 import useFetchData from "../../../hooks/useFetchData";
 import useFetchGeneralReport from "../../../hooks/useFetchGeneralReport";
 import { use30DaysAgoReport } from "../../../hooks/use30DaysAgoReport";
 import formatDate from "../../../utils/formatDate";
 
 const currency = "$";
-
 const formatCurrency = (value) => `${currency}${Number(value || 0).toFixed(2)}`;
 
-function DashboardMetric({ label, value, icon: Icon, accent = "bg-[#eff4ff] text-[#0058be]" }) {
+function DashboardMetric({ label, value, icon: Icon, accentClass = "bg-violet-100 dark:bg-blue-50 text-violet-600 dark:text-[#3350BF]" }) {
   return (
-    <div className="flex min-h-32 items-center justify-between rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm transition hover:border-[#c6c6cd]">
+    <div className="flex min-h-[120px] items-center justify-between rounded-2xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] p-5 shadow-sm transition hover:shadow-md dark:hover:shadow-lg dark:shadow-black/10">
       <div className="min-w-0">
-        <p className="text-sm text-[#45464d]">{label}</p>
-        <p className="mt-2 break-words text-2xl font-bold text-[#0b1c30] sm:text-3xl">{value}</p>
+        <p className="text-sm font-medium text-slate-500 dark:text-[#A9A6BB]">{label}</p>
+        <p className="mt-2 break-words text-2xl font-bold text-slate-900 dark:text-[#F8FAFC] sm:text-3xl">{value}</p>
       </div>
-      <div className={`ml-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${accent}`}>
-        <Icon />
+      <div className={`ml-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${accentClass}`}>
+        <Icon size={24} />
       </div>
     </div>
   );
 }
 
-function CountCard({ label, value, icon: Icon, className }) {
+function GradientCard({ label, value, icon: Icon }) {
   return (
-    <div className={`flex min-h-28 items-center justify-between rounded-xl p-5 text-white shadow-sm ${className}`}>
-      <div>
-        <p className="text-3xl font-bold">{value}</p>
-        <p className="mt-1 text-sm font-medium opacity-90">{label}</p>
+    <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 dark:from-[#3350BF] dark:to-[#AF68E0] p-6 text-white shadow-md dark:shadow-lg dark:shadow-[#3350BF]/20 relative overflow-hidden">
+      <div className="relative z-10">
+        <p className="text-sm font-medium opacity-90">{label}</p>
+        <p className="mt-2 text-3xl font-bold">{value}</p>
       </div>
-      <Icon className="text-4xl opacity-70" />
+      <Icon size={48} className="absolute right-4 bottom-4 opacity-20 rotate-[-10deg]" />
     </div>
   );
 }
@@ -46,112 +54,121 @@ function Home() {
     {
       label: "Today Revenue",
       value: formatCurrency(report?.totalSaleToday),
-      icon: FaMoneyBillTrendUp,
+      icon: LuTrendingUp,
+      accentClass: "bg-violet-100 text-violet-600 dark:bg-[#3350BF]/10 dark:text-[#22D3EE]",
     },
     {
-      label: "Due Invoice",
+      label: "Due Invoices (Sale)",
       value: formatCurrency(report?.totalDueAmountSale),
-      icon: FaFileInvoice,
-      accent: "bg-[#fff7ed] text-[#c2410c]",
+      icon: LuFileText,
+      accentClass: "bg-amber-100 text-amber-600 dark:bg-[#F59E0B]/10 dark:text-[#F59E0B]",
     },
     {
-      label: "Due Purchase",
+      label: "Due Purchases",
       value: formatCurrency(report?.totalDueAmountPurchase),
-      icon: IoReceiptOutline,
-      accent: "bg-[#fef2f2] text-[#ba1a1a]",
+      icon: LuShoppingCart,
+      accentClass: "bg-red-100 text-red-600 dark:bg-[#EF4444]/10 dark:text-[#EF4444]",
     },
     {
       label: "Monthly Revenue",
       value: formatCurrency(report?.totalMonthlySale),
-      icon: FaChartLine,
-      accent: "bg-[#ecfdf5] text-[#047857]",
+      icon: LuBanknote,
+      accentClass: "bg-green-100 text-green-600 dark:bg-[#22C55E]/10 dark:text-[#22C55E]",
     },
   ];
 
   return (
-    <div className="w-full max-w-full space-y-6">
+    <div className="w-full min-w-0 space-y-6">
+      {/* Page Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#0058be]">Dashboard</p>
-          <h1 className="mt-1 text-2xl font-bold text-[#0b1c30] sm:text-3xl">General Report</h1>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-[#45464d]">
-            Review revenue, dues, supplier totals, and recent sales activity.
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-[#F8FAFC] sm:text-3xl">Dashboard</h1>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500 dark:text-[#A9A6BB]">
+            Platform overview, daily metrics, and recent sales activity.
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#c6c6cd] bg-white px-4 py-2 text-sm font-semibold text-[#0b1c30] transition hover:bg-[#eff4ff]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] px-5 text-sm font-semibold text-slate-700 dark:text-[#F8FAFC] transition hover:bg-slate-50 dark:hover:bg-[#2A2E36] shadow-sm"
           >
-            <IoCalendarOutline />
-            Today
+            <LuCalendar size={18} /> Today
           </button>
           <Link
             to="/admin/sales"
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#0b1c30] bg-[#0b1c30] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#213145]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-violet-600 dark:bg-[#3350BF] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 dark:hover:bg-[#253A8F]"
           >
-            <IoReceiptOutline />
-            View Sales
+            <LuListChecks size={18} /> View Sales
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* Primary Metrics Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => (
           <DashboardMetric key={metric.label} {...metric} />
         ))}
       </div>
 
+      {/* Secondary Metrics / Gradients */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <CountCard
-          label="Suppliers"
+        <GradientCard
+          label="Total Suppliers"
           value={report?.totalSuppliers || 0}
-          icon={FaHandshake}
-          className="bg-[#2170e4]"
+          icon={LuTruck}
         />
-        <CountCard
-          label="Purchase Due Invoice"
-          value={report?.totalPurchase || 0}
-          icon={FaFileInvoice}
-          className="bg-[#213145]"
-        />
-        <CountCard
-          label="Sales Due Invoice"
-          value={report?.totalSaleDue || 0}
-          icon={IoStatsChart}
-          className="bg-[#009668]"
-        />
-      </div>
-
-      <div className="rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm">
-        <SalesReportChart data={thirtyDaysSales} isLoading={isChartLoading} />
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-[#d7dced] bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-[#d7dced] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-[#0b1c30]">Recent Sales Transactions</h2>
-            <p className="text-sm text-[#45464d]">Latest invoices from the sales endpoint.</p>
+        <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-white dark:bg-[#1A1D22] p-6 text-slate-900 dark:text-white shadow-sm dark:shadow-lg relative overflow-hidden border border-slate-200 dark:border-[#2A2E36]">
+          <div className="relative z-10">
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9A6BB]">Products in System</p>
+            <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-[#F8FAFC]">{report?.totalProducts || 0}</p>
           </div>
-          <Link to="/admin/sales" className="text-sm font-semibold text-[#0058be] hover:underline">
+          <LuPackage size={48} className="absolute right-4 bottom-4 opacity-10 rotate-[10deg] text-violet-500 dark:text-[#22D3EE]" />
+        </div>
+        <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-white dark:bg-[#1A1D22] p-6 text-slate-900 dark:text-white shadow-sm dark:shadow-lg relative overflow-hidden border border-slate-200 dark:border-[#2A2E36]">
+          <div className="relative z-10">
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9A6BB]">Low Stock Alerts</p>
+            <div className="mt-2 flex items-baseline gap-2">
+              <p className="text-3xl font-bold text-amber-500 dark:text-[#F59E0B]">{report?.lowStock || 0}</p>
+              <span className="text-sm text-slate-400 dark:text-[#6B7280]">items</span>
+            </div>
+          </div>
+          <LuTriangleAlert size={48} className="absolute right-4 bottom-4 opacity-10 text-amber-500 dark:text-[#F59E0B]" />
+        </div>
+      </div>
+
+      {/* Chart Section */}
+      <div className="w-full min-w-0 overflow-x-auto rounded-2xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] p-6 shadow-sm">
+        <div className="min-w-[700px]">
+          <SalesReportChart data={thirtyDaysSales} isLoading={isChartLoading} />
+        </div>
+      </div>
+
+      {/* Recent Sales Table */}
+      <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] shadow-sm dark:shadow-lg dark:shadow-black/10">
+        <div className="flex flex-col gap-3 border-b border-slate-200 dark:border-[#2A2E36] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">Recent Sales Transactions</h2>
+            <p className="text-sm text-slate-500 dark:text-[#A9A6BB]">Latest invoices generated from POS.</p>
+          </div>
+          <Link to="/admin/sales" className="text-sm font-semibold text-violet-600 dark:text-[#22D3EE] hover:underline">
             View All Sales
           </Link>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] border-collapse text-left">
-            <thead className="bg-[#eff4ff] text-xs font-semibold uppercase tracking-[0.08em] text-[#5b6472]">
+          <table className="w-full min-w-[800px] border-collapse text-left text-sm">
+            <thead className="bg-slate-50 dark:bg-[#111318] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#6B7280]">
               <tr>
-                <th className="px-5 py-3">Invoice ID</th>
-                <th className="px-5 py-3">Cashier</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Date</th>
-                <th className="px-5 py-3 text-right">Amount</th>
+                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Invoice ID</th>
+                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Cashier</th>
+                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Status</th>
+                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Date</th>
+                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36] text-right">Amount</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-[#2A2E36]">
               {isSalesLoading && (
                 <tr>
-                  <td className="px-5 py-8 text-center text-sm text-[#45464d]" colSpan={5}>
+                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#A9A6BB]" colSpan={5}>
                     Loading recent sales...
                   </td>
                 </tr>
@@ -159,7 +176,7 @@ function Home() {
 
               {!isSalesLoading && recentSales?.length === 0 && (
                 <tr>
-                  <td className="px-5 py-10 text-center text-sm text-[#45464d]" colSpan={5}>
+                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#4E4E50]" colSpan={5}>
                     No recent sales found.
                   </td>
                 </tr>
@@ -167,18 +184,28 @@ function Home() {
 
               {!isSalesLoading &&
                 recentSales?.map((sale) => (
-                  <tr key={sale?._id} className="border-b border-[#e5eeff] text-sm transition hover:bg-[#f8f9ff]">
-                    <td className="px-5 py-4 font-semibold uppercase text-[#0b1c30]">{sale?.invoiceNumber || "-"}</td>
-                    <td className="px-5 py-4 text-[#45464d]">{sale?.user?.username || "-"}</td>
+                  <tr key={sale?._id} className="transition-colors hover:bg-slate-50 dark:hover:bg-[#22262D]">
+                    <td className="px-5 py-4 font-semibold uppercase text-slate-900 dark:text-[#F8FAFC]">{sale?.invoiceNumber || "-"}</td>
+                    <td className="px-5 py-4 text-slate-600 dark:text-[#A9A6BB]">{sale?.user?.username || "-"}</td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex rounded-full border border-[#d7dced] bg-[#f8f9ff] px-2.5 py-1 text-xs font-semibold capitalize text-[#213145]">
-                        {sale?.paymentStatus || "-"}
-                      </span>
+                      {sale?.paymentStatus?.toLowerCase() === 'paid' ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 dark:bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-green-700 dark:text-[#22C55E] border border-green-200 dark:border-[#22C55E]/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#22C55E]"></span> Paid
+                        </span>
+                      ) : sale?.paymentStatus?.toLowerCase() === 'partial' ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-[#F59E0B] border border-amber-200 dark:border-[#F59E0B]/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F59E0B]"></span> Partial
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-red-700 dark:text-[#EF4444] border border-red-200 dark:border-[#EF4444]/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-[#EF4444]"></span> Unpaid
+                        </span>
+                      )}
                     </td>
-                    <td className="px-5 py-4 text-[#45464d]">
-                      {sale?.createdAt ? formatDate(sale.createdAt, "DD/MMM/YYYY HH:mm") : "-"}
+                    <td className="px-5 py-4 text-slate-600 dark:text-[#A9A6BB]">
+                      {sale?.createdAt ? formatDate(sale.createdAt, "DD MMM, YYYY HH:mm") : "-"}
                     </td>
-                    <td className="px-5 py-4 text-right font-semibold text-[#0b1c30]">
+                    <td className="px-5 py-4 text-right font-bold text-slate-900 dark:text-[#F8FAFC]">
                       {formatCurrency(sale?.totalCost)}
                     </td>
                   </tr>

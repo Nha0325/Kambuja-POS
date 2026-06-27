@@ -1,26 +1,23 @@
-import { useEffect, useRef, useState } from "react"
-import { Outlet, useLocation, useNavigate } from "react-router-dom"
-import {
-  FaBars,
-  FaBell,
-  FaCircleQuestion,
-  FaRightFromBracket,
-  FaUserShield,
-} from "react-icons/fa6"
+import { useEffect, useState } from "react"
+import { Outlet, useLocation } from "react-router-dom"
 import AdminManagerSidebar from "../components/navigation/AdminManagerSidebar"
-import useCurrent from "../hooks/auth/useCurrent"
-import useSignout from "../hooks/auth/useSignout"
+import TopMenu from "../components/TopMenu"
+import ConfirmProvider from "../pages/admin-manager/components/confirm/ConfirmProvider"
 
 const pageTitles = [
   ["/admin-manager/shops/create", "Create Shop"],
   ["/admin-manager/shops/", "Edit Shop"],
   ["/admin-manager/shops", "Shops"],
-  ["/admin-manager/stock", "Stock"],
+  ["/admin-manager/admin-owners/create", "Create Admin Owner"],
+  ["/admin-manager/admin-owners", "Admin Owners"],
+  ["/admin-manager/admins/create", "Create Admin Owner"],
+  ["/admin-manager/admins", "Admin Owners"],
+  ["/admin-manager/stock", "Stock Overview"],
   ["/admin-manager/pos", "POS"],
-  ["/admin-manager/admins/create", "Create Admin"],
-  ["/admin-manager/admins", "Admin Accounts"],
   ["/admin-manager/reports", "Platform Reports"],
   ["/admin-manager/system-logs", "System Logs"],
+  ["/admin-manager/system-health", "System Health"],
+  ["/admin-manager/alerts", "Alerts"],
   ["/admin-manager/settings", "Platform Settings"],
 ]
 
@@ -28,134 +25,86 @@ const getPageTitle = (pathname) => (
   pageTitles.find(([path]) => pathname.startsWith(path))?.[1] || "Platform Dashboard"
 )
 
-function AdminManagerTopBar({ onShowSidebar }) {
-  const { data: user } = useCurrent()
-  const { signout } = useSignout()
-  const navigate = useNavigate()
+function AdminManagerLayout() {
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isPinned, setIsPinned] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  })
   const location = useLocation()
-  const [isAccountOpen, setIsAccountOpen] = useState(false)
-  const accountMenuRef = useRef(null)
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
-        setIsAccountOpen(false)
-      }
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem("theme", "light");
     }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  const handleSignOut = async () => {
-    const res = await signout()
-    if (res) navigate("/login")
-  }
-
-  return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-violet-100 bg-white/95 px-4 backdrop-blur sm:px-6">
-      <div className="flex min-w-0 items-center gap-4">
-        <button
-          type="button"
-          onClick={onShowSidebar}
-          className="rounded-full p-2 text-slate-600 transition-colors hover:bg-violet-50 hover:text-violet-800"
-          aria-label="Toggle sidebar"
-        >
-          <FaBars />
-        </button>
-        <h2 className="truncate text-xl font-semibold text-slate-900">{getPageTitle(location.pathname)}</h2>
-      </div>
-
-      <div className="flex items-center gap-4 sm:gap-6">
-        <div className="hidden items-center gap-4 text-slate-500 sm:flex">
-          <button type="button" className="transition-colors hover:text-violet-700" aria-label="Notifications">
-            <FaBell />
-          </button>
-          <button type="button" className="transition-colors hover:text-violet-700" aria-label="Help">
-            <FaCircleQuestion />
-          </button>
-        </div>
-
-        <div className="h-8 w-px bg-violet-100" />
-
-        <div ref={accountMenuRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setIsAccountOpen((value) => !value)}
-            className="flex items-center gap-3 rounded-lg transition-opacity hover:opacity-80"
-          >
-            <div className="hidden text-right sm:block">
-              <p className="max-w-36 truncate text-sm font-semibold leading-tight text-slate-900">{user?.username || "Admin User"}</p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-violet-700">Super Administrator</p>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-violet-100 bg-violet-50 text-violet-700">
-              <FaUserShield />
-            </div>
-          </button>
-
-          {isAccountOpen && (
-            <div className="absolute right-0 top-full z-50 mt-3 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-xl shadow-violet-100/60">
-              <div className="border-b border-violet-100 p-4">
-                <p className="truncate text-sm font-semibold text-slate-900">{user?.username || "Admin User"}</p>
-                <p className="mt-1 truncate text-xs text-slate-500">{user?.email || "No email"}</p>
-              </div>
-              <button
-                onClick={handleSignOut}
-                type="button"
-                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
-              >
-                <FaRightFromBracket />
-                Log out
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
-  )
-}
-
-const getDefaultSidebarState = () => (
-  typeof window === "undefined" ? true : window.innerWidth >= 1024
-)
-
-function AdminManagerLayout() {
-  const [isShowSidebar, setIsShowSidebar] = useState(getDefaultSidebarState)
+  }, [isDark]);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsShowSidebar(window.innerWidth >= 1024)
+      if (window.innerWidth >= 1024) {
+        setIsMobileOpen(false)
+      }
     }
-
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  const isExpanded = isPinned || isHovered
+  const sidebarPadding = isExpanded ? "lg:pl-[260px]" : "lg:pl-[72px]"
+
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 text-slate-900">
-      {isShowSidebar && (
+    <ConfirmProvider>
+      <div className="min-h-screen overflow-x-hidden bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
+      {isMobileOpen && (
         <button
           type="button"
           aria-label="Close sidebar"
           className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
-          onClick={() => setIsShowSidebar(false)}
+          onClick={() => setIsMobileOpen(false)}
         />
       )}
+      
       <AdminManagerSidebar
-        isShowSidebar={isShowSidebar}
+        isMobileOpen={isMobileOpen}
+        isExpanded={isExpanded}
+        onHover={(state) => setIsHovered(state)}
         onNavigate={() => {
-          if (window.innerWidth < 1024) setIsShowSidebar(false)
+          if (window.innerWidth < 1024) setIsMobileOpen(false)
         }}
       />
-      <div className={`${isShowSidebar ? "lg:ml-[260px]" : "lg:ml-0"} min-w-0 max-w-full transition-all duration-300`}>
-        <AdminManagerTopBar onShowSidebar={() => setIsShowSidebar((value) => !value)} />
-        <main className="min-h-[calc(100vh-64px)] max-w-full px-3 py-4 sm:px-4 lg:px-6 lg:py-6">
-          <div className="mx-auto w-full max-w-full min-w-0 xl:max-w-7xl">
+      
+      <div className={`${sidebarPadding} min-w-0 max-w-full overflow-x-hidden transition-all duration-300`}>
+        <TopMenu
+          title={getPageTitle(location.pathname)}
+          eyebrow="Platform Manager"
+          onShowSidebar={() => {
+            if (window.innerWidth < 1024) {
+              setIsMobileOpen(!isMobileOpen)
+            } else {
+              setIsPinned(!isPinned)
+            }
+          }}
+          isDark={isDark}
+          onToggleTheme={() => setIsDark(!isDark)}
+        />
+        <main className="min-h-[calc(100vh-64px)] max-w-full p-4 lg:p-8">
+          <div className="w-full max-w-full min-w-0">
             <Outlet />
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </ConfirmProvider>
   )
 }
 

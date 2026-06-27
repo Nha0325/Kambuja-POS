@@ -6,9 +6,9 @@ const useStorage = () => {
 
     const uploadFile = async (file) => {
         try {
-            const formData = new FormData();
-            formData.append("imageUrl", file);
-            const res = await api.post('/upload',formData)
+            const res = await api.postForm('/upload', {
+                imageUrl: file
+            });
             return res.data
         } catch (error) {
             const msg = formatApiError(error)

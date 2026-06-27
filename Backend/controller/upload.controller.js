@@ -104,9 +104,9 @@ exports.removeFile = (req, res) => {
             })
         }
         else{
-            res.status(404).json({
-                success: false,
-                error: "Image not found!"
+            res.status(200).json({
+                success: true,
+                message: "Image already deleted or not found!"
             })     
         }
     } catch (error) {

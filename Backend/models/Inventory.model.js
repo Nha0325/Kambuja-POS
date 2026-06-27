@@ -7,6 +7,12 @@ const schema = new mongoose.Schema({
         required: true,
         index: true,
     },
+    locationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Location",
+        required: true,
+        index: true,
+    },
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
@@ -29,6 +35,6 @@ const schema = new mongoose.Schema({
     },
 }, { timestamps: true })
 
-schema.index({ shopId: 1, product: 1 }, { unique: true })
+schema.index({ shopId: 1, locationId: 1, product: 1 }, { unique: true })
 
 module.exports = mongoose.model("Inventory", schema)

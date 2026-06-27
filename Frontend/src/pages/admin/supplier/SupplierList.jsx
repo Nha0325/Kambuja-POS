@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import toast from "react-hot-toast";
-import { FaHandshake } from "react-icons/fa6";
-import { IoMdTrash } from "react-icons/io";
+import { FaHandshake, FaCircleCheck } from "react-icons/fa6";
+
 import {
-  IoAdd,
-  IoCheckmarkCircleOutline,
-  IoDownloadOutline,
-  IoFilterOutline,
-  IoPeopleOutline,
-  IoPencilSharp,
-  IoSearch,
-} from "react-icons/io5";
+  LuPlus,
+  LuDownload,
+  LuFilter,
+  LuUsers,
+  LuPencil,
+  LuSearch,
+  LuTrash2
+} from "react-icons/lu";
 import { useCollection } from "../../../hooks/useCollection";
 import { useQuery } from "../../../hooks/useQuery";
 import { adminSurface } from "../adminPageUi";
@@ -19,8 +19,8 @@ import { downloadCsv } from "../../../utils/downloadCsv";
 import AdminPagination from "../../../components/admin/AdminPagination";
 
 const supplierStats = [
-  { label: "Total Suppliers", key: "total", icon: IoPeopleOutline },
-  { label: "With Phone", key: "withPhone", icon: IoCheckmarkCircleOutline },
+  { label: "Total Suppliers", key: "total", icon: LuUsers },
+  { label: "With Phone", key: "withPhone", icon: FaCircleCheck },
 ];
 
 function Supplier() {
@@ -78,7 +78,7 @@ function Supplier() {
           </p>
         </div>
         <Link to="/admin/suppliers/create" className={adminSurface.primaryButton}>
-          <IoAdd />
+          <LuPlus />
           Add Supplier
         </Link>
       </div>
@@ -118,9 +118,9 @@ function Supplier() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <label className={`${adminSurface.input} flex w-full items-center gap-2 lg:w-80`}>
-                <IoSearch className="shrink-0 text-[#76777d]" />
+                <LuSearch className="shrink-0 text-[#6B7280]" />
                 <input
-                  className="w-full bg-transparent text-sm outline-none"
+                  className="w-full bg-transparent text-sm outline-none text-[#F8FAFC] placeholder-[#6B7280]"
                   type="search"
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -129,18 +129,18 @@ function Supplier() {
                   placeholder="Search suppliers, contacts, or phone..."
                 />
               </label>
-              <div className="flex overflow-hidden rounded-lg border border-[#c6c6cd] bg-white">
+              <div className="flex overflow-hidden rounded-lg border border-[#2A2E36] bg-[#111318]">
                 <button
                   type="button"
                   aria-label="Show suppliers with phone"
                   title="Show suppliers with phone"
                   aria-pressed={showWithPhoneOnly}
                   onClick={() => setShowWithPhoneOnly((value) => !value)}
-                  className={`inline-flex h-10 w-10 items-center justify-center border-r border-[#c6c6cd] transition hover:bg-[#eff4ff] ${
-                    showWithPhoneOnly ? "bg-[#d8e2ff] text-[#0058be]" : "text-[#45464d]"
+                  className={`inline-flex h-10 w-10 items-center justify-center border-r border-[#2A2E36] transition hover:bg-[#2A2E36] ${
+                    showWithPhoneOnly ? "bg-[#3350BF]/20 text-[#22D3EE]" : "text-[#A9A6BB]"
                   }`}
                 >
-                  <IoFilterOutline />
+                  <LuFilter />
                 </button>
                 <button
                   type="button"
@@ -148,9 +148,9 @@ function Supplier() {
                   title="Download suppliers"
                   onClick={handleDownload}
                   disabled={!visibleSuppliers?.length}
-                  className="inline-flex h-10 w-10 items-center justify-center text-[#45464d] transition hover:bg-[#eff4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-10 w-10 items-center justify-center text-[#A9A6BB] transition hover:bg-[#2A2E36] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <IoDownloadOutline />
+                  <LuDownload />
                 </button>
               </div>
             </div>
@@ -175,8 +175,8 @@ function Supplier() {
               {isLoading && (
                 <tr>
                   <td colSpan={7} className="p-8">
-                    <div className="flex items-center justify-center gap-3 text-[#45464d]">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#d8e2ff] border-t-[#0058be]" />
+                    <div className="flex items-center justify-center gap-3 text-[#A9A6BB]">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#22D3EE]" />
                       Loading suppliers...
                     </div>
                   </td>
@@ -187,17 +187,17 @@ function Supplier() {
                 <tr>
                   <td colSpan={7} className="px-5 py-20 text-center">
                     <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#eff4ff] text-3xl text-[#76777d]">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#3350BF]/10 text-3xl text-[#22D3EE]">
                         <FaHandshake />
                       </div>
                       <div>
-                        <h2 className="text-base font-semibold text-[#0b1c30]">No suppliers found</h2>
-                        <p className="mt-1 text-sm text-[#45464d]">
+                        <h2 className="text-base font-semibold text-[#F8FAFC]">No suppliers found</h2>
+                        <p className="mt-1 text-sm text-[#A9A6BB]">
                           You have not registered any suppliers yet.
                         </p>
                       </div>
                       <Link to="/admin/suppliers/create" className={adminSurface.secondaryButton}>
-                        <IoAdd />
+                        <LuPlus />
                         Add Your First Supplier
                       </Link>
                     </div>
@@ -211,14 +211,14 @@ function Supplier() {
                     key={item?._id || idx}
                     className={adminSurface.row}
                   >
-                    <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
+                    <td className={`${adminSurface.td} text-center font-medium text-[#6B7280]`}>
                       {(page - 1) * limit + idx + 1}
                     </td>
-                    <td className={`${adminSurface.td} min-w-44 font-semibold text-[#0b1c30]`}>{item?.businessName || "-"}</td>
-                    <td className={`${adminSurface.td} min-w-36 text-[#45464d]`}>{item?.name || "-"}</td>
-                    <td className={`${adminSurface.td} min-w-32 text-[#45464d]`}>{item?.phone || "-"}</td>
-                    <td className={`${adminSurface.td} min-w-56 text-[#45464d]`}>{item?.address || "-"}</td>
-                    <td className={`${adminSurface.td} min-w-48 text-[#45464d]`}>{item?.note || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-44 font-semibold text-[#F8FAFC]`}>{item?.businessName || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-36 text-[#A9A6BB]`}>{item?.name || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-32 text-[#A9A6BB]`}>{item?.phone || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-56 text-[#A9A6BB]`}>{item?.address || "-"}</td>
+                    <td className={`${adminSurface.td} min-w-48 text-[#A9A6BB]`}>{item?.note || "-"}</td>
                     <td className={adminSurface.td}>
                       <div className="flex items-center justify-center gap-2">
                         <Link
@@ -226,7 +226,7 @@ function Supplier() {
                           title="Edit supplier"
                           className={adminSurface.iconButton}
                         >
-                          <IoPencilSharp />
+                          <LuPencil />
                         </Link>
                         <button
                           type="button"
@@ -235,7 +235,7 @@ function Supplier() {
                           disabled={isDeleting}
                           className={adminSurface.dangerIconButton}
                         >
-                          <IoMdTrash />
+                          <LuTrash2 />
                         </button>
                       </div>
                     </td>

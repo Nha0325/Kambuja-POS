@@ -1,6 +1,7 @@
 
 
 const errorHandler = (err, req, res, next) => {
+    console.error("DEBUG ERROR HANDLER:", err);
     let statusCode = err.statusCode || err.status || 500
     let errMessage = statusCode === 500 ? "Server Error!" : err.message || "Server Error!"
 

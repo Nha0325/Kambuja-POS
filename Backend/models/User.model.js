@@ -8,12 +8,21 @@ const schema = new mongoose.Schema({
         required: [true, "username is required"]     
     },
     
+    fullName: {
+        type: String,
+    },
     email: {
         type: String,
         lowercase: true,
         trim: true,
         unique: true,
         required: [true, "email is required"]
+    },
+    phone: {
+        type: String,
+    },
+    lastLogin: {
+        type: Date,
     },
     password: {
         type: String,

@@ -129,21 +129,27 @@ function CreatePurchase() {
     setTotalCost(total);
   }, [carts]);
 
-  return (
-    <div className="w-full max-w-full p-3 sm:p-4">
-      <h1 className="text-xl font-semibold">Create Purchase</h1>
+  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+  const selectClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
+  const labelClass = "mb-2 block text-xs font-bold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa]"
+  const textareaClass = "min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
 
-      <form onSubmit={handleSubmit} className="intro-y mt-5 rounded-lg bg-white p-4">
-        <h3 className="text-base font-medium mt-1 w-fit mb-4 border-b border-slate-400 border-dashed">
-          Import Product
-        </h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <fieldset>
-            <label className="block">Supplier</label>
-            <select
-              onChange={(e) => setSupplier(e.target.value)}
-              value={supplier}
-              className="select w-full select-bordered"
+  return (
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
+      <div className="mx-auto max-w-6xl">
+        <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl mb-6">Create Purchase</h1>
+
+        <form onSubmit={handleSubmit} className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-5 md:p-6 shadow-none">
+          <h3 className="text-base font-semibold mt-1 mb-6 pb-2 w-fit border-b-2 border-[#7033ff] text-[#020617] dark:text-[#f8fafc]">
+            Import Product
+          </h3>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <fieldset>
+              <label className={labelClass}>Supplier</label>
+              <select
+                onChange={(e) => setSupplier(e.target.value)}
+                value={supplier}
+                className={selectClass}
               required
             >
               <option value="" disabled>
@@ -155,67 +161,67 @@ function CreatePurchase() {
                 </option>
               ))}
             </select>
-          </fieldset>
-          <fieldset>
-            <label className="block">Invoice Number</label>
-            <div className="flex items-center">
-              <input
-                type="number"
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-                className="input w-full input-bordered"
-                placeholder="Enter invoice number"
-              />
-            </div>
-          </fieldset>
-          <fieldset>
-            <label className="block">Import Date</label>
-            <div className="flex items-center">
-              <input
-                onChange={(e) => setPurchaseDate(e.target.value)}
-                type="date"
-                required
-                className="input w-full input-bordered"
-              />
-            </div>
-          </fieldset>
-          <fieldset>
-            <label className="block">Status</label>
-            <div className="flex items-center">
-              <select
-                required
-                className="select w-full select-bordered"
-                value={purchaseStatus}
-                onChange={(e) => setPurchaseStatus(e.target.value)}
-              >
+            </fieldset>
+            <fieldset>
+              <label className={labelClass}>Invoice Number</label>
+              <div className="flex items-center">
+                <input
+                  type="number"
+                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  className={inputClass}
+                  placeholder="Enter invoice number"
+                />
+              </div>
+            </fieldset>
+            <fieldset>
+              <label className={labelClass}>Import Date</label>
+              <div className="flex items-center">
+                <input
+                  onChange={(e) => setPurchaseDate(e.target.value)}
+                  type="date"
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </fieldset>
+            <fieldset>
+              <label className={labelClass}>Status</label>
+              <div className="flex items-center">
+                <select
+                  required
+                  className={selectClass}
+                  value={purchaseStatus}
+                  onChange={(e) => setPurchaseStatus(e.target.value)}
+                >
                 <option value="" disabled>
                   Select Purchase Status
                 </option>
                 <option value="received">Received</option>
                 <option value="pending">Pending</option>
                 <option value="ordered">Ordered</option>
-              </select>
-            </div>
-          </fieldset>
+                </select>
+              </div>
+            </fieldset>
 
-          <fieldset className="md:col-span-2 xl:col-span-4">
-            <label className="block">Note</label>
-            <textarea
-              onChange={(e) => setNote(e.target.value)}
-              className="textarea w-full textarea-bordered"
-              placeholder="Type shipping address..."
-            ></textarea>
-          </fieldset>
-        </div>
+            <fieldset className="md:col-span-2 xl:col-span-4">
+              <label className={labelClass}>Note</label>
+              <textarea
+                onChange={(e) => setNote(e.target.value)}
+                className={textareaClass}
+                placeholder="Type shipping address..."
+              ></textarea>
+            </fieldset>
+          </div>
 
-        <h3 className="text-base font-medium mt-8 mb-4 w-fit border-b border-slate-400 border-dashed">
-          Product Details
-        </h3>
+          <h3 className="text-base font-semibold mt-10 mb-6 pb-2 w-fit border-b-2 border-[#7033ff] text-[#020617] dark:text-[#f8fafc]">
+            Product Details
+          </h3>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-          <div className="min-w-0 space-y-2 lg:col-span-4">
-            <fieldset>
-              <label className="block">Product Code</label>
-              <div className="flex items-center relative">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            <div className="min-w-0 space-y-6 lg:col-span-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-5">
+              <fieldset>
+                <label className={labelClass}>Product Code</label>
+                <div className="flex items-center relative">
                 <input
                   type="text"
                   onChange={(e) => setProductCode(e.target.value)}
@@ -224,125 +230,136 @@ function CreatePurchase() {
                       handleSearchProductByCode();
                     }
                   }}
-                  value={productCode}
-                  className="input input-bordered w-full"
-                  placeholder="e.g pro-0001"
-                />
-                <button
-                  onClick={handleSearchProductByCode}
-                  type="button"
-                  className="btn btn-xs btn-neutral absolute top-0 right-2"
-                >
-                  +
-                </button>
-              </div>
-            </fieldset>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <fieldset>
-                <label className="block">Quantity</label>
-                <div className="flex items-center">
-                  <input
-                    type="number"
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                    value={quantity}
-                    className="input input-bordered w-full"
+                    value={productCode}
+                    className={`${inputClass} pr-12`}
+                    placeholder="e.g pro-0001"
                   />
+                  <button
+                    onClick={handleSearchProductByCode}
+                    type="button"
+                    className="absolute top-1 right-1 h-8 px-3 rounded-md bg-[#7033ff] text-white font-bold hover:bg-[#5f27e6] transition-colors"
+                  >
+                    +
+                  </button>
                 </div>
               </fieldset>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <fieldset>
+                  <label className={labelClass}>Quantity</label>
+                  <div className="flex items-center">
+                    <input
+                      type="number"
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                      value={quantity}
+                      className={inputClass}
+                    />
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <label className={labelClass}>Unit Price ($)</label>
+                  <div className="flex items-center relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
+                    <input
+                      onChange={(e) => setUnitPrice(Number(e.target.value))}
+                      type="number"
+                      value={unitPrice}
+                      className={`${inputClass} pl-8`}
+                    />
+                  </div>
+                </fieldset>
+              </div>
+
               <fieldset>
-                <label className="label-b">Unit Price ($)</label>
-                <div className="flex items-center">
-                  <input
-                    onChange={(e) => setUnitPrice(Number(e.target.value))}
-                    type="number"
-                    value={unitPrice}
-                    className="input input-bordered w-full"
-                  />
-                </div>
+                <label className="text-sm font-semibold text-[#020617] dark:text-[#f8fafc]">
+                  Total : <span className="text-red-500 font-bold ml-1">${total.toFixed(2)}</span>
+                </label>
+              </fieldset>
+              <fieldset className="flex justify-end pt-2 border-t border-[#e5e7eb] dark:border-[#27272a]">
+                <button
+                  onClick={handleAddToCart}
+                  type="button"
+                  className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold transition-colors w-full"
+                >
+                  Add Item
+                </button>
               </fieldset>
             </div>
 
-            <fieldset>
-              <label className="label-b">
-                Total : <span className="text-red-600 font-semibold">${total.toFixed(2)}</span>
-              </label>
-            </fieldset>
-            <fieldset className="flex justify-end">
-              <button
-                onClick={handleAddToCart}
-                type="button"
-                className="btn btn-sm btn-neutral w-full sm:w-20"
-              >
-                Add
-              </button>
-            </fieldset>
-          </div>
-
-          <div className="min-w-0 lg:col-span-8">
-            <div className="mt-3 max-w-full overflow-x-auto rounded-lg border border-gray-200">
-              <table className="min-w-[760px] w-full">
-                <thead>
-                  <tr className="bg-gray-200 text-sm">
-                    <th className="text-left whitespace-nowrap p-4">Image</th>
-                    <th className="text-left whitespace-nowrap p-4">Product</th>
-                    <th className="text-right whitespace-nowrap p-4">Unit Price</th>
-                    <th className="text-right whitespace-nowrap p-4">Qty</th>
-                    <th className="text-right whitespace-nowrap p-4">Total</th>
-                    <th className="text-right whitespace-nowrap p-4">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {carts?.map((el) => (
-                    <tr key={el.product} className="even:bg-gray-100">
-                      <td className="py-2 p-4">
-                        <img
-                          className="w-10 h-10 object-cover rounded"
-                          src={`${baseUrl}/upload/${el?.image}`}
-                          alt=""
-                        />
-                      </td>
-                      <td className="py-2 p-4">{el?.name}</td>
+            <div className="min-w-0 lg:col-span-8">
+              <div className="max-w-full overflow-x-auto rounded-lg border border-[#e5e7eb] dark:border-[#27272a]">
+                <table className="min-w-[760px] w-full text-sm">
+                  <thead>
+                    <tr className="bg-[#f8fafc] dark:bg-[#09090b] text-left text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa] border-b border-[#e5e7eb] dark:border-[#27272a]">
+                      <th className="p-4">Image</th>
+                      <th className="p-4">Product</th>
+                      <th className="p-4 text-right">Unit Price</th>
+                      <th className="p-4 text-right">Qty</th>
+                      <th className="p-4 text-right">Total</th>
+                      <th className="p-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
+                    {carts?.map((el) => (
+                      <tr key={el.product} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        <td className="p-4">
+                          <img
+                            className="w-10 h-10 object-cover rounded-lg border border-[#e5e7eb] dark:border-[#27272a]"
+                            src={`${baseUrl}/upload/${el?.image}`}
+                            alt=""
+                          />
+                        </td>
+                        <td className="p-4 font-semibold text-[#020617] dark:text-[#f8fafc]">{el?.name}</td>
 
                      
-                      <td className="text-right text-red-600">
-                        ${Number(el?.unitPrice || 0).toFixed(2)}
-                      </td>
-                      <td className="text-right">{el?.quantity}</td>
-                      <td className="text-right text-red-600">
-                        ${Number(el?.totalPrice || 0).toFixed(2)}
-                      </td>
-                      <td className="text-center px-4">
-                        <p
-                          onClick={() => handleRemoveItem(el.product)}
-                          className="text-red-600 w-full flex justify-end text-center space-x-1 mr-3 cursor-pointer"
-                        >
-                          <FaTrash className="w-4 h-4" />
-                        </p>
-                      </td>
+                        <td className="text-right p-4 text-[#020617] dark:text-[#f8fafc]">
+                          ${Number(el?.unitPrice || 0).toFixed(2)}
+                        </td>
+                        <td className="text-right p-4 text-[#020617] dark:text-[#f8fafc]">{el?.quantity}</td>
+                        <td className="text-right p-4 font-bold text-red-500">
+                          ${Number(el?.totalPrice || 0).toFixed(2)}
+                        </td>
+                        <td className="text-right p-4">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(el.product)}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-lg transition-colors inline-flex justify-center items-center"
+                          >
+                            <FaTrash className="w-4 h-4" />
+                          </button>
+                        </td>
                     </tr>
                   ))}
 
-                  <tr className="bg-gray-200 border-t">
-                    <td colSpan="6" className="text-right p-4 font-semibold uppercase">
-                      Total Cost : <span className="text-red-600">${Number(totalCost || 0).toFixed(2)}</span>
-                    </td>
-                  </tr>
+                    <tr className="bg-[#f8fafc] dark:bg-[#09090b]">
+                      <td colSpan="6" className="text-right p-4 text-[#020617] dark:text-[#f8fafc] font-semibold uppercase tracking-wider text-xs">
+                        Total Cost : <span className="text-red-500 text-sm font-bold ml-2">${Number(totalCost || 0).toFixed(2)}</span>
+                      </td>
+                    </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <fieldset className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
-          <button type="button" className="btn btn-sm w-full sm:w-20">
-            Cancel
-          </button>
-          <button type="submit" disabled={isLoading} className="btn btn-sm btn-neutral w-full sm:w-20">
-            Save
-          </button>
-        </fieldset>
-      </form>
+          <fieldset className="mt-8 pt-6 flex flex-col-reverse gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] sm:flex-row sm:items-center sm:justify-end">
+            <button 
+              type="button" 
+              onClick={() => navigate("/admin/purchases")}
+              className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
+            >
+              {isLoading ? "Saving..." : "Save Purchase"}
+            </button>
+          </fieldset>
+        </form>
+      </div>
     </div>
   );
 }

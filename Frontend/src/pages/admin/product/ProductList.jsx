@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { IoMdTrash } from "react-icons/io";
-import { IoPencilSharp } from "react-icons/io5";
+import { LuTrash2, LuPencil, LuSearch, LuPlus, LuTags } from "react-icons/lu";
 import { baseUrl } from "../../../configs/env";
 import { useCollection } from "../../../hooks/useCollection";
 import { useQuery } from "../../../hooks/useQuery";
@@ -42,9 +41,14 @@ function Product() {
             Maintain product codes, pricing, category assignment, stock count, and labels.
           </p>
         </div>
-        <Link to="/admin/products/create" className={adminSurface.primaryButton}>
-          + New Product
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link to="/admin/categories" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-[#2A2E36] bg-[#111318] px-5 text-sm font-semibold text-[#F8FAFC] shadow-sm transition-colors hover:border-[#3A3F49] hover:bg-[#1A1D24]">
+            <LuTags className="text-[#A9A6BB]" /> Manage Categories
+          </Link>
+          <Link to="/admin/products/create" className={adminSurface.primaryButton}>
+            <LuPlus /> New Product
+          </Link>
+        </div>
       </div>
 
       <div className={adminSurface.statGrid}>
@@ -83,14 +87,9 @@ function Product() {
           </fieldset>
 
           <label className={`${adminSurface.input} flex w-full items-center gap-2 lg:max-w-sm`}>
-            <svg className="h-4 w-4 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </g>
-            </svg>
+            <LuSearch className="h-4 w-4 opacity-50 text-[#F8FAFC]" />
             <input
-              className="w-full text-sm"
+              className="w-full text-sm bg-transparent outline-none placeholder-[#6B7280] text-[#F8FAFC]"
               type="search"
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -122,8 +121,8 @@ function Product() {
               {isLoading && (
                 <tr>
                   <td colSpan={9} className="p-8">
-                    <div className="flex justify-center text-[#45464d]">
-                      <span className="loading loading-spinner" />
+                    <div className="flex justify-center text-[#A9A6BB]">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#22D3EE]" />
                     </div>
                   </td>
                 </tr>
@@ -131,7 +130,7 @@ function Product() {
 
               {!isLoading && products?.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-sm text-[#5b6472]">
+                  <td colSpan={9} className="p-8 text-center text-sm text-[#6B7280]">
                     No products found.
                   </td>
                 </tr>
@@ -147,14 +146,14 @@ function Product() {
                       key={item?._id || idx}
                       className={adminSurface.row}
                     >
-                      <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
+                      <td className={`${adminSurface.td} text-center font-medium text-[#6B7280]`}>
                         {(page - 1) * limit + idx + 1}
                       </td>
-                      <td className={`${adminSurface.td} min-w-28 font-semibold uppercase text-[#213145]`}>{item?.code || "-"}</td>
+                      <td className={`${adminSurface.td} min-w-28 font-semibold uppercase text-[#A9A6BB]`}>{item?.code || "-"}</td>
                       <td className={`${adminSurface.td} min-w-56`}>
                         <div className="flex items-center gap-3">
                           {item?.imageUrl ? (
-                            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#d7dced] bg-[#f8f9ff]">
+                            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#2A2E36] bg-[#111318]">
                               <img
                                 src={`${baseUrl}/upload/${item.imageUrl}`}
                                 alt={item?.name || "Product"}
@@ -162,22 +161,22 @@ function Product() {
                               />
                             </div>
                           ) : (
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#c6c6cd] bg-[#f8f9ff] text-[10px] text-[#5b6472]">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#2A2E36] bg-[#111318] text-[10px] text-[#A9A6BB]">
                               No Img
                             </div>
                           )}
-                          <span className="font-semibold text-[#0b1c30]">{item?.name || "-"}</span>
+                          <span className="font-semibold text-[#F8FAFC]">{item?.name || "-"}</span>
                         </div>
                       </td>
-                      <td className={`${adminSurface.td} min-w-36 text-[#45464d]`}>{item?.category?.name || "-"}</td>
-                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
+                      <td className={`${adminSurface.td} min-w-36 text-[#A9A6BB]`}>{item?.category?.name || "-"}</td>
+                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-[#F8FAFC]`}>
                         {currency}{cost.toFixed(2)}
                       </td>
-                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-red-600`}>
+                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-[#22D3EE]`}>
                         {currency}{sale.toFixed(2)}
                       </td>
-                      <td className={`${adminSurface.td} min-w-32 text-center text-[#45464d]`}>{item?.currentStock ?? 0}</td>
-                      <td className={`${adminSurface.td} min-w-48 max-w-xs truncate text-[#45464d]`}>{item?.note || "-"}</td>
+                      <td className={`${adminSurface.td} min-w-32 text-center text-[#F8FAFC]`}>{item?.currentStock ?? 0}</td>
+                      <td className={`${adminSurface.td} min-w-48 max-w-xs truncate text-[#A9A6BB]`}>{item?.note || "-"}</td>
                       <td className={adminSurface.td}>
                         <div className="flex items-center justify-center gap-2">
                           <Link
@@ -185,7 +184,7 @@ function Product() {
                             title="Edit product"
                             className={adminSurface.iconButton}
                           >
-                            <IoPencilSharp />
+                            <LuPencil />
                           </Link>
                           <button
                             type="button"
@@ -193,7 +192,7 @@ function Product() {
                             onClick={() => handleDelete(item._id)}
                             className={adminSurface.dangerIconButton}
                           >
-                            <IoMdTrash />
+                            <LuTrash2 />
                           </button>
                         </div>
                       </td>

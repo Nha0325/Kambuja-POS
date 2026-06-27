@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react"
-import { Outlet, useLocation } from "react-router"
+import { Outlet, useLocation } from "react-router-dom"
 import TopMenu from "../components/TopMenu"
 import CashierSidebar from "../components/navigation/CashierSidebar"
-
-const getDefaultSidebarState = () => (
-  typeof window === "undefined" ? true : window.innerWidth >= 1024
-)
 
 const pageTitles = [
   ["/cashier/pos", "POS"],
   ["/cashier/checkout", "Checkout"],
-  ["/cashier/sales-today", "Sales Today"],
-  ["/cashier/hold-bills", "Hold Bills"],
+  ["/cashier/sales-history", "Sales History"],
+  ["/cashier/sales-today", "Sales History"],
+  ["/cashier/hold-orders", "Hold Orders"],
+  ["/cashier/hold-bills", "Hold Orders"],
   ["/cashier/stock-check", "Stock Check"],
-  ["/cashier/daily-close", "Daily Close"],
+  ["/cashier/my-shift", "My Shift"],
+  ["/cashier/daily-close", "My Shift"],
 ]
 
 const getPageTitle = (pathname) => (
@@ -21,50 +20,84 @@ const getPageTitle = (pathname) => (
 )
 
 function CashierLayout() {
-  const [isShowSidebar, setIsShowSidebar] = useState(getDefaultSidebarState)
-  const { pathname } = useLocation()
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isPinned, setIsPinned] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  })
+  const location = useLocation()
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsShowSidebar(window.innerWidth >= 1024)
+      if (window.innerWidth >= 1024) {
+        setIsMobileOpen(false)
+      }
     }
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  const isExpanded = isPinned || isHovered
+  const sidebarPadding = isExpanded ? "lg:pl-[240px]" : "lg:pl-[72px]"
+
   return (
-    <>
-       <div className='min-h-screen overflow-x-hidden bg-[#f8f9ff] text-[#0b1c30]'>
-          {isShowSidebar && (
-            <button
-              type="button"
-              aria-label="Close sidebar"
-              className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
-              onClick={() => setIsShowSidebar(false)}
-            />
-          )}
-          <CashierSidebar
-            isShowSidebar={isShowSidebar}
-            onNavigate={() => {
-              if (window.innerWidth < 1024) setIsShowSidebar(false)
-            }}
-          />
-          <div className={`${isShowSidebar  ? 'lg:ml-[260px]':'lg:ml-0'} min-w-0 max-w-full transition-all duration-300`}>
-            <TopMenu
-              title={getPageTitle(pathname)}
-              eyebrow="Shop Cashier"
-              onShowSidebar={ () => setIsShowSidebar(!isShowSidebar) }
-            />
-            <main className='min-h-[calc(100vh-64px)] max-w-full p-3 sm:p-4 lg:p-6'>
-              <div className="mx-auto w-full max-w-full min-w-0 xl:max-w-7xl">
-                <Outlet />
-              </div>
-            </main>
-            
+    <div className="min-h-screen overflow-x-hidden bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
+      {isMobileOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+      
+      <CashierSidebar
+        isMobileOpen={isMobileOpen}
+        isExpanded={isExpanded}
+        onHover={(state) => setIsHovered(state)}
+        onNavigate={() => {
+          if (window.innerWidth < 1024) setIsMobileOpen(false)
+        }}
+      />
+      
+      <div className={`${sidebarPadding} min-w-0 max-w-full overflow-x-hidden transition-all duration-300`}>
+        <TopMenu
+          title={getPageTitle(location.pathname)}
+          eyebrow="Shop Cashier"
+          onShowSidebar={() => {
+            if (window.innerWidth < 1024) {
+              setIsMobileOpen(!isMobileOpen)
+            } else {
+              setIsPinned(!isPinned)
+            }
+          }}
+          isDark={isDark}
+          onToggleTheme={() => setIsDark(!isDark)}
+        />
+        <main className="min-h-[calc(100vh-64px)] max-w-full p-4 lg:p-8">
+          <div className="w-full max-w-full min-w-0">
+            <Outlet />
           </div>
-       </div>
-    </>
+        </main>
+      </div>
+    </div>
   )
 }
 

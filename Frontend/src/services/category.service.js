@@ -1,4 +1,4 @@
-import { api } from "../configs/api"
+import api from "../configs/api"
 
 export const categoryService = {
   list: (params) => api.get("/categories", { params }),

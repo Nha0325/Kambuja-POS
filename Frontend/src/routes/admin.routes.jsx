@@ -1,9 +1,8 @@
-import { Route } from "react-router-dom"
+import { Navigate, Route } from "react-router-dom"
 import Protected from "../components/Protected"
 import AdminLayout from "../layouts/AdminLayout"
 import Home from "../pages/admin/dashboard"
 import { SupplierCreate, SupplierEdit, SupplierList } from "../pages/admin/supplier"
-import { CustomerCreate, CustomerEdit, CustomerList } from "../pages/admin/customer"
 import Profile from "../pages/profile/Profile"
 import { CategoryCreate, CategoryEdit, CategoryList } from "../pages/admin/category"
 import { PrintLabel, ProductCreate, ProductEdit, ProductList } from "../pages/admin/product"
@@ -23,7 +22,7 @@ const adminElement = (
 )
 
 const stockElement = (
-  <Protected allowedRoles={[ROLES.ADMIN_MANAGER, ROLES.ADMIN]}>
+  <Protected allowedRoles={[ROLES.ADMIN]}>
     <AdminLayout />
   </Protected>
 )
@@ -33,7 +32,8 @@ export const adminRoutes = (
     <Route path="/admin" element={stockElement}>
       <Route path="inventory" element={<Inventory />} />
       <Route path="inventory/stock-in" element={<StockIn />} />
-      <Route path="inventory/adjust" element={<StockAdjustment />} />
+      <Route path="inventory/adjustment" element={<StockAdjustment />} />
+      <Route path="inventory/adjust" element={<Navigate to="/admin/inventory/adjustment" replace />} />
     </Route>
 
     <Route path="/admin" element={adminElement}>
@@ -42,9 +42,6 @@ export const adminRoutes = (
       <Route path="suppliers" element={<SupplierList />} />
       <Route path="suppliers/create" element={<SupplierCreate />} />
       <Route path="suppliers/:id/edit" element={<SupplierEdit />} />
-      <Route path="customers" element={<CustomerList />} />
-      <Route path="customers/create" element={<CustomerCreate />} />
-      <Route path="customers/:id/edit" element={<CustomerEdit />} />
       <Route path="profile" element={<Profile />} />
       <Route path="categories" element={<CategoryList />} />
       <Route path="categories/create" element={<CategoryCreate />} />
@@ -59,20 +56,20 @@ export const adminRoutes = (
       <Route path="cashiers/create" element={<CashierCreate />} />
       <Route path="cashiers/:id/edit" element={<CashierEdit />} />
       <Route path="sales" element={<ListSale />} />
+      <Route path="channels" element={<NotificationChannels />} />
+      <Route path="logs" element={<NotificationLogs />} />
       <Route path="reports/sales" element={<SaleReport />} />
       <Route path="reports/stock" element={<StockReport />} />
       <Route path="notifications/channels" element={<NotificationChannels />} />
       <Route path="notifications/logs" element={<NotificationLogs />} />
-      <Route path="shop-settings" element={<ShopSettings />} />
+      <Route path="settings" element={<ShopSettings />} />
+      <Route path="shop-settings" element={<Navigate to="/admin/settings" replace />} />
     </Route>
 
     <Route element={adminElement}>
       <Route path="/supplier" element={<SupplierList />} />
       <Route path="/supplier/create" element={<SupplierCreate />} />
       <Route path="/supplier/edit/:id" element={<SupplierEdit />} />
-      <Route path="/customer" element={<CustomerList />} />
-      <Route path="/customer/create" element={<CustomerCreate />} />
-      <Route path="/customer/edit/:id" element={<CustomerEdit />} />
       <Route path="/category" element={<CategoryList />} />
       <Route path="/category/create" element={<CategoryCreate />} />
       <Route path="/category/edit/:id" element={<CategoryEdit />} />

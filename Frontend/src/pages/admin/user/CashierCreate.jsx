@@ -31,33 +31,33 @@ function CreateUser() {
   };
 
   return (
-    <section className="min-h-screen bg-[#f8f9ff] px-3 py-4 text-[#0b1c30] sm:px-4 lg:px-6">
+    <section className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
       <div className="mx-auto max-w-[1440px]">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[#45464d]">
+        <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
           <Link
             to="/admin/cashiers"
-            className="flex items-center font-medium transition-colors hover:text-[#0058be]"
+            className="flex items-center font-medium transition-colors hover:text-[#7033ff]"
           >
             Cashiers
           </Link>
 
-          <span className="text-[#76777d]">›</span>
+          <span className="text-[#64748b] dark:text-[#a1a1aa]">›</span>
 
-          <span className="font-semibold text-[#0b1c30]">
+          <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">
             Create New Cashier
           </span>
         </nav>
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           {/* Main Form Card */}
-          <div className="w-full flex-1 overflow-hidden rounded-xl border border-[#c6c6cd] bg-white">
+          <div className="w-full flex-1 overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
             {/* Card Header */}
-            <div className="border-b border-[#c6c6cd] bg-[#eff4ff]/70 p-6">
-              <h1 className="text-xl font-semibold text-[#0b1c30]">
+            <div className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6">
+              <h1 className="text-xl font-semibold text-[#020617] dark:text-[#f8fafc]">
                 Add Cashier
               </h1>
-              <p className="mt-1 text-sm text-[#45464d]">
+              <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">
                 Create a new user account with cashier permissions for point-of-sale access.
               </p>
             </div>
@@ -68,9 +68,9 @@ function CreateUser() {
                 <div className="space-y-2">
                   <label
                     htmlFor="username"
-                    className="block text-sm font-semibold text-[#0b1c30]"
+                    className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Username <span className="text-[#ba1a1a]">*</span>
+                    Username <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -80,7 +80,7 @@ function CreateUser() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
-                    className="w-full rounded-lg border border-[#c6c6cd] bg-white p-4 text-sm text-[#0b1c30] outline-none transition-all placeholder:text-[#76777d] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="e.g. john_doe"
                   />
                 </div>
@@ -89,9 +89,9 @@ function CreateUser() {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-semibold text-[#0b1c30]"
+                    className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Email <span className="text-[#ba1a1a]">*</span>
+                    Email <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -101,7 +101,7 @@ function CreateUser() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
-                    className="w-full rounded-lg border border-[#c6c6cd] bg-white p-4 text-sm text-[#0b1c30] outline-none transition-all placeholder:text-[#76777d] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="e.g. john@kambuja.com"
                   />
                 </div>
@@ -110,9 +110,9 @@ function CreateUser() {
                 <div className="space-y-2">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-semibold text-[#0b1c30]"
+                    className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Password <span className="text-[#ba1a1a]">*</span>
+                    Password <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -122,17 +122,17 @@ function CreateUser() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     type="password"
-                    className="w-full rounded-lg border border-[#c6c6cd] bg-white p-4 text-sm text-[#0b1c30] outline-none transition-all placeholder:text-[#76777d] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="Enter secure password"
                   />
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="flex flex-col-reverse gap-3 border-t border-[#c6c6cd] bg-[#eff4ff]/50 p-6 sm:flex-row sm:items-center sm:justify-end">
+              <div className="flex flex-col-reverse gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6 sm:flex-row sm:items-center sm:justify-end">
                 <Link
                   to="/admin/cashiers"
-                  className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-[#c6c6cd] bg-white px-8 text-sm font-semibold text-[#0b1c30] transition-colors hover:bg-[#e5eeff] active:scale-[0.98] sm:w-auto"
+                  className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
                   Cancel
                 </Link>
@@ -140,7 +140,7 @@ function CreateUser() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#0b1c30] px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#0b1c30]/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                  className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
                   {isLoading ? "Saving..." : "Save Cashier"}
                 </button>

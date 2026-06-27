@@ -19,49 +19,94 @@ const schema = new mongoose.Schema({
         ref: "User",
         required: [true, "Owner admin is required"],
     },
-    phone: {
-        type: String,
-        trim: true,
-        validate: {
-            validator(value) {
-                return !value || /^[0-9+()\-\s]{6,20}$/.test(value)
-            },
-            message: "Phone number is invalid",
-        },
-    },
-    address: {
-        type: mongoose.Schema.Types.Mixed,
-        default: null,
-    },
-    provinceCode: {
+    businessType: {
         type: String,
         trim: true,
     },
-    provinceName: {
+    billingPhone: {
         type: String,
         trim: true,
     },
-    districtCode: {
+    billingEmail: {
+        type: String,
+        trim: true,
+        lowercase: true,
+    },
+    subscriptionPlan: {
+        type: String,
+        enum: ["Free", "Basic", "Pro"],
+        default: "Free",
+    },
+    subscriptionPrice: {
+        type: Number,
+        default: 0,
+    },
+    subscriptionStartDate: {
+        type: Date,
+    },
+    subscriptionExpireDate: {
+        type: Date,
+    },
+    subscriptionPaymentStatus: {
+        type: String,
+        enum: ["Paid", "Unpaid", "Pending"],
+        default: "Unpaid",
+    },
+    subscriptionStatus: {
+        type: String,
+        enum: ["Active", "Expired", "Suspended", "Cancelled"],
+        default: "Active",
+    },
+    posAccess: {
+        type: Boolean,
+        default: true,
+    },
+    maxLocations: {
+        type: Number,
+        default: 1,
+    },
+    maxCashiers: {
+        type: Number,
+        default: 1,
+    },
+    maxProducts: {
+        type: Number,
+        default: 100,
+    },
+    logo: {
         type: String,
         trim: true,
     },
-    districtName: {
+    defaultCurrency: {
+        type: String,
+        enum: ["USD", "KHR"],
+        default: "USD",
+    },
+    provinceKh: {
         type: String,
         trim: true,
     },
-    communeCode: {
+    provinceEn: {
         type: String,
         trim: true,
     },
-    communeName: {
+    districtKh: {
         type: String,
         trim: true,
     },
-    villageCode: {
+    districtEn: {
         type: String,
         trim: true,
     },
-    villageName: {
+    communeKh: {
+        type: String,
+        trim: true,
+    },
+    communeEn: {
+        type: String,
+        trim: true,
+    },
+    village: {
         type: String,
         trim: true,
     },
@@ -69,20 +114,35 @@ const schema = new mongoose.Schema({
         type: String,
         trim: true,
     },
-    province: {
+    fullAddressKh: {
         type: String,
-        required: [true, "Province / Capital is required"],
         trim: true,
     },
-    city: {
+    fullAddressEn: {
         type: String,
-        required: [true, "District / Municipality / Khan is required"],
         trim: true,
+    },
+    defaultTax: {
+        type: Number,
+        default: 0,
     },
     status: {
         type: String,
-        enum: ["ACTIVE", "INACTIVE"],
+        enum: ["ACTIVE", "LOCKED", "SUSPENDED", "EXPIRED", "ARCHIVED"],
         default: "ACTIVE",
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    archivedAt: {
+        type: Date,
+        default: null,
+    },
+    archivedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,

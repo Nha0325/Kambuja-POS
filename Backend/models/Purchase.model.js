@@ -7,6 +7,10 @@ const schema = new mongoose.Schema({
         required: [true, "Shop is required"],
         index: true,
     },
+    locationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Location",
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

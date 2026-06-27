@@ -74,50 +74,46 @@ function PurchasePaymentModal({ open, editId, onClose }) {
         {isLoading || !data ? (
           <div className="flex justify-center p-10"><span className="loading loading-spinner loading-lg"></span></div>
         ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="block text-sm font-medium mb-1">Paid Amount ($)</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2">Paid Amount ($)</label>
             <input
               onChange={(e) => setPaidAmount(e.target.value)}
               value={paidAmount}
               type="number"
-              className="input input-bordered w-full"
+              className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
               placeholder="Enter amount in $"
             />
           </div>
           
-          <div className="mb-4 space-y-2">
+          <div className="space-y-2">
             <button
               type="button"
               onClick={() => setPaidAmount(data?.dueAmount || 0)}
               disabled={isSaving}
-              className="btn block btn-sm btn-ghost border border-gray-200 w-full text-left justify-between px-3"
+              className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm"
             >
-              <span>Due Amount:</span>
-              <span className="text-red-600 font-semibold">${Number(data?.dueAmount || 0).toFixed(2)}</span>
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Due Amount:</span>
+              <span className="text-red-500 font-bold">${Number(data?.dueAmount || 0).toFixed(2)}</span>
             </button>
             
-            <div className="flex justify-between items-center btn-sm px-3 bg-gray-50 rounded-lg text-gray-700">
-              <span>Remaining Due:</span>
-              <span className="text-orange-600 font-semibold">
+            <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] text-sm">
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Remaining Due:</span>
+              <span className="text-orange-500 font-bold">
                 ${Math.max(0, (data?.totalCost || 0) - ((data?.paidAmount || 0) + Number(paidAmount || 0))).toFixed(2)}
               </span>
             </div>
 
-            <div className="flex justify-between items-center btn-sm px-3 bg-gray-50 rounded-lg text-gray-700">
-              <span>Change Amount:</span>
-              <span className="text-green-600 font-semibold">
+            <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] text-sm">
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Change Amount:</span>
+              <span className="text-green-500 font-bold">
                 ${Number(changeAmount || 0).toFixed(2)}
               </span>
             </div>
           </div>
           
-          <button type="submit" disabled={isSaving} className="btn btn-neutral w-full">
-            {isSaving ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              "Save Payment"
-            )}
+          <button type="submit" disabled={isSaving} className="mt-4 bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full">
+            {isSaving ? "Saving..." : "Save Payment"}
           </button>
         </form>
         )}

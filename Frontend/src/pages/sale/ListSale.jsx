@@ -1,9 +1,8 @@
 import { useState } from "react";
 import useFetchData from "../../hooks/useFetchData";
 import { Link } from "react-router";
-import { IoEye } from "react-icons/io5";
+import { LuEye, LuCreditCard, LuSearch } from "react-icons/lu";
 import formatDate from "../../utils/formatDate";
-import { FaCreditCard } from "react-icons/fa6";
 import SalePaymentModal from "./SalePaymentModal";
 import Loading from "../../components/Loading";
 import useCurrent from "../../hooks/auth/useCurrent";
@@ -27,80 +26,79 @@ function ListSale() {
 
   return (
     <>
-      <div className="w-full max-w-full p-3 sm:p-4">
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl font-semibold text-black">Sale Lists</h1>
+      <div className={adminSurface.page}>
+        <div className={adminSurface.header}>
+          <div>
+            <p className={adminSurface.eyebrow}>Sales</p>
+            <h1 className={adminSurface.title}>Sale Lists</h1>
+            <p className={adminSurface.description}>
+              Review completed POS sales, payment statuses, and invoice details.
+            </p>
+          </div>
           {normalizeRole(currentUser?.role) === ROLES.CASHIER && (
-            <Link to="/cashier/pos" className="btn btn-sm btn-neutral w-full sm:w-auto">
+            <Link to="/cashier/pos" className={adminSurface.primaryButton}>
               + New Sale
             </Link>
           )}
         </div>
 
-        <div className="bg-white mt-4 p-4 rounded-md border border-gray-200">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <select
-              onChange={(e) => setLimit(Number(e.target.value))}
-              value={limit}
-              aria-label="Page size"
-              title="Page size"
-              className={adminSurface.pageSizeSelect}
-            >
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-              <option value="200">200</option>
-            </select>
-
-            <label className="input input-sm input-bordered flex w-full items-center gap-2 sm:w-64">
-              <input
-                onChange={(e) => setSearch(e.target.value)}
-                type="text"
-                className="grow text-xs"
-                placeholder="Search Invoice..."
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-4 w-4 opacity-70"
+        <div className={adminSurface.tableShell}>
+          <div className={adminSurface.toolbar}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <select
+                onChange={(e) => setLimit(Number(e.target.value))}
+                value={limit}
+                aria-label="Page size"
+                title="Page size"
+                className={adminSurface.pageSizeSelect}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                  clipRule="evenodd"
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+              </select>
+
+              <div className="relative w-full sm:w-64">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <LuSearch className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  onChange={(e) => setSearch(e.target.value)}
+                  type="text"
+                  className={`${adminSurface.input} w-full pl-10`}
+                  placeholder="Search Invoice..."
                 />
-              </svg>
-            </label>
+              </div>
+            </div>
           </div>
 
-          <div className="overflow-x-auto mt-4">
-            <table className="table min-w-[1120px] w-full border-collapse">
-            <thead className="text-xs text-slate-500 bg-gray-50">
-              <tr>
-                <th className="py-3 px-2">N.o</th>
-                <th className="py-3 px-2">Invoice</th>
-                <th className="py-3 px-2">Sale By</th>
-                <th className="py-3 px-2">Total Cost</th>
-                <th className="py-3 px-2">Paid Amount</th>
-                <th className="py-3 px-2">Due Amount</th>
-                <th className="py-3 px-2">Change Amount</th>
-                <th className="py-3 px-2">Payment Status</th>
-                <th className="py-3 px-2">Created Date</th>
-                <th className="py-3 px-2 text-center">Action</th>
-              </tr>
-            </thead>
+          <div className={adminSurface.tableWrap}>
+            <table className={`${adminSurface.table} min-w-[1120px]`}>
+              <thead className={adminSurface.tableHead}>
+                <tr>
+                  <th className={adminSurface.th}>N.o</th>
+                  <th className={adminSurface.th}>Invoice</th>
+                  <th className={adminSurface.th}>Sale By</th>
+                  <th className={`${adminSurface.th} text-right`}>Total Cost</th>
+                  <th className={`${adminSurface.th} text-right`}>Paid Amount</th>
+                  <th className={`${adminSurface.th} text-right`}>Due Amount</th>
+                  <th className={`${adminSurface.th} text-right`}>Change</th>
+                  <th className={`${adminSurface.th} text-center`}>Status</th>
+                  <th className={`${adminSurface.th} text-right`}>Date</th>
+                  <th className={`${adminSurface.th} text-center`}>Action</th>
+                </tr>
+              </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="10" className="text-center p-8 text-gray-500">
-                      កំពុងទាញយកទិន្នន័យ...
+                    <td colSpan="10" className="p-8 text-center text-[#4E4E50]">
+                      Loading sales data...
                     </td>
                   </tr>
                 ) : data?.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="text-center p-8 text-gray-400 font-medium">
-                      មិនមានទិន្នន័យលក់ឡើយ។
+                    <td colSpan="10" className="p-8 text-center font-medium text-[#4E4E50]">
+                      No sales records found.
                     </td>
                   </tr>
                 ) : (
@@ -111,30 +109,30 @@ function ListSale() {
                     const changeAmount = Number(item?.changeAmount || 0);
 
                     return (
-                      <tr key={item?._id || idx} className="border-b border-gray-100 text-xs hover:bg-gray-50">
-                        <td className="px-2 py-3">{(page - 1) * limit + idx + 1}</td>
-                        <td className="px-2 font-semibold text-gray-800 uppercase">{item?.invoiceNumber || "-"}</td>
-                        <td className="px-2 capitalize text-gray-700">{item?.user?.username || "-"}</td>
-                        <td className="px-2 text-gray-800 font-medium">${totalCost.toFixed(2)}</td>
-                        <td className="px-2 text-green-600 font-medium">${paidAmount.toFixed(2)}</td>
-                        <td className={`px-2 font-semibold ${dueAmount > 0 ? "text-error" : "text-gray-500"}`}>
+                      <tr key={item?._id || idx} className={adminSurface.row}>
+                        <td className={`${adminSurface.td} text-[#A9A6BB]`}>{(page - 1) * limit + idx + 1}</td>
+                        <td className={`${adminSurface.td} font-bold uppercase`}>{item?.invoiceNumber || "-"}</td>
+                        <td className={`${adminSurface.td} capitalize`}>{item?.user?.username || "-"}</td>
+                        <td className={`${adminSurface.td} text-right font-medium`}>${totalCost.toFixed(2)}</td>
+                        <td className={`${adminSurface.td} text-right font-medium text-[#22C55E]`}>${paidAmount.toFixed(2)}</td>
+                        <td className={`${adminSurface.td} text-right font-semibold ${dueAmount > 0 ? "text-[#EF4444]" : "text-[#6B7280]"}`}>
                           ${dueAmount.toFixed(2)}
                         </td>
-                        <td className="px-2 text-blue-600 font-medium">${changeAmount.toFixed(2)}</td>
-                        <td className="px-2">
+                        <td className={`${adminSurface.td} text-right font-medium text-[#22D3EE]`}>${changeAmount.toFixed(2)}</td>
+                        <td className={`${adminSurface.td} text-center`}>
                           <span
-                            className={`px-2 py-1 rounded-full text-[10px] font-semibold uppercase ${
-                              item?.paymentStatus === "due" ? "bg-red-100 text-red-800" :
-                              item?.paymentStatus === "partial" ? "bg-yellow-100 text-yellow-800" :
-                              "bg-blue-100 text-blue-800"
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase border ${
+                              item?.paymentStatus === "due" ? "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20" :
+                              item?.paymentStatus === "partial" ? "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20" :
+                              "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"
                             }`}
                           >
                             {item.paymentStatus || "-"}
                           </span>
                         </td>
-                        <td className="px-2 text-gray-500">{formatDate(item.createdAt)}</td>
-                        <td className="text-center">
-                          <div className="flex items-center justify-center gap-3">
+                        <td className={`${adminSurface.td} text-right text-[#A9A6BB]`}>{formatDate(item.createdAt)}</td>
+                        <td className={adminSurface.td}>
+                          <div className="flex items-center justify-center gap-2">
                             <button 
                               onClick={() => {
                                 setOpen(true); 
@@ -142,16 +140,18 @@ function ListSale() {
                               }} 
                               type="button" 
                               disabled={item.paymentStatus === 'paid'} 
-                              className={`text-lg transition ${item.paymentStatus === "paid" ? 'text-gray-300 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800 cursor-pointer'}`}
+                              className={adminSurface.iconButton}
+                              title="Process Payment"
                             >
-                              <FaCreditCard />
+                              <LuCreditCard />
                             </button>
                             <Link
                               to={`/sale/invoice/${item._id}`}
                               target="_blank"
-                              className="text-lg text-gray-700 hover:text-black transition"
+                              className={adminSurface.iconButton}
+                              title="View Invoice"
                             >
-                              <IoEye />
+                              <LuEye />
                             </Link>
                           </div>
                         </td>

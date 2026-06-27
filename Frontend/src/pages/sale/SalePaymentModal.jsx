@@ -72,42 +72,48 @@ function SalePaymentModal({ open, editId, onClose }) {
         {isLoading || !data ? (
           <div className="flex justify-center p-10"><span className="loading loading-spinner loading-lg"></span></div>
         ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm space-y-1">
-            <div className="flex justify-between">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mb-4 p-3 bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] rounded-lg text-sm space-y-2">
+            <div className="flex justify-between text-[#64748b] dark:text-[#a1a1aa]">
               <span>Total Cost:</span>
-              <span className="font-bold">${Number(data?.totalCost || 0).toFixed(2)}</span>
+              <span className="font-bold text-[#020617] dark:text-[#f8fafc]">${Number(data?.totalCost || 0).toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-green-700">
+            <div className="flex justify-between text-[#64748b] dark:text-[#a1a1aa]">
               <span>Already Paid:</span>
-              <span className="font-bold">${Number(data?.paidAmount || 0).toFixed(2)}</span>
+              <span className="font-bold text-green-500">${Number(data?.paidAmount || 0).toFixed(2)}</span>
             </div>
           </div>
 
-          <div className="mb-3">
-            <label className="block text-sm font-medium mb-1">Paid Amount ($)</label>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2">Paid Amount ($)</label>
             <input 
               onChange={(e) => setPaidAmount(e.target.value)} 
               value={paidAmount} 
               disabled={isSaving}
               type="number" 
-              className="input input-sm input-bordered w-full" 
+              className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+              placeholder="0.00"
             />
           </div>
-          <div className="mb-4 space-y-2">
-            <div className="text-red-600 font-semibold">Due: ${dueAmount.toFixed(2)}</div>
-            <div className="text-green-600 font-semibold">Change: ${changeAmount.toFixed(2)}</div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm">
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Due:</span>
+              <span className="text-red-500 font-bold">${dueAmount.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm">
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Change:</span>
+              <span className="text-green-500 font-bold">${changeAmount.toFixed(2)}</span>
+            </div>
           </div>
+
           <button
             type="submit"
             disabled={isSaving}
-            className="btn btn-neutral w-full"
+            className="mt-4 bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full"
           >
-            {isSaving ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              "Save"
-            )}
+            {isSaving ? "Saving..." : "Save Payment"}
           </button>
         </form>
         )}

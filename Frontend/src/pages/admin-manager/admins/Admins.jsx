@@ -1,20 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
-import { FaDownload, FaFilter, FaMagnifyingGlass, FaPlus, FaShop, FaUserShield } from "react-icons/fa6"
 import { adminManagerService } from "../../../services/adminManager.service"
-import { downloadCsv } from "../../../utils/downloadCsv"
 import { formatApiError } from "../../../utils/formatApiError"
-import {
-  cardClass,
-  getInitials,
+import formatDate from "../../../utils/formatDate"
+
+import { 
+  cardClass, 
+  inputClass, 
+  selectClass, 
   primaryButtonClass,
-  secondaryButtonClass,
-  tableCellClass,
-  tableHeadCellClass,
-  tableHeadClass,
+  tableHeadClass, 
+  tableHeadCellClass, 
+  tableCellClass 
 } from "../adminManagerUi"
-import { PageHeader, StatusBadge, TableEmpty } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty, StatusBadge } from "../components/AdminManagerUi"
+
 
 function Admins() {
   const [admins, setAdmins] = useState([])
@@ -27,7 +28,7 @@ function Admins() {
   const load = useCallback(() => {
     setIsLoading(true)
     setError("")
-    return adminManagerService.admins()
+    return adminManagerService.getAdmins()
       .then((response) => setAdmins(response.data.result || []))
       .catch((loadError) => {
         if (loadError?.response?.status !== 401) {
@@ -56,19 +57,6 @@ function Admins() {
     ))
   }, [admins, assignmentFilter, search, statusFilter])
 
-  const exportAdmins = () => {
-    downloadCsv(
-      "admin-manager-admins.csv",
-      [
-        { label: "Username", value: (admin) => admin.username || "" },
-        { label: "Email", value: (admin) => admin.email || "" },
-        { label: "Assigned Shop", value: (admin) => admin.shopId?.name || "Platform Wide" },
-        { label: "Status", value: (admin) => admin.status || "" },
-      ],
-      displayedAdmins
-    )
-  }
-
   const toggle = async (admin) => {
     const status = admin.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"
     try {
@@ -81,134 +69,159 @@ function Admins() {
     }
   }
 
-  const activeCount = admins.filter((admin) => admin.status === "ACTIVE").length
-  const assignedCount = admins.filter((admin) => admin.shopId).length
-
   return (
-    <section>
-      <PageHeader
-        title="Admin Accounts"
-        description="Manage platform controller accounts and shop ownership assignments."
-        action={(
-          <Link className={primaryButtonClass} to="/admin-manager/admins/create">
-            <FaPlus />
-            Add Admin
+    <div className="max-w-[1600px] mx-auto flex flex-col gap-6">
+      <PageHeader 
+        title="Admins Management" 
+        description="Manage all admin accounts, roles, and shop assignments."
+        action={
+          <Link
+            className={primaryButtonClass}
+            to="/admin-manager/admin-owners/create"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            Create Admin
           </Link>
-        )}
+        }
       />
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/50 px-4 py-3 text-sm text-red-700 dark:text-red-400 font-medium">
           {error}
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Total Admins</p>
-          <strong className="block text-3xl font-bold text-slate-900">{admins.length.toLocaleString()}</strong>
-        </article>
-        <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Active</p>
-          <strong className="block text-3xl font-bold text-slate-900">{activeCount.toLocaleString()}</strong>
-        </article>
-        <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-slate-500">Assigned Shops</p>
-          <strong className="block text-3xl font-bold text-slate-900">{assignedCount.toLocaleString()}</strong>
-        </article>
+      {/* Action Bar */}
+      <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="relative w-full max-w-md">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">search</span>
+            <input
+              className={`${inputClass} pl-10`}
+              placeholder="Search by name, email, shop..."
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="relative min-w-[150px]">
+            <select
+              className={selectClass}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Disabled</option>
+            </select>
+          </div>
+          <div className="relative min-w-[150px]">
+            <select
+              className={selectClass}
+              value={assignmentFilter}
+              onChange={(e) => setAssignmentFilter(e.target.value)}
+            >
+              <option value="ALL">Any Assignment</option>
+              <option value="ASSIGNED">Assigned</option>
+              <option value="UNASSIGNED">Unassigned</option>
+            </select>
+          </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-12">
-        <label className={`${cardClass} flex h-14 min-w-0 items-center gap-3 px-4 sm:col-span-2 xl:col-span-5`}>
-          <FaMagnifyingGlass className="text-slate-500" />
-          <input
-            className="h-full min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:ring-0"
-            placeholder="Search by username, email, shop, or status..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-        </label>
-        <label className={`${secondaryButtonClass} h-14 min-w-0 xl:col-span-2`}>
-          <FaFilter />
-          <select
-            className="min-w-0 bg-transparent text-sm font-semibold outline-none"
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-          >
-            <option value="ALL">All Status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-          </select>
-        </label>
-        <label className={`${secondaryButtonClass} h-14 min-w-0 xl:col-span-3`}>
-          <FaShop />
-          <select
-            className="min-w-0 bg-transparent text-sm font-semibold outline-none"
-            value={assignmentFilter}
-            onChange={(event) => setAssignmentFilter(event.target.value)}
-          >
-            <option value="ALL">Any Assignment</option>
-            <option value="ASSIGNED">Assigned</option>
-            <option value="UNASSIGNED">Unassigned</option>
-          </select>
-        </label>
-        <button
-          className={`${secondaryButtonClass} h-14 min-w-0 sm:col-span-2 xl:col-span-2`}
-          type="button"
-          onClick={exportAdmins}
-          disabled={displayedAdmins.length === 0}
-        >
-          <FaDownload />
-          Export
-        </button>
-      </div>
-
-      <div className={`${cardClass} overflow-hidden`}>
+      {/* Data Table Card */}
+      <div className={`${cardClass} overflow-hidden flex flex-col`}>
         <div className="overflow-x-auto">
-          <table className="min-w-[820px] w-full border-collapse text-left">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Username</th>
-                <th className={tableHeadCellClass}>Email</th>
+                <th className={tableHeadCellClass}>Admin Name</th>
+                <th className={tableHeadCellClass}>Contact Info</th>
                 <th className={tableHeadCellClass}>Assigned Shop</th>
-                <th className={tableHeadCellClass}>Status</th>
+                <th className={`${tableHeadCellClass} text-center`}>Status</th>
+                <th className={`${tableHeadCellClass} text-right`}>Last Login</th>
+                <th className={`${tableHeadCellClass} text-right`}>Created Date</th>
                 <th className={`${tableHeadCellClass} text-right`}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-violet-100">
+            <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {isLoading ? (
-                <TableEmpty colSpan="5">Loading admins...</TableEmpty>
-              ) : displayedAdmins.map((admin) => (
-                <tr key={admin._id} className="transition-colors hover:bg-violet-50/50">
-                  <td className={tableCellClass}>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-xs font-bold text-violet-800">
-                        {getInitials(admin.username)}
+                <TableEmpty colSpan="7">Loading admins...</TableEmpty>
+              ) : displayedAdmins.length === 0 ? (
+                <TableEmpty colSpan="7">No admins found matching your criteria.</TableEmpty>
+              ) : (
+                displayedAdmins.map((admin) => (
+                  <tr key={admin._id} className={`group transition-colors ${admin.status === 'INACTIVE' ? 'bg-[#f8fafc] dark:bg-[#09090b]' : 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}>
+                    <td className={tableCellClass}>
+                      <div className={`flex items-center gap-3 ${admin.status === 'INACTIVE' ? 'opacity-60' : ''}`}>
+                        <div>
+                          <p className="font-bold">{admin.fullName || admin.username}</p>
+                          {admin.fullName && <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-0.5">@{admin.username}</p>}
+                        </div>
                       </div>
-                      <span className="font-semibold text-slate-900">{admin.username}</span>
-                    </div>
-                  </td>
-                  <td className={tableCellClass}>{admin.email}</td>
-                  <td className={tableCellClass}>
-                    <span className="inline-flex rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-mono text-violet-800">
-                      {admin.shopId?.name || "Platform Wide"}
-                    </span>
-                  </td>
-                  <td className={tableCellClass}><StatusBadge status={admin.status} /></td>
-                  <td className={`${tableCellClass} text-right`}>
-                    <button className={secondaryButtonClass} type="button" onClick={() => toggle(admin)}>
-                      <FaUserShield />
-                      {admin.status === "ACTIVE" ? "Disable" : "Enable"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {!isLoading && displayedAdmins.length === 0 && <TableEmpty colSpan="5">No admins found</TableEmpty>}
+                    </td>
+                    <td className={tableCellClass}>
+                      <div className={admin.status === 'INACTIVE' ? 'opacity-60' : ''}>
+                        <p>{admin.email || "-"}</p>
+                        <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-0.5">{admin.phone || admin.profile?.phone || admin.contactPhone || admin.ownerPhone || admin.user?.phone || "No Owner Phone"}</p>
+                      </div>
+                    </td>
+                    <td className={tableCellClass}>
+                      <div className={admin.status === 'INACTIVE' ? 'opacity-60' : ''}>
+                        <p>{admin.shopId?.name || "Unassigned"}</p>
+                      </div>
+                    </td>
+                    <td className={`${tableCellClass} text-center`}>
+                      <StatusBadge status={admin.status} />
+                    </td>
+                    <td className={`${tableCellClass} text-right`}>
+                      <div className={admin.status === 'INACTIVE' ? 'opacity-60' : ''}>
+                        {admin.lastLogin ? formatDate(admin.lastLogin, "MMM DD, YYYY HH:mm") : "-"}
+                      </div>
+                    </td>
+                    <td className={`${tableCellClass} text-right`}>
+                      <div className={admin.status === 'INACTIVE' ? 'opacity-60' : ''}>
+                        {admin.createdAt ? formatDate(admin.createdAt) : "-"}
+                      </div>
+                    </td>
+                    <td className={`${tableCellClass} text-right`}>
+                      <div className={`flex items-center justify-end gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity ${admin.status === 'INACTIVE' ? 'opacity-60 hover:opacity-100' : ''}`}>
+                        <Link
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 dark:hover:bg-[#7033ff]/20 transition-colors"
+                          title="Edit Admin"
+                          to={`/admin-manager/admin-owners/${admin._id}/edit`}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </Link>
+                        <button
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${admin.status === 'ACTIVE' ? 'text-[#64748b] dark:text-[#a1a1aa] hover:text-orange-500 hover:bg-orange-500/10' : 'text-[#64748b] dark:text-[#a1a1aa] hover:text-green-500 hover:bg-green-500/10'}`}
+                          title={admin.status === 'ACTIVE' ? 'Disable Account' : 'Enable Account'}
+                          onClick={() => toggle(admin)}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">{admin.status === 'ACTIVE' ? 'block' : 'check_circle'}</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        <div className="bg-[#ffffff] dark:bg-[#111113] border-t border-[#e5e7eb] dark:border-[#27272a] px-6 py-4 flex items-center justify-between">
+          <span className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa]">Showing {displayedAdmins.length} of {admins.length} admins</span>
+          <div className="flex gap-1">
+            <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors disabled:opacity-50" disabled>
+              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+            <button className="w-8 h-8 rounded-md bg-[#7033ff] text-white flex items-center justify-center text-sm font-bold">1</button>
+            <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors text-sm font-bold disabled:opacity-50" disabled>
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 

@@ -7,6 +7,12 @@ const schema = new mongoose.Schema({
         required: true,
         index: true,
     },
+    locationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Location",
+        required: true,
+        index: true,
+    },
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",

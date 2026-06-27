@@ -1,530 +1,1123 @@
-ខាងក្រោមនេះជា របៀបដែល hacker អាចគិតវាយប្រហារ POS / React / Node / MongoDB project និង របៀបការពារ។ ប្រើសម្រាប់ test project ខ្លួនឯងប៉ុណ្ណោះ។
+# DESIGN.md — Kambuja-POS Full UI Prototype
 
-1. Hacker មើល request/API មុនគេ
+## Project Name
 
-ពេលអ្នក click login, create product, sell product, view report, browser ផ្ញើ request ទៅ backend។
+Kambuja-POS
 
-Frontend React → Backend API → MongoDB
+## System Type
 
-Hacker មិនត្រូវការមើល button ក្នុង UI ទេ។ គេអាច call API ផ្ទាល់។
+POS + Inventory + Shop Management + Subscription Platform.
 
-ឧទាហរណ៍ POS របស់អ្នកអាចមាន API ដូចជា៖
+This is not a small POS demo. Design it as a serious multi-role business platform for mini markets, retail shops, and small businesses.
 
-POST /api/v1/auth/signin
-GET /api/v1/products
-POST /api/v1/products
-DELETE /api/v1/products/:id
-POST /api/v1/sales
-GET /api/v1/reports/sales
+## Brand
 
-បញ្ហាធំ៖
-បើ backend មិន check role ឲ្យត្រឹមត្រូវ Cashier អាច call API របស់ Admin បាន។
+Company: Kambuja Flow Digital
+Slogan: មរតកខ្មែរ បច្ចេកវិទ្យាអនាគត
 
-ការពារ៖
-គ្រប់ API សំខាន់ត្រូវមាន៖
+## Tech / UI Direction
 
-1. Check token
-2. Check role
-3. Validate input
-4. Check shop ownership
-2. Role bypass
-
-នេះសំខាន់បំផុតសម្រាប់ POS របស់អ្នក។
-
-Role មាន៖
-
-ADMIN_MANAGER
-ADMIN
-CASHIER
-
-Hacker ឬ Cashier អាចសាក call API ដែលខ្លួនមិនគួរប្រើបាន។
-
-ឧទាហរណ៍ Cashier មិនគួរធ្វើបាន៖
-
-Create admin
-Delete product
-Edit product price
-View full report
-View all shops
-Change shop setting
-
-ការពារ backend:
-
-const requireRoles = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
-
-    next();
-  };
-};
-
-ប្រើលើ route:
-
-router.delete(
-  "/products/:id",
-  authGuard,
-  requireRoles("ADMIN_MANAGER", "ADMIN"),
-  productController.deleteProduct
-);
-
-router.get(
-  "/reports/sales",
-  authGuard,
-  requireRoles("ADMIN_MANAGER", "ADMIN"),
-  reportController.getSalesReport
-);
-
-សម្រាប់ Cashier:
-
-router.post(
-  "/sales",
-  authGuard,
-  requireRoles("ADMIN", "CASHIER"),
-  saleController.createSale
-);
-
-ច្បាប់ត្រឹមត្រូវ៖
-
-Frontend hide menu = មិនគ្រប់គ្រាន់
-Backend block role = ចាំបាច់
-3. Price manipulation
-
-នេះគ្រោះថ្នាក់ខ្លាំងសម្រាប់ POS។
-
-បើ frontend ផ្ញើ price ទៅ backend ហើយ backend ជឿ price នោះ hacker អាចកែតម្លៃបាន។
-
-មិនត្រូវធ្វើបែបនេះ៖
-
-{
-  "productId": "123",
-  "qty": 1,
-  "price": 1
-}
-
-បញ្ហា៖
-Cashier ឬ hacker អាចកែ price ពី 5000៛ ទៅ 1៛។
-
-ការពារ៖
-Backend ត្រូវយក price ពី database មិនមែនយកពី frontend។
-
-const product = await Product.findById(item.productId);
-
-if (!product) {
-  return res.status(404).json({ message: "Product not found" });
-}
-
-const unitPrice = product.price;
-const lineTotal = unitPrice * item.qty;
-
-Frontend ផ្ញើតែនេះគ្រប់គ្រាន់៖
-
-{
-  "productId": "123",
-  "qty": 2
-}
-
-Backend គណនាខ្លួនឯង៖
-
-price = from database
-subtotal = price × qty
-total = backend calculate
-stock = backend cut
-4. Stock manipulation
-
-Hacker អាចកែ quantity ក្នុង request។
-
-ឧទាហរណ៍៖
-
-{
-  "productId": "123",
-  "qty": 999999
-}
-
-បើ backend មិន check stock នឹងបង្កើត sale ខុស។
-
-ការពារ៖
-
-if (item.qty <= 0) {
-  return res.status(400).json({ message: "Invalid quantity" });
-}
-
-if (product.stock < item.qty) {
-  return res.status(400).json({ message: "Insufficient stock" });
-}
-
-ពេល sale success ត្រូវ cut stock នៅ backend:
-
-product.stock -= item.qty;
-await product.save();
-
-ច្បាប់ត្រឹមត្រូវ៖
-
-Stock មិនត្រូវ cut នៅ frontend
-Stock ត្រូវ cut នៅ backend
-Sale និង stock update គួរធ្វើក្នុង transaction
-5. Shop ownership bypass
-
-បើ system មានច្រើន shop, hacker អាចសាកយក product/shop ID របស់ហាងផ្សេង។
-
-ឧទាហរណ៍៖
-
-GET /api/v1/products?shopId=SHOP_OTHER
-
-បញ្ហា៖
-Admin ហាង A អាចមើល product ហាង B។
-
-ការពារ៖
-Backend មិនត្រូវជឿ shopId ពី frontend សម្រាប់ user ធម្មតា។ ត្រូវយក shopId ពី token/user session។
-
-const products = await Product.find({
-  shopId: req.user.shopId
-});
-
-សម្រាប់ update/delete:
-
-const product = await Product.findOne({
-  _id: req.params.id,
-  shopId: req.user.shopId
-});
-
-if (!product) {
-  return res.status(404).json({ message: "Product not found" });
-}
-
-ច្បាប់ត្រឹមត្រូវ៖
-
-Admin មើលតែ shop ខ្លួន
-Cashier មើលតែ shop ខ្លួន
-ADMIN_MANAGER ទើបអាចមើល all shops
-6. Token problem
-
-Hacker អាចលួច token បើ project store token មិនល្អ។
-
-គ្រោះថ្នាក់៖
-
-Token in localStorage
-XSS អាចលួច token
-Token មិន expire
-Token មិន verify role
-JWT_SECRET ខ្សោយ
-
-ការពារ៖
-
-JWT secret ត្រូវខ្លាំង
-Access token ត្រូវ expire ខ្លី
-Backend verify token រាល់ request
-Do not expose .env
-Use HTTPS on production
-
-Auth guard:
-
-import jwt from "jsonwebtoken";
-
-const authGuard = (req, res, next) => {
-  const header = req.headers.authorization;
-
-  if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = header.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-};
-7. File upload attack
-
-បើ project upload product image, hacker អាច upload file គ្រោះថ្នាក់។
-
-គ្រោះថ្នាក់៖
-
-Upload .js
-Upload .php
-Upload .exe
-Upload file ធំពេក
-Upload fake image
-Use original filename dangerous
-
-ការពារ៖
-
-Allow only image/jpeg, image/png, image/webp
-Limit file size
-Rename file
-Store outside sensitive folder
-Never execute uploaded file
-
-Multer example:
-
-const fileFilter = (req, file, cb) => {
-  const allowed = ["image/jpeg", "image/png", "image/webp"];
-
-  if (!allowed.includes(file.mimetype)) {
-    return cb(new Error("Only image files are allowed"), false);
-  }
-
-  cb(null, true);
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 2 * 1024 * 1024
-  }
-});
-8. Directory traversal
-
-នេះជារឿងក្នុង TikTok video។
-
-អត្ថន័យ៖
-Hacker សាកអាន file នៅក្រៅ folder ដែល website អនុញ្ញាត។
-
-គោលដៅដែល hacker ចង់បាន៖
-
-.env
-database config
-server config
-system file
-backup file
-
-ការពារ៖
-
-កុំឲ្យ user បញ្ជូន path ផ្ទាល់ទៅ server
-កុំ read file តាម filename ពី user ដោយគ្មាន validate
-Use safe upload folder
-Normalize path
-Block ../
-
-Defensive check:
-
-import path from "path";
-
-const safeBase = path.resolve("uploads");
-
-const getSafeFilePath = (filename) => {
-  const filePath = path.resolve(safeBase, filename);
-
-  if (!filePath.startsWith(safeBase)) {
-    throw new Error("Invalid file path");
-  }
-
-  return filePath;
-};
-9. NoSQL injection
-
-Project អ្នកប្រើ MongoDB/Mongoose។
-បើ backend ទទួល object ពី user ដោយមិន validate អាចមាន NoSQL injection។
-
-គ្រោះថ្នាក់៖
-
-Login bypass
-Filter bypass
-Query manipulate
-
-ការពារ៖
-
-Validate input type
-Email must be string
-Password must be string
-Do not pass req.body directly into Mongo query
-Use express-mongo-sanitize
-
-Install:
-
-npm i express-mongo-sanitize
+Create a modern SaaS-style dashboard UI similar to a React + Vite + Tailwind CSS application.
 
 Use:
 
-import mongoSanitize from "express-mongo-sanitize";
+* Clean dashboard layouts
+* Sidebar navigation
+* Topbar
+* Cards
+* Tables
+* Forms
+* Modals
+* Drawers
+* Filters
+* Search inputs
+* Charts
+* Status badges
+* Responsive layouts
+* English + Khmer labels where useful
 
-app.use(mongoSanitize());
+Use mock data only. Do not create backend logic. Do not create database logic. This is UI prototype only.
 
-Login ត្រូវ validate:
+---
 
-if (typeof email !== "string" || typeof password !== "string") {
-  return res.status(400).json({ message: "Invalid input" });
-}
-10. XSS
+# Roles
 
-XSS គឺ hacker បញ្ចូល script ក្នុង input ដូចជា product name, customer name, note, receipt message។
+The system has exactly 3 roles:
 
-គ្រោះថ្នាក់៖
+1. ADMIN_MANAGER
+2. ADMIN
+3. CASHIER
 
-លួច token
-បង្ហាញ fake UI
-ប្តូរ content
-Attack admin browser
+---
 
-ការពារ React:
+# Role Theme
 
-កុំប្រើ dangerouslySetInnerHTML
-Escape output by default
-Validate input
-Sanitize rich text បើមាន
+## Admin Manager Theme
 
-កុំធ្វើបែបនេះ៖
+Role: ADMIN_MANAGER
+Purpose: Platform owner / system owner / super admin.
 
-<div dangerouslySetInnerHTML={{ __html: product.description }} />
+Visual style:
 
-ធ្វើធម្មតា៖
+* Premium
+* Professional
+* Platform management feel
 
-<div>{product.description}</div>
-11. CORS misconfiguration
+Colors:
 
-កុំដាក់ production backend ឲ្យ accept all origins។
+* Primary: #7033ff
+* Background: #fdfdfd
+* Accent: #e2ebff
 
-មិនល្អ៖
+Use Violet Bloom style.
 
-app.use(cors({ origin: "*" }));
+## Admin Theme
 
-ល្អជាង៖
+Role: ADMIN
+Purpose: Shop owner / business owner.
 
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://yourdomain.com"
-  ],
-  credentials: true
-}));
-12. Rate limit / brute force login
+Visual style:
 
-Hacker អាចសាក password ច្រើនដង។
+* Clean
+* Business
+* Shop management feel
 
-ការពារ៖
+Colors:
 
-npm i express-rate-limit
-import rateLimit from "express-rate-limit";
+* Primary: #1e69dc
+* Background: #f8faff
+* Accent: #dbeafe
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: "Too many login attempts"
-});
+Use Blue Business style.
 
-router.post("/signin", loginLimiter, authController.signin);
-13. Security headers
+## Cashier Theme
 
-Install:
+Role: CASHIER
+Purpose: Fast selling / POS operation.
 
-npm i helmet
+Visual style:
+
+* Simple
+* Fast
+* Large buttons
+* Scanner friendly
+
+Colors:
+
+* Primary: #4ac885
+* Background: #fafffa
+* Accent: #dcfce7
+
+Use Green Fast POS style.
+
+---
+
+# Global Screens
+
+Create these screens:
+
+1. Landing / Welcome screen
+2. Login screen
+3. Forgot password screen
+4. Role-based redirect dashboard
+5. Admin Manager dashboard and pages
+6. Admin dashboard and pages
+7. Cashier POS and pages
+8. Unauthorized / 403 page
+9. Not found / 404 page
+10. Profile page
+11. Settings pages
+12. Responsive mobile navigation
+
+---
+
+# Login Page
+
+Create a polished login page.
+
+Layout:
+
+* Left brand panel
+* Right login form card
+* Mobile responsive single-column layout
+
+Content:
+
+* Kambuja-POS logo area
+* Title: Kambuja-POS
+* Subtitle: POS + Inventory Management Platform
+* Email input
+* Password input
+* Remember me checkbox
+* Forgot password link
+* Login button
+* Language switch: English / Khmer
+* Demo role cards:
+
+  * Admin Manager
+  * Admin
+  * Cashier
+
+Redirect after login:
+
+* ADMIN_MANAGER -> /admin-manager
+* ADMIN -> /admin
+* CASHIER -> /cashier/pos
+
+---
+
+# Admin Manager UI
+
+Admin Manager manages the whole platform, shops, owners, subscriptions, POS access, reports, logs, and system settings.
+
+Admin Manager must not look like a cashier POS page.
+
+## Admin Manager Navigation
+
+* Dashboard
+* Shops
+* Admins
+* Locations
+* Subscriptions
+* POS Access
+* Alerts / Notifications
+* Reports
+* Stock Overview
+* System Logs
+* Backup / Health
+* Settings
+
+## Admin Manager Dashboard
+
+Cards:
+
+* Total shops
+* Active shops
+* Locked shops
+* Expired subscriptions
+* Total admins
+* Total cashiers
+* Monthly subscription revenue
+* Platform revenue
+* System health
+* Low stock shops overview
+
+Widgets:
+
+* Subscription revenue chart
+* Active vs expired shops chart
+* Recent shop registrations table
+* Shops requiring attention list
+* Latest audit logs
+* Notification delivery status
+* System health panel
+
+## Admin Management Page
+
+Features:
+
+* List admins / shop owners
+* Create admin
+* Search by name, email, phone, shop
+* Filter by active / disabled
+
+Table columns:
+
+* Admin name
+* Email
+* Phone
+* Assigned shop
+* Status
+* Last login
+* Created date
+* Actions
+
+Actions:
+
+* View
+* Edit
+* Disable / Enable
+* Reset password
+* Assign shop
+
+Form fields:
+
+* Full name
+* Email
+* Phone
+* Password
+* Assign shop
+* Status
+* Notes
+
+## Shop Management Page
+
+Features:
+
+* List shops
+* Create shop
+* Search and filters
+
+Table columns:
+
+* Shop code
+* Shop name
+* Owner / admin
+* Province
+* District / Khan
+* Subscription plan
+* POS access
+* Status
+* Created date
+* Actions
+
+Actions:
+
+* View
+* Edit
+* Lock / Unlock
+* Assign owner
+* Manage subscription
+* Manage POS access
+
+Form fields:
+
+* Shop name
+* Auto shop code
+* Owner / admin
+* Phone
+* Email
+* Province
+* District / Khan
+* Commune / Sangkat
+* Address
+* Logo upload placeholder
+* Status
+
+## Subscription Page
+
+Show plan cards:
+
+* Basic
+* Standard
+* Pro
+* Enterprise
+
+Subscription table columns:
+
+* Shop
+* Plan
+* Start date
+* End date
+* Status
+* Monthly fee
+* Payment status
+* Actions
+
+Actions:
+
+* Activate
+* Renew
+* Expire
+* Suspend
+* View payment history
+
+Plan form:
+
+* Plan name
+* Price
+* Cashier limit
+* Product limit
+* Shop / branch limit
+* POS enabled
+* Reports enabled
+* Telegram alert enabled
+
+## POS Access Page
+
+Show:
+
+* Shops with POS access status
+* Enable / disable POS per shop
+* Cashier limit
+* Product limit
+* Subscription status
+* Reason why POS is blocked:
+
+  * Expired subscription
+  * Shop locked
+  * POS disabled
+  * Cashier limit exceeded
+
+## Location Management Page
+
+Create UI for:
+
+* Province list
+* District / Khan list
+* Commune / Sangkat list
+* Store location list
+* Create / edit location modal
+* Active / inactive toggle
+
+## System Reports Page
+
+Reports:
+
+* Platform revenue report
+* Subscription revenue report
+* Best shops report
+* Inactive shops report
+* Expired subscriptions report
+* Admin activity report
+
+Include:
+
+* Date filter
+* Export CSV button
+* Summary cards
+* Chart
+* Table
+
+## Stock Overview Page
+
+Read-only cross-shop stock view:
+
+* Low stock shops
+* Out of stock products across shops
+* Filter by shop / province / category
+* Product stock overview table
+
+## System Logs Page
+
+Logs:
+
+* Login logs
+* Create / edit / delete logs
+* Stock adjustment logs
+* Payment logs
+* Subscription logs
+* Failed login attempts
+
+Include:
+
+* Filter by role
+* Filter by action
+* Filter by shop
+* Filter by date
+* Log detail drawer
+
+## Notifications Page
+
+Features:
+
+* Send announcement to all shops
+* Send message to one shop
+* Send message to one admin
+* Telegram / email / channel log
+* Delivery status table
+
+## Backup / Health Page
+
+Cards:
+
+* API status
+* Database status
+* Backup status
+* Last backup time
+* Server status
+* Storage status
+
+Actions:
+
+* Export system data
+* Restore request
+* View backup history
+
+## Global Settings Page
+
+Fields:
+
+* App name
+* Logo
+* Default currency
+* Default tax
+* Invoice format
+* Maintenance mode
+* Support contact
+* Language settings
+
+---
+
+# Admin UI
+
+Admin is the shop owner. Admin manages only own shop. Admin must not see other shops.
+
+## Admin Navigation
+
+* Dashboard
+* Products
+* Categories
+* Inventory
+* Purchases
+* Suppliers
+* Customers
+* Cashiers
+* Sales Monitor
+* Reports
+* Notifications
+* Barcode / Labels
+* Settings
+
+## Admin Dashboard
+
+Cards:
+
+* Today sales
+* Today profit
+* Total products
+* Low stock
+* Out of stock
+* Unpaid purchases
+* Cashier sales today
+* Customer debt
+* Supplier balance
+* Recent sales
+
+Widgets:
+
+* Sales chart
+* Profit chart
+* Low stock table
+* Top selling products
+* Recent purchases
+* Cashier performance
+* Alerts panel
+
+## Products Page
+
+Features:
+
+* Product list
+* Grid / table toggle
+* Create product
+* Search by name, SKU, barcode
+* Filter by category, status, stock
+
+Table columns:
+
+* Image
+* Product name
+* SKU
+* Barcode
+* Category
+* Cost price
+* Sale price
+* Stock
+* Low stock threshold
+* Status
+* Actions
+
+Actions:
+
+* View
+* Edit
+* Disable / Delete
+* Print label
+
+Product form:
+
+* Product name
+* Category
+* SKU
+* Barcode
+* QR code
+* Unit
+* Cost price
+* Sale price
+* Stock
+* Low stock threshold
+* Image upload placeholder
+* Description
+* Status
+
+## Categories Page
+
+Features:
+
+* Category table
+* Create / edit category modal
+* Product count
+* Active / inactive status
+* Actions
+
+## Inventory Page
+
+Tabs:
+
+* Stock Overview
+* Stock In
+* Stock Out
+* Adjustment
+* Damaged / Lost Stock
+* Stock Movement History
+
+Stock Movement table:
+
+* Product
+* Type
+* Quantity
+* Before
+* After
+* User
+* Date
+* Note
+
+## Purchases Page
+
+Features:
+
+* Purchase list
+* Create purchase
+* Supplier filter
+* Payment status filter
+* Purchase status filter
+
+Table columns:
+
+* Purchase no
+* Supplier
+* Total
+* Paid
+* Balance
+* Status
+* Payment status
+* Date
+* Actions
+
+Purchase form:
+
+* Supplier
+* Product items
+* Quantity
+* Cost
+* Discount
+* Total
+* Paid amount
+* Payment method
+* Note
+
+## Suppliers Page
+
+Features:
+
+* Supplier list
+* Create supplier
+* Search by name / phone
+
+Supplier form:
+
+* Name
+* Phone
+* Email
+* Address
+* Opening balance
+* Status
+
+Supplier detail:
+
+* Purchase history
+* Payment history
+* Balance
+
+## Customers Page
+
+Features:
+
+* Customer list
+* Create customer
+
+Customer form:
+
+* Name
+* Phone
+* Email
+* Address
+* Credit / debt limit
+* Notes
+* Status
+
+Customer detail:
+
+* Purchase history
+* Debt / credit history
+* Payment history
+
+## Cashier Management Page
+
+Features:
+
+* Cashier list
+* Create cashier
+* Search / filter by status
+
+Table columns:
+
+* Name
+* Email / phone
+* Status
+* Sales today
+* Last login
+* Actions
+
+Actions:
+
+* Edit
+* Disable / Enable
+* Reset password
+* View sales
+
+Cashier form:
+
+* Name
+* Email
+* Phone
+* Password
+* Permissions
+* Status
+
+## Sales Monitor Page
+
+Features:
+
+* Sales table
+* Filters:
+
+  * Date
+  * Cashier
+  * Payment method
+  * Status
+  * Receipt number
+
+Table columns:
+
+* Receipt number
+* Cashier
+* Customer
+* Total
+* Payment method
+* Status
+* Date
+* Actions
+
+Actions:
+
+* View detail
+* Reprint receipt
+* Cancel sale
+* Approve refund / return
+
+## Reports Page
+
+Tabs:
+
+* Sales Report
+* Stock Report
+* Profit Report
+* Purchase Report
+* Supplier Report
+* Customer Debt Report
+* Cashier Report
+* Daily Close Report
+* Product Profit Report
+* Damaged / Lost Stock Report
+
+Each report:
+
+* Date filter
+* Export CSV button
+* Summary cards
+* Table
+* Chart area
+
+## Barcode / Labels Page
+
+Features:
+
+* Select products
+* Label size
+* Barcode / QR preview
+* Print labels button
+* Product code lookup
+
+## Notifications Page
+
+Features:
+
+* Low stock alert settings
+* Sale alert settings
+* Purchase due alert
+* Customer debt alert
+* Telegram channel setup
+* Notification logs
+
+## Shop Settings Page
+
+Fields:
+
+* Shop profile
+* Receipt setting
+* Invoice format
+* Tax setting
+* Discount policy
+* Currency
+* Printer setting
+* Telegram notification channel
+* Language settings
+
+---
+
+# Cashier UI
+
+Cashier is for fast selling only. UI must be simple, big, scanner-friendly, and keyboard-friendly.
+
+## Cashier Navigation
+
+* POS
+* Hold Bills
+* Receipts
+* Sales History
+* Stock Check
+* Daily Close
+* Profile
+
+## POS Screen
+
+Layout:
+
+* Full screen POS layout
+* Left side product search and product grid
+* Right side cart and checkout
+* Topbar with cashier name, shop name, shift status, date/time
+* Barcode input always visible and focused
+* Big buttons
+
+POS features:
+
+* Product search
+* Barcode scan
+* Product code lookup
+* Quick category filters
+* Quick product buttons
+* Product cards:
+
+  * Name
+  * Price
+  * Stock
+  * Image placeholder
+* Add to cart
+* Quantity + / -
+* Remove item
+* Clear cart
+
+## Cart Panel
+
+Show:
+
+* Cart item list
+* Quantity controls
+* Item discount if allowed
+* Subtotal
+* Tax
+* Discount
+* Grand total
+* Customer select
+* Hold bill button
+* Checkout button
+
+## Checkout Modal
+
+Fields:
+
+* Total amount
+* Cash received
+* Change calculation
+* Payment method:
+
+  * Cash
+  * ABA / manual
+  * Split payment
+* Payment note
+* Print receipt checkbox
+* Complete sale button
+
+## Receipt Screen
+
+Receipt preview:
+
+* Shop name
+* Receipt number
+* Cashier name
+* Items
+* Subtotal
+* Discount
+* Tax
+* Total
+* Payment method
+* Cash received
+* Change
+* Print button
+* Reprint button
+
+## Hold Bills Page
+
+Features:
+
+* Held bills list
+* Search by bill number / customer
+
+Show:
+
+* Hold bill number
+* Customer
+* Items count
+* Total
+* Cashier
+* Time
+* Status
+
+Actions:
+
+* Resume
+* Cancel
+
+Rule message:
+Only HELD bills can be resumed. Completed or cancelled bills cannot be resumed.
+
+## Daily Close Page
+
+Features:
+
+* Open shift card
+* Close shift form
+* Today cash sales
+* ABA / manual sales
+* Expected cash
+* Counted cash
+* Difference
+* Notes
+* Submit daily close button
+* Daily close status
+
+## Sales History Page
+
+Features:
+
+* Own sales only
+* Filter today
+* Filter by receipt number
+* Sales table
+* View detail
+* Reprint own receipt
+
+## Stock Check Page
+
+Features:
+
+* Search product
+* Scan barcode
+* Product stock result
+* Read-only UI
+* No edit buttons
+
+## Customer Quick Add Modal
+
+Fields:
+
+* Name
+* Phone
+* Address optional
+* Save and attach to sale
+
+## Return / Refund Request UI
+
+Fields:
+
+* Select sale
+* Select items
+* Reason
+* Request refund button
+
+Status:
+
+* Pending admin approval
+* Approved
+* Rejected
+
+---
+
+# Permission UI Rules
+
+## ADMIN_MANAGER
+
+Can manage:
+
+* Shops
+* Admins
+* Subscriptions
+* Locations
+* System settings
+* Reports
+* Logs
+* Notifications
+* POS access
+
+## ADMIN
+
+Can manage only own shop:
+
+* Products
+* Categories
+* Inventory
+* Purchases
+* Suppliers
+* Customers
+* Cashiers
+* Sales monitor
+* Reports
+* Shop settings
+
+## CASHIER
+
+Can use:
+
+* POS
+* Cart
+* Checkout
+* Receipts
+* Hold bills
+* Daily close
+* Own sales history
+* Stock lookup only
+
+Cashier must not see:
+
+* Product create / edit / delete
+* Supplier create / edit / delete
+* Purchase management
+* Shop settings
+* Subscription
+* User management
+* Admin Manager pages
+
+---
+
+# Unauthorized Page
+
+Create a 403 page:
+
+* Title: 403 Access denied
+* Message: You do not have permission to access this page.
+* Button: Go back to dashboard
+
+---
+
+# Shared Components
+
+Create reusable UI patterns:
+
+* Sidebar
+* Topbar
+* StatCard
+* DataTable
+* SearchInput
+* FilterBar
+* ActionButton
+* StatusBadge
+* Modal
+* ConfirmDialog
+* FormCard
+* ChartCard
+* EmptyState
+* LoadingState
+* ReceiptPreview
+* ProductCard
+* CartPanel
+* PaymentModal
+* LanguageSwitch
+* ThemeSwitcher preview only
+
+---
+
+# Responsive Design
+
+## Desktop
+
+* Fixed sidebar
+* Topbar
+* Dashboard grid
+* POS two-column layout
+
+## Tablet
+
+* Collapsible sidebar
+* Dashboard two-column
+* POS cart slide-over
+
+## Mobile
+
+* Bottom navigation or drawer
+* Cards stacked
+* POS product grid two columns
+* Cart as bottom sheet
+* Big touch buttons
+
+---
+
+# Visual Style Rules
 
 Use:
 
-import helmet from "helmet";
+* Modern SaaS dashboard style
+* Clean spacing
+* Rounded cards
+* Soft shadows
+* Professional tables
+* Clear role identity
+* Khmer-friendly typography
+* Large POS buttons for cashier
+* Status colors:
 
-app.use(helmet());
+  * Success: green
+  * Warning: amber
+  * Danger: red
+  * Info: blue
+  * Primary: role theme color
 
-វាជួយការពារ header សុវត្ថិភាពមូលដ្ឋាន។
+Avoid:
 
-14. .env leak
+* Black and white default theme only
+* Tiny POS buttons
+* Confusing navigation
+* Mixing Admin Manager and Cashier functions
+* Showing management CRUD to cashier
+* Making the app look like a small demo
 
-.env មិនត្រូវ push ទៅ GitHub។
+---
 
-ត្រូវមាន .gitignore:
+# Output Expectation
 
-.env
-node_modules
-logs
-uploads
-dist
+Generate a complete clickable UI prototype with:
 
-បើធ្លាប់ push .env រួច ត្រូវ remove ពី git tracking:
+1. Login page
+2. Admin Manager full UI pages
+3. Admin full UI pages
+4. Cashier full POS UI pages
+5. Role-based dashboards
+6. Role-based sidebars
+7. Forms, tables, modals, cards
+8. Mock data
+9. Responsive layouts
+10. Khmer / English label support where useful
 
-git rm --cached .env
-git commit -m "Remove env from git tracking"
-git push
-
-ហើយត្រូវប្តូរ secret/token/database password ចាស់ចោល។
-
-15. Test plan សម្រាប់ POS របស់អ្នក
-Auth test
-[ ] API without token → 401
-[ ] Invalid token → 401
-[ ] Expired token → 401
-[ ] Wrong role → 403
-[ ] Correct role → success
-Role test
-[ ] Cashier cannot create admin
-[ ] Cashier cannot delete product
-[ ] Cashier cannot edit price
-[ ] Cashier cannot view full report
-[ ] Cashier cannot access other shop
-[ ] Admin cannot access admin-manager system APIs
-Sale test
-[ ] Backend calculates price from DB
-[ ] Backend rejects qty <= 0
-[ ] Backend rejects qty over stock
-[ ] Backend cuts stock after sale
-[ ] Backend saves sale items correctly
-[ ] Backend prevents editing paid sale without permission
-Product test
-[ ] SKU/barcode unique per shop
-[ ] Product price must be positive
-[ ] Stock cannot be negative
-[ ] Only admin can edit product
-[ ] Cashier can search/scan only
-Upload test
-[ ] Accept only image
-[ ] Reject non-image
-[ ] Limit file size
-[ ] Rename uploaded file
-[ ] No direct file path from user
-Report test
-[ ] Cashier sees only allowed daily sale
-[ ] Admin sees only own shop report
-[ ] ADMIN_MANAGER sees all shops
-[ ] Report API requires token
-16. Security middleware order in Express
-
-ដាក់ក្នុង app.js ប្រហែលបែបនេះ៖
-
-app.use(helmet());
-
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ],
-  credentials: true
-}));
-
-app.use(express.json({ limit: "1mb" }));
-app.use(mongoSanitize());
-
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/products", authGuard, productRoutes);
-app.use("/api/v1/sales", authGuard, saleRoutes);
-app.use("/api/v1/reports", authGuard, reportRoutes);
-
-app.use(errorMiddleware);
-ចំណុចដែលត្រូវចាប់ផ្តើម fix មុនគេ
-1. Backend role guard
-2. Backend shop ownership check
-3. Backend calculate price from DB
-4. Backend stock validation
-5. File upload validation
-6. Remove .env from git
-7. Rate limit login
-8. Helmet + CORS
-9. Mongo sanitize
-10. API 401/403 standard
-
-សរុប៖
-
-Hacker មិនវាយពី UI ទេ
-Hacker វាយពី API request
-ដូច្នេះ Backend ត្រូវជា security center
-Frontend គ្រាន់តែ UI
-Backend ត្រូវ check token, role, shop, input, price, stock រាល់ request
+Make it visually complete and ready to use as a UI reference for the real Kambuja-POS React project.

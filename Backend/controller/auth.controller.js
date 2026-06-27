@@ -2,6 +2,8 @@ const bcryptjs = require("bcryptjs")
 const User = require("../models/User.model")
 const jwt = require("jsonwebtoken")
 const { ROLES, normalizeRole } = require("../constants/roles")
+const { createLoginAlert, createFailedLoginAlert } = require("../helper/alert.helper")
+const SystemLog = require("../models/SystemLog")
 
 exports.signup = async (req, res, next) => {
     try {
@@ -59,6 +61,17 @@ exports.signin = async (req, res, next) => {
             .select("+password")
             .populate("shopId", "name code status")
         if(!user){
+            await createFailedLoginAlert(normalizedEmail, 'User not found', req);
+            await SystemLog.create({
+                action: "LOGIN_FAILED",
+                entity: "Auth",
+                message: "Failed login attempt",
+                metadata: {
+                    attemptedEmail: normalizedEmail,
+                    ipAddress: req.ip || req.headers["x-forwarded-for"],
+                    userAgent: req.headers["user-agent"]
+                }
+            });
             return res.status(401).json({
                 success: false,
                 error: "Invalid email or password"
@@ -66,21 +79,53 @@ exports.signin = async (req, res, next) => {
 
         }
 
-        if(user.status === "INACTIVE" || user.shopId?.status === "INACTIVE"){
+        if(user.status === "INACTIVE" || (user.shopId && user.shopId.status !== "ACTIVE")){
             return res.status(403).json({
                 success: false,
-                error: "This account is inactive",
+                error: "This account or shop is locked/inactive",
             })
         }
 
         const isMatch = await bcryptjs.compare(password,user.password)
         if(!isMatch){
+            await createFailedLoginAlert(user.username || user.email, 'Incorrect password', req);
+            await SystemLog.create({
+                action: "LOGIN_FAILED",
+                entity: "Auth",
+                message: "Failed login attempt",
+                metadata: {
+                    attemptedEmail: user.email,
+                    ipAddress: req.ip || req.headers["x-forwarded-for"],
+                    userAgent: req.headers["user-agent"]
+                }
+            });
             return res.status(401).json({
                 success: false,
                 error: "Invalid email or password"
             })
         }
  
+        user.lastLogin = new Date();
+        await user.save();
+
+        if (['ADMIN_MANAGER', 'ADMIN', 'CASHIER'].includes(user.role)) {
+            await createLoginAlert(user, req);
+        }
+
+        await SystemLog.create({
+            userId: user._id,
+            userName: user.username,
+            userEmail: user.email,
+            role: user.role,
+            shopId: user.shopId ? user.shopId._id : undefined,
+            shopName: user.shopId ? user.shopId.name : undefined,
+            action: "LOGIN",
+            entity: "Auth",
+            message: `${user.role} logged in`,
+            ipAddress: req.ip || req.headers["x-forwarded-for"],
+            userAgent: req.headers["user-agent"]
+        });
+
         const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_LIFETIME
         })
