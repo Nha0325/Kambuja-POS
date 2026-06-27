@@ -87,6 +87,7 @@ backups/
 Thumbs.db
 .vscode/
 .idea/
+.agents/
 .codex/
 .kimchi/
 *.swp
