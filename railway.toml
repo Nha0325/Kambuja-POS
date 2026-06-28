@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd Backend && npm ci"
+watchPatterns = ["Backend/**"]
+
+[deploy]
+startCommand = "cd Backend && npm start"
+restartPolicyType = "ON_FAILURE"

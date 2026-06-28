@@ -1,0 +1,12 @@
+{
+  "name": "kambuja-pos-railway-root",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "build": "cd Backend && npm ci",
+    "start": "cd Backend && npm start"
+  }
+}
