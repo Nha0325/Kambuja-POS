@@ -61,18 +61,30 @@ jobs:
     needs: checks
 
     steps:
+      - name: Check VPS secrets
+        id: check_secrets
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -Eeuo pipefail
+          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ] || [ -z "$VPS_SSH_KEY" ]; then
+            echo "VPS deploy skipped because VPS secrets are not configured."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Create a private key file from the GitHub Secret.
       - name: Prepare SSH key
+        if: steps.check_secrets.outputs.skip != 'true'
         shell: bash
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
           set -Eeuo pipefail
-
-          if [ -z "$VPS_SSH_KEY" ]; then
-            echo "Missing required GitHub Secret: VPS_SSH_KEY" >&2
-            exit 1
-          fi
 
           mkdir -p ~/.ssh
           printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/vps_key
@@ -80,6 +92,7 @@ jobs:
 
       # Connect to the VPS and run deployment commands inside PROJECT_PATH.
       - name: Deploy application over SSH
+        if: steps.check_secrets.outputs.skip != 'true'
         shell: bash
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
