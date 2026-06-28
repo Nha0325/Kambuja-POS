@@ -166,113 +166,248 @@ if git_path_exists rebase-merge || git_path_exists rebase-apply || git_path_exis
   exit 1
 fi
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Detect current branch
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BLUE}Checking current branch...${NC}"
-CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+CURRENT_BRANCH="$(git branch --show-current 2>/dev/null || true)"
 
 if [ -z "$CURRENT_BRANCH" ]; then
-  echo -e "${RED}Error: You are in detached HEAD mode. Checkout main before pushing.${NC}" >&2
+  echo -e "${RED}Error: Cannot detect current branch.${NC}" >&2
+  echo -e "${RED}You may be in detached HEAD mode. Checkout a branch first.${NC}" >&2
   exit 1
 fi
 
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo -e "${RED}Error: This script only pushes from main to origin/main.${NC}" >&2
-  echo -e "${YELLOW}Current branch: $CURRENT_BRANCH${NC}" >&2
-  echo -e "${YELLOW}Run: git checkout main${NC}" >&2
-  exit 1
-fi
+echo -e "${GREEN}Current branch: ${CYAN}$CURRENT_BRANCH${NC}"
 
-echo -e "${GREEN}Already on main branch${NC}"
-
+# ─────────────────────────────────────────────────────────────────────────────
+# Validation (tests)
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BLUE}Running validation (tests)...${NC}"
 "$SCRIPT_DIR/test.sh"
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Fetch latest from origin
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
-echo -e "${BLUE}Fetching latest changes from origin/main...${NC}"
+echo -e "${BLUE}Fetching latest changes from origin...${NC}"
 git fetch origin --prune
-git ls-remote --exit-code --heads origin main >/dev/null 2>&1 || {
-  echo -e "${RED}Error: origin/main was not found.${NC}" >&2
-  exit 1
-}
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage and check for changes
+# ─────────────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BLUE}Checking for changes...${NC}"
 
 # Stage all changes, including deletes and renames.
 git add -A
 
+HAS_STAGED_CHANGES=true
 if git diff --cached --quiet; then
-  echo -e "${YELLOW}No changes to commit.${NC}"
+  HAS_STAGED_CHANGES=false
+  echo -e "${YELLOW}No staged changes to commit.${NC}"
+fi
 
-  LOCAL="$(git rev-parse HEAD)"
-  REMOTE="$(git rev-parse origin/main)"
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN BRANCH: Direct push workflow
+# ─────────────────────────────────────────────────────────────────────────────
+if [ "$CURRENT_BRANCH" = "main" ]; then
 
-  if [ "$LOCAL" = "$REMOTE" ]; then
-    echo -e "${GREEN}✓ Already up to date with origin/main${NC}"
+  git ls-remote --exit-code --heads origin main >/dev/null 2>&1 || {
+    echo -e "${RED}Error: origin/main was not found.${NC}" >&2
+    exit 1
+  }
+
+  if [ "$HAS_STAGED_CHANGES" = false ]; then
+    LOCAL="$(git rev-parse HEAD)"
+    REMOTE="$(git rev-parse origin/main)"
+
+    if [ "$LOCAL" = "$REMOTE" ]; then
+      echo -e "${GREEN}✓ Already up to date with origin/main${NC}"
+      exit 0
+    fi
+
+    echo -e "${BLUE}Rebasing existing local commits on origin/main...${NC}"
+    if ! git pull --rebase origin main; then
+      show_rebase_conflict_help
+      exit 1
+    fi
+
+    if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+      echo -e "${BLUE}Pushing existing local commits to main branch...${NC}"
+      git push origin main
+    else
+      echo -e "${GREEN}✓ Up to date with origin/main${NC}"
+    fi
+
     exit 0
   fi
 
-  echo -e "${BLUE}Rebasing existing local commits on origin/main...${NC}"
+  # Show what will be committed
+  echo ""
+  echo -e "${CYAN}Files to be committed:${NC}"
+  git diff --cached --name-status | while read -r status file; do
+    case "$status" in
+      A) echo -e "  ${GREEN}[Added]${NC}    $file" ;;
+      M) echo -e "  ${YELLOW}[Modified]${NC} $file" ;;
+      D) echo -e "  ${RED}[Deleted]${NC}  $file" ;;
+      *) echo -e "  [$status]      $file" ;;
+    esac
+  done
+
+  echo ""
+  echo -e "${CYAN}Commit message:${NC} ${MAGENTA}$MSG${NC}"
+  echo ""
+
+  # Ask for confirmation
+  echo -n -e "${YELLOW}Proceed with commit and push to main? [Y/n]: ${NC}"
+  read -r CONFIRM
+
+  if [[ "$CONFIRM" =~ ^[Nn] ]]; then
+    echo -e "${YELLOW}Cancelled by user.${NC}"
+    git reset > /dev/null 2>&1
+    exit 0
+  fi
+
+  # Commit
+  echo -e "${BLUE}Committing changes...${NC}"
+  git commit -m "$MSG"
+
+  # Rebase the new commit on top of origin/main to get latest changes.
+  echo -e "${BLUE}Rebasing on origin/main...${NC}"
   if ! git pull --rebase origin main; then
     show_rebase_conflict_help
     exit 1
   fi
 
-  if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-    echo -e "${BLUE}Pushing existing local commits to main branch...${NC}"
-    git push origin main
+  # Push directly to main branch
+  echo -e "${BLUE}Pushing to main branch...${NC}"
+  git push origin main
+
+  echo ""
+  echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+  echo -e "${GREEN}✓ Successfully pushed to main branch!${NC}"
+  echo -e "${GREEN}✓ Commit: $MSG${NC}"
+  echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+  echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FEATURE BRANCH: Push + Pull Request workflow
+# ─────────────────────────────────────────────────────────────────────────────
+else
+
+  echo ""
+  echo -e "${CYAN}Feature branch detected: ${MAGENTA}$CURRENT_BRANCH${NC}"
+  echo -e "${CYAN}Will push to origin/${CURRENT_BRANCH} and create/update PR into main.${NC}"
+
+  # Commit if there are staged changes
+  if [ "$HAS_STAGED_CHANGES" = true ]; then
+    # Show what will be committed
+    echo ""
+    echo -e "${CYAN}Files to be committed:${NC}"
+    git diff --cached --name-status | while read -r status file; do
+      case "$status" in
+        A) echo -e "  ${GREEN}[Added]${NC}    $file" ;;
+        M) echo -e "  ${YELLOW}[Modified]${NC} $file" ;;
+        D) echo -e "  ${RED}[Deleted]${NC}  $file" ;;
+        *) echo -e "  [$status]      $file" ;;
+      esac
+    done
+
+    echo ""
+    echo -e "${CYAN}Commit message:${NC} ${MAGENTA}$MSG${NC}"
+    echo ""
+
+    # Ask for confirmation
+    echo -n -e "${YELLOW}Proceed with commit, push, and PR? [Y/n]: ${NC}"
+    read -r CONFIRM
+
+    if [[ "$CONFIRM" =~ ^[Nn] ]]; then
+      echo -e "${YELLOW}Cancelled by user.${NC}"
+      git reset > /dev/null 2>&1
+      exit 0
+    fi
+
+    echo -e "${BLUE}Committing changes...${NC}"
+    git commit -m "$MSG"
   else
-    echo -e "${GREEN}✓ Up to date with origin/main${NC}"
+    echo ""
+    echo -e "${YELLOW}No new changes to commit. Will push existing commits and create PR.${NC}"
+    echo ""
+    echo -n -e "${YELLOW}Proceed with push and PR? [Y/n]: ${NC}"
+    read -r CONFIRM
+
+    if [[ "$CONFIRM" =~ ^[Nn] ]]; then
+      echo -e "${YELLOW}Cancelled by user.${NC}"
+      exit 0
+    fi
   fi
 
-  exit 0
+  # Push the feature branch to origin
+  echo ""
+  echo -e "${BLUE}Pushing branch '${CURRENT_BRANCH}' to origin...${NC}"
+  git push -u origin "$CURRENT_BRANCH"
+
+  # Check if gh CLI is available
+  if ! command -v gh &>/dev/null; then
+    echo ""
+    echo -e "${YELLOW}⚠ GitHub CLI (gh) is not installed. Skipping PR creation.${NC}"
+    echo -e "${YELLOW}  Install it from: https://cli.github.com/${NC}"
+    echo -e "${YELLOW}  Then create a PR manually or run:${NC}"
+    echo -e "${CYAN}  gh pr create --base main --head $CURRENT_BRANCH --title \"$MSG\"${NC}"
+    echo ""
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}✓ Successfully pushed branch: $CURRENT_BRANCH${NC}"
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo ""
+    exit 0
+  fi
+
+  # Check if a PR already exists for this branch
+  echo ""
+  echo -e "${BLUE}Checking for existing Pull Request...${NC}"
+  EXISTING_PR_URL="$(gh pr view "$CURRENT_BRANCH" --json url --jq '.url' 2>/dev/null || true)"
+
+  if [ -n "$EXISTING_PR_URL" ]; then
+    echo -e "${GREEN}✓ Pull Request already exists for branch '${CURRENT_BRANCH}'.${NC}"
+    echo -e "${CYAN}  PR URL: ${MAGENTA}$EXISTING_PR_URL${NC}"
+    echo ""
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}✓ Pushed and PR already up to date!${NC}"
+    echo -e "${GREEN}✓ Branch: $CURRENT_BRANCH${NC}"
+    echo -e "${GREEN}✓ PR: $EXISTING_PR_URL${NC}"
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo ""
+  else
+    # Create a new Pull Request
+    echo -e "${BLUE}Creating Pull Request: ${CURRENT_BRANCH} → main...${NC}"
+    PR_URL="$(gh pr create \
+      --base main \
+      --head "$CURRENT_BRANCH" \
+      --title "$MSG" \
+      --body "Automated PR from branch \`$CURRENT_BRANCH\` into \`main\`.
+
+**Commit message:** $MSG
+
+---
+_Created by git-push.sh_" 2>&1)" || {
+      echo -e "${RED}Failed to create Pull Request.${NC}" >&2
+      echo -e "${YELLOW}Output: $PR_URL${NC}" >&2
+      echo -e "${YELLOW}You can create it manually:${NC}" >&2
+      echo -e "${CYAN}  gh pr create --base main --head $CURRENT_BRANCH --title \"$MSG\"${NC}" >&2
+      exit 1
+    }
+
+    echo ""
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}✓ Successfully pushed and created PR!${NC}"
+    echo -e "${GREEN}✓ Branch: $CURRENT_BRANCH → main${NC}"
+    echo -e "${GREEN}✓ Commit: $MSG${NC}"
+    echo -e "${GREEN}✓ PR: $PR_URL${NC}"
+    echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
+    echo ""
+  fi
+
 fi
-
-# Show what will be committed
-echo ""
-echo -e "${CYAN}Files to be committed:${NC}"
-git diff --cached --name-status | while read -r status file; do
-  case "$status" in
-    A) echo -e "  ${GREEN}[Added]${NC}    $file" ;;
-    M) echo -e "  ${YELLOW}[Modified]${NC} $file" ;;
-    D) echo -e "  ${RED}[Deleted]${NC}  $file" ;;
-    *) echo -e "  [$status]      $file" ;;
-  esac
-done
-
-echo ""
-echo -e "${CYAN}Commit message:${NC} ${MAGENTA}$MSG${NC}"
-echo ""
-
-# Ask for confirmation
-echo -n -e "${YELLOW}Proceed with commit and push to main? [Y/n]: ${NC}"
-read -r CONFIRM
-
-if [[ "$CONFIRM" =~ ^[Nn] ]]; then
-  echo -e "${YELLOW}Cancelled by user.${NC}"
-  git reset > /dev/null 2>&1
-  exit 0
-fi
-
-# Commit
-echo -e "${BLUE}Committing changes...${NC}"
-git commit -m "$MSG"
-
-# Rebase the new commit on top of origin/main to get latest changes.
-echo -e "${BLUE}Rebasing on origin/main...${NC}"
-if ! git pull --rebase origin main; then
-  show_rebase_conflict_help
-  exit 1
-fi
-
-# Push directly to main branch
-echo -e "${BLUE}Pushing to main branch...${NC}"
-git push origin main
-
-echo ""
-echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}✓ Successfully pushed to main branch!${NC}"
-echo -e "${GREEN}✓ Commit: $MSG${NC}"
-echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
-echo ""
