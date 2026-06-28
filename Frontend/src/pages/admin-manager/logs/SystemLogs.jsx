@@ -10,10 +10,10 @@ import {
   FaMagnifyingGlass,
   FaTerminal,
 } from "react-icons/fa6"
-import api from "../../../configs/api"
-import { downloadCsv } from "../../../utils/downloadCsv"
-import { formatApiError } from "../../../utils/formatApiError"
-import formatDate from "../../../utils/formatDate"
+import api from "../../../utils/config/api"
+import { downloadCsv } from "../../../utils/helpers/downloadCsv"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
+import formatDate from "../../../utils/formatters/formatDate"
 import {
   cardClass,
   inputClass,
@@ -22,7 +22,7 @@ import {
   tableHeadCellClass,
   tableHeadClass,
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
 
 const dateFormat = "DD/MMM/YYYY"
 const timeFormat = "HH:mm"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { api } from "../../configs/api"
+import { api } from "../../utils/config/api"
 import toast from "react-hot-toast"
-import { formatApiError } from "../../utils/formatApiError"
+import { formatApiError } from "../../utils/formatters/formatApiError"
 
 const useCurrent = () => {
     const [isLoading, setIsLoading] = useState(true)

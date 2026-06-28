@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { notificationService } from "../../../services/notification.service"
+import { notificationService } from "../../../services/engagement/notification.service"
 import { adminSurface } from "../adminPageUi"
 
 function NotificationChannels() {

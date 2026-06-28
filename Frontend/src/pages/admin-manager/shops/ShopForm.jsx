@@ -2,9 +2,9 @@ import { useEffect, useState, useRef } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import toast from "react-hot-toast"
 
-import { adminManagerService } from "../../../services/adminManager.service"
-import { formatApiError } from "../../../utils/formatApiError"
-import { cambodiaAddress } from "../../../data/cambodiaAddress"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
+import { cambodiaAddress } from "../../../utils/data/cambodiaAddress"
 
 const createInitialForm = () => ({
   name: "",

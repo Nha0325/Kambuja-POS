@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import AdminManagerSidebar from "../components/navigation/AdminManagerSidebar"
-import TopMenu from "../components/TopMenu"
-import ConfirmProvider from "../pages/admin-manager/components/confirm/ConfirmProvider"
+import TopMenu from "../components/navigation/TopMenu"
+import ConfirmProvider from "../components/ui/ConfirmProvider"
 
 const pageTitles = [
   ["/admin-manager/shops/create", "Create Shop"],

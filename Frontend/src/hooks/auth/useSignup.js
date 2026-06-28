@@ -1,6 +1,6 @@
 import toast from "react-hot-toast"
-import { api } from "../../configs/api"
-import { formatApiError } from "../../utils/formatApiError"
+import { api } from "../../utils/config/api"
+import { formatApiError } from "../../utils/formatters/formatApiError"
 import { useState } from "react"
 
 const useSignup = () => {

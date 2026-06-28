@@ -1,5 +1,5 @@
 import { Route } from "react-router-dom"
-import AuthRedirect from "../components/AuthRedirect"
+import AuthRedirect from "../components/auth/AuthRedirect"
 import AuthLayout from "../layouts/AuthLayout"
 import Signin from "../pages/auth/Signin"
 

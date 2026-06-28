@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useStockReport } from "../../../hooks/useStockReport";
+import { useStockReport } from "../../../hooks/reports/useStockReport";
 import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";
 import useCurrent from "../../../hooks/auth/useCurrent";
-import { api } from "../../../configs/api";
+import { api } from "../../../utils/config/api";
 import dayjs from "dayjs";
 import { FiEye, FiX } from "react-icons/fi";
 

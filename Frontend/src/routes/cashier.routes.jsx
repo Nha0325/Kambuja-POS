@@ -1,13 +1,13 @@
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/Protected"
+import Protected from "../components/auth/Protected"
 import CashierLayout from "../layouts/CashierLayout"
-import POS from "../pages/sale/POS"
-import Invoice from "../pages/sale/Invoice"
+import POS from "../pages/cashier/pos/POS"
+import Invoice from "../pages/cashier/pos/Invoice"
 import HoldBills from "../pages/cashier/HoldBills"
 import StockCheck from "../pages/cashier/StockCheck"
 import DailyClose from "../pages/cashier/DailyClose"
 import SalesHistory from "../pages/cashier/SalesHistory"
-import { ROLES } from "../utils/role"
+import { ROLES } from "../utils/helpers/role"
 
 const cashierLayout = (
   <Protected allowedRoles={[ROLES.CASHIER]}>

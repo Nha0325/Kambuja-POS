@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
-import { adminService } from "../../../services/admin.service"
-import { productService } from "../../../services/product.service"
-import { supplierService } from "../../../services/supplier.service"
+import { adminService } from "../../../services/users/admin.service"
+import { productService } from "../../../services/inventory/product.service"
+import { supplierService } from "../../../services/purchase/supplier.service"
 import { LuPackagePlus, LuInfo, LuPackage, LuFileText, LuDollarSign } from "react-icons/lu"
 import { adminSurface } from "../adminPageUi"
 

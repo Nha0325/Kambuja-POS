@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FaCircleInfo, FaStore, FaShieldHalved, FaCheck } from "react-icons/fa6"
-import { locationService } from "../../../services/location.service"
-import { api } from "../../../configs/api"
-import { formatApiError } from "../../../utils/formatApiError"
+import { locationService } from "../../../services/system/location.service"
+import { api } from "../../../utils/config/api"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
 
 const createInitialForm = () => ({
   name: "",

@@ -12,10 +12,10 @@ import {
   LuSearch,
   LuTrash2
 } from "react-icons/lu";
-import { useCollection } from "../../../hooks/useCollection";
-import { useQuery } from "../../../hooks/useQuery";
+import { useCollection } from "../../../hooks/common/useCollection";
+import { useQuery } from "../../../hooks/common/useQuery";
 import { adminSurface } from "../adminPageUi";
-import { downloadCsv } from "../../../utils/downloadCsv";
+import { downloadCsv } from "../../../utils/helpers/downloadCsv";
 import AdminPagination from "../../../components/admin/AdminPagination";
 
 const supplierStats = [

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import AdminSidebar from '../components/navigation/AdminSidebar'
-import TopMenu from '../components/TopMenu'
+import TopMenu from '../components/navigation/TopMenu'
 
 const pageTitles = [
   ["/admin/suppliers/create", "Create Supplier"],

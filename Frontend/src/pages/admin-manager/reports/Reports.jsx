@@ -3,10 +3,10 @@ import { FaDownload, FaChevronDown, FaChartLine, FaMoneyBillWave, FaChartBar, Fa
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from "recharts"
-import { adminManagerService } from "../../../services/adminManager.service"
-import { downloadCsv } from "../../../utils/downloadCsv"
-import { formatApiError } from "../../../utils/formatApiError"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import { downloadCsv } from "../../../utils/helpers/downloadCsv"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
+import formatDate from "../../../utils/formatters/formatDate"
 
 
 const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {

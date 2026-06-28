@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import { adminManagerService } from "../../../services/adminManager.service"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import formatDate from "../../../utils/formatters/formatDate"
 import toast from "react-hot-toast"
 import { cardClass, inputClass, tableHeadClass, tableHeadCellClass, tableCellClass } from "../adminManagerUi"
-import { PageHeader, TableEmpty } from "../components/AdminManagerUi"
-import { useConfirm } from "../components/confirm/useConfirm"
+import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
+import { useConfirm } from "../../../hooks/ui/useConfirm"
 
 function Subscriptions() {
   const [shops, setShops] = useState([])

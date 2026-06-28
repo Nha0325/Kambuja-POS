@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FaCircleInfo, FaUserShield } from "react-icons/fa6"
-import { adminManagerService } from "../../../services/adminManager.service"
+import { adminManagerService } from "../../../services/users/adminManager.service"
 import {
   cardClass,
   inputClass,
@@ -11,7 +11,7 @@ import {
   secondaryButtonClass,
   selectClass,
 } from "../adminManagerUi"
-import { PageHeader } from "../components/AdminManagerUi"
+import { PageHeader } from "../../../components/admin/AdminManagerUi"
 
 const getShopLocation = (shop) => {
   if (!shop || typeof shop !== "object") return "-"

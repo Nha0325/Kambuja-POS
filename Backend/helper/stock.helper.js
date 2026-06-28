@@ -1,6 +1,6 @@
-const Inventory = require("../models/Inventory.model")
-const Location = require("../models/Location.model")
-const StockMovement = require("../models/StockMovement.model")
+const Inventory = require('../models/inventory/Inventory.model')
+const Location = require('../models/system/Location.model')
+const StockMovement = require('../models/misc/StockMovement.model')
 
 const getProductStock = (product) => {
     return Number(product?.stock ?? product?.currentStock ?? 0)

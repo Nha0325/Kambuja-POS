@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { adminService } from "../../../services/admin.service"
+import { adminService } from "../../../services/users/admin.service"
 import {
   LuSearch,
   LuPackage,
@@ -16,7 +16,7 @@ import {
 } from "react-icons/lu"
 import dayjs from "dayjs"
 import { adminSurface } from "../adminPageUi"
-import { getImageUrl } from "../../../utils/getImageUrl"
+import { getImageUrl } from "../../../utils/helpers/getImageUrl"
 
 function Inventory() {
   const [rows, setRows] = useState([])

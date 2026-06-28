@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import useFetchOne from "../../../hooks/useFetchOne";
-import Modal from "../../../components/Modal";
-import useAddPaymentPurchase from "../../../hooks/useAddPaymentPurchase";
+import useFetchOne from "../../../hooks/common/useFetchOne";
+import Modal from "../../../components/ui/Modal";
+import useAddPaymentPurchase from "../../../hooks/purchase/useAddPaymentPurchase";
 import toast from "react-hot-toast";
 
 function PurchasePaymentModal({ open, editId, onClose }) {

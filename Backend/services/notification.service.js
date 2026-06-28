@@ -1,5 +1,5 @@
-const NotificationChannel = require("../models/NotificationChannel.model")
-const NotificationLog = require("../models/NotificationLog.model")
+const NotificationChannel = require('../models/engagement/NotificationChannel.model')
+const NotificationLog = require('../models/engagement/NotificationLog.model')
 const { sendTelegramMessage } = require("./telegram.service")
 
 const notifySaleCreated = async (sale) => {

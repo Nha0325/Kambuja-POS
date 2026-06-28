@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import { adminManagerService } from "../../../services/adminManager.service"
+import { adminManagerService } from "../../../services/users/adminManager.service"
 import { Link } from "react-router-dom"
-import formatDate from "../../../utils/formatDate"
+import formatDate from "../../../utils/formatters/formatDate"
 import toast from "react-hot-toast"
 
 
@@ -17,7 +17,7 @@ import {
   tableCellClass,
   modalClass
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty, StatusBadge } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty, StatusBadge } from "../../../components/admin/AdminManagerUi"
 
 function Shops() {
   const [search, setSearch] = useState("")

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import { api } from "../../configs/api";
+import { api } from "../../utils/config/api";
 import { FaMoneyBillWave, FaReceipt, FaCoins, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
-import { cashierService } from "../../services/cashier.service";
+import { cashierService } from "../../services/users/cashier.service";
 
 const formatUsd = (value) => {
   const num = Number(value || 0);

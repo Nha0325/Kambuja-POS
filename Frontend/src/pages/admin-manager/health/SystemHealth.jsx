@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
-import { adminManagerService } from "../../../services/adminManager.service"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import formatDate from "../../../utils/formatters/formatDate"
 import {
   FaServer,
   FaDatabase,
@@ -14,7 +14,7 @@ import {
   FaClock
 } from "react-icons/fa6"
 import toast from "react-hot-toast"
-import { useConfirm } from "../components/confirm/useConfirm"
+import { useConfirm } from "../../../hooks/ui/useConfirm"
 
 function SystemHealth() {
   const [healthData, setHealthData] = useState(null)

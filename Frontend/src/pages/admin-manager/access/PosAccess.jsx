@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { FaCashRegister, FaCircleInfo, FaStore, FaUserShield } from "react-icons/fa6"
-import { adminManagerService } from "../../../services/adminManager.service"
-import { formatApiError } from "../../../utils/formatApiError"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
 import {
   cardClass,
   primaryButtonClass,
@@ -11,7 +11,7 @@ import {
   tableHeadCellClass,
   tableHeadClass,
 } from "../adminManagerUi"
-import { PageHeader, StatusBadge, TableEmpty } from "../components/AdminManagerUi"
+import { PageHeader, StatusBadge, TableEmpty } from "../../../components/admin/AdminManagerUi"
 
 function PosAccess() {
   const [shops, setShops] = useState([])

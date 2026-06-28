@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useFindById as useFetchById } from "../../../hooks/useFindById";
-import Modal from "../../../components/Modal";
-import useUpdatePurchaseStatus from "../../../hooks/useUpdatePurchaseStatus";
+import { useFindById as useFetchById } from "../../../hooks/common/useFindById";
+import Modal from "../../../components/ui/Modal";
+import useUpdatePurchaseStatus from "../../../hooks/purchase/useUpdatePurchaseStatus";
 import toast from "react-hot-toast";
 
 function PurchaseStatusModal({ open, onClose, editId }) {

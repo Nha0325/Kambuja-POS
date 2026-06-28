@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { FaXmark } from "react-icons/fa6"
-import { locationService } from "../../../services/location.service"
-import { api } from "../../../configs/api"
+import { locationService } from "../../../services/system/location.service"
+import { api } from "../../../utils/config/api"
 
 export default function LocationModal({ isOpen, onClose, onSuccess, initialData }) {
   const [formData, setFormData] = useState({

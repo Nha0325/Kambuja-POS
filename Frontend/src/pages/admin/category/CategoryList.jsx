@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LuTrash2, LuPencil, LuSearch, LuPlus, LuPackage } from "react-icons/lu";
-import useCollection from "../../../hooks/useCollection";
-import useFetchData from "../../../hooks/useFetchData";
+import useCollection from "../../../hooks/common/useCollection";
+import useFetchData from "../../../hooks/common/useFetchData";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
-import formatDate from "../../../utils/formatDate";
+import formatDate from "../../../utils/formatters/formatDate";
 
 function Category() {
   const [search, setSearch] = useState("");

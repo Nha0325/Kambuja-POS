@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react"
-import { cashierService } from "../../services/cashier.service"
-import { baseUrl } from "../../configs/env"
+import { cashierService } from "../../services/users/cashier.service"
+import { baseUrl } from "../../utils/config/env"
 
 function StockCheck() {
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`

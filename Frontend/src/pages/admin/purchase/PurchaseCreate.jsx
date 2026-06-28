@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa6";
-import useFetchOneByCode from "../../../hooks/useFetchOneByCode";
+import useFetchOneByCode from "../../../hooks/common/useFetchOneByCode";
 import toast from "react-hot-toast";
-import useFetchData from "../../../hooks/useFetchData";
-import useCollection from "../../../hooks/useCollection";
+import useFetchData from "../../../hooks/common/useFetchData";
+import useCollection from "../../../hooks/common/useCollection";
 import { useNavigate } from "react-router";
-import { baseUrl } from "../../../configs/env";
+import { baseUrl } from "../../../utils/config/env";
 
 function CreatePurchase() {
   const [productCode, setProductCode] = useState("");

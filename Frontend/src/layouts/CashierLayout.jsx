@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Outlet, useLocation } from "react-router-dom"
-import TopMenu from "../components/TopMenu"
+import TopMenu from "../components/navigation/TopMenu"
 import CashierSidebar from "../components/navigation/CashierSidebar"
 
 const pageTitles = [

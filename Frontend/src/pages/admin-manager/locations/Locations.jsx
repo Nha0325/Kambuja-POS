@@ -6,7 +6,7 @@ import {
   FaBuilding, 
   FaStore,
 } from "react-icons/fa6"
-import { adminManagerService } from "../../../services/adminManager.service"
+import { adminManagerService } from "../../../services/users/adminManager.service"
 import { 
   cardClass, 
   inputClass, 
@@ -15,7 +15,7 @@ import {
   tableHeadCellClass, 
   tableCellClass 
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty, StatusBadge } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty, StatusBadge } from "../../../components/admin/AdminManagerUi"
 
 function Locations() {
   const [searchParams] = useSearchParams()

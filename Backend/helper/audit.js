@@ -1,4 +1,4 @@
-const AuditLog = require("../models/AuditLog.model")
+const AuditLog = require('../models/misc/AuditLog.model')
 
 const writeAuditLog = async (req, action, entityType, entityId = null, metadata = {}) => {
     await AuditLog.create({

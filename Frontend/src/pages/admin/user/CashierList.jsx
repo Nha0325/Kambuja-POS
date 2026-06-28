@@ -1,9 +1,9 @@
 import { useState } from "react";
-import useFetchData from "../../../hooks/useFetchData";
+import useFetchData from "../../../hooks/common/useFetchData";
 import { Link } from "react-router-dom";
 import { IoPencilSharp } from "react-icons/io5";
 import { IoMdTrash } from "react-icons/io";
-import useCollection from "../../../hooks/useCollection";
+import useCollection from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";

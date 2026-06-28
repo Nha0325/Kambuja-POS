@@ -1,5 +1,5 @@
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/Protected"
+import Protected from "../components/auth/Protected"
 import AdminManagerLayout from "../layouts/AdminManagerLayout"
 import Dashboard from "../pages/admin-manager/dashboard"
 import { CreateShop, EditShop, Shops } from "../pages/admin-manager/shops"
@@ -16,7 +16,7 @@ import PosAccess from "../pages/admin-manager/access"
 
 import ProductList from "../pages/admin-manager/products/ProductList"
 import ProductDetail from "../pages/admin-manager/products/ProductDetail"
-import { ROLES } from "../utils/role"
+import { ROLES } from "../utils/helpers/role"
 
 export const adminManagerRoutes = (
   <Route

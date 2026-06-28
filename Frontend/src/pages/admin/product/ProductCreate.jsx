@@ -1,11 +1,11 @@
 import { useState } from "react";
-import useFetchData from "../../../hooks/useFetchData";
+import useFetchData from "../../../hooks/common/useFetchData";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import useStorage from "../../../hooks/useStorage";
-import useCollection from "../../../hooks/useCollection";
-import ProductCodePreview from "../../../components/ProductCodePreview";
-import ProductLabelPrintModal from "../../../components/ProductLabelPrintModal";
+import useStorage from "../../../hooks/common/useStorage";
+import useCollection from "../../../hooks/common/useCollection";
+import ProductCodePreview from "../../../components/product/ProductCodePreview";
+import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
 
 function CreateProduct() {
   const [name, setName] = useState("");

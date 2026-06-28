@@ -1,5 +1,5 @@
 import { FaTrash } from "react-icons/fa6";
-import useFetchOneByCode from "../../../hooks/useFetchOneByCode";
+import useFetchOneByCode from "../../../hooks/common/useFetchOneByCode";
 import { useState } from "react";
 import toast from "react-hot-toast";
 function PrintLabel() {

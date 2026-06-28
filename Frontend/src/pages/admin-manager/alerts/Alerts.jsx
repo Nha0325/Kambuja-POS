@@ -9,10 +9,10 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6"
-import { adminManagerService } from "../../../services/adminManager.service"
-import { downloadCsv } from "../../../utils/downloadCsv"
-import { formatApiError } from "../../../utils/formatApiError"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import { downloadCsv } from "../../../utils/helpers/downloadCsv"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
+import formatDate from "../../../utils/formatters/formatDate"
 import {
   cardClass,
   inputClass,
@@ -21,7 +21,7 @@ import {
   tableHeadCellClass,
   tableHeadClass,
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
 
 const severityClass = {
   CRITICAL: "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/50",

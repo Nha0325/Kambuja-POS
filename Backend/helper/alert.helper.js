@@ -1,4 +1,4 @@
-const Alert = require("../models/Alert.model");
+const Alert = require('../models/system/Alert.model');
 const telegramService = require("../services/telegram.service");
 
 exports.createAlert = async (payload) => {
@@ -106,7 +106,7 @@ exports.checkStockAndAlert = async (product) => {
         let reorderLevel = 10; // default
 
         // Fetch reorderLevel from Inventory
-        const Inventory = require("../models/Inventory.model");
+        const Inventory = require('../models/inventory/Inventory.model');
         const inventory = await Inventory.findOne({ product: product._id, shopId: product.shopId });
         if (inventory && inventory.reorderLevel !== undefined) {
             reorderLevel = Number(inventory.reorderLevel);

@@ -1,6 +1,6 @@
 import useCurrent from '../hooks/auth/useCurrent'
 import { useNavigate } from 'react-router'
-import { homeForRole } from '../utils/role'
+import { homeForRole } from '../utils/helpers/role'
 import { FaMapLocationDot } from "react-icons/fa6"
 
 function NotFound() {

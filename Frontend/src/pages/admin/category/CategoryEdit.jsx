@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import useCollection from "../../../hooks/useCollection";
-import useFetchOne from "../../../hooks/useFetchOne";
+import useCollection from "../../../hooks/common/useCollection";
+import useFetchOne from "../../../hooks/common/useFetchOne";
 
 import toast from "react-hot-toast";
 import dayjs from "dayjs";

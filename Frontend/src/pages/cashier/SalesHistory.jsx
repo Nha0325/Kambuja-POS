@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { Link } from "react-router-dom"
-import { api } from "../../configs/api"
-import formatDate from "../../utils/formatDate"
+import { api } from "../../utils/config/api"
+import formatDate from "../../utils/formatters/formatDate"
 
 function SalesHistory() {
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`

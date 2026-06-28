@@ -1,4 +1,4 @@
-import SalesReportChart from "../../../components/RevenueChart.jsx";
+import SalesReportChart from "../../../components/dashboard/RevenueChart.jsx";
 import { Link } from "react-router";
 import { 
   LuBanknote, 
@@ -11,10 +11,10 @@ import {
   LuCalendar,
   LuListChecks
 } from "react-icons/lu";
-import useFetchData from "../../../hooks/useFetchData";
-import useFetchGeneralReport from "../../../hooks/useFetchGeneralReport";
-import { use30DaysAgoReport } from "../../../hooks/use30DaysAgoReport";
-import formatDate from "../../../utils/formatDate";
+import useFetchData from "../../../hooks/common/useFetchData";
+import useFetchGeneralReport from "../../../hooks/reports/useFetchGeneralReport";
+import { use30DaysAgoReport } from "../../../hooks/reports/use30DaysAgoReport";
+import formatDate from "../../../utils/formatters/formatDate";
 
 const currency = "$";
 const formatCurrency = (value) => `${currency}${Number(value || 0).toFixed(2)}`;

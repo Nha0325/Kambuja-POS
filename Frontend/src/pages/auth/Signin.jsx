@@ -2,7 +2,7 @@ import { useState } from "react";
 import useSignin from "../../hooks/auth/useSignin";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
-import { homeForRole } from "../../utils/role";
+import { homeForRole } from "../../utils/helpers/role";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");

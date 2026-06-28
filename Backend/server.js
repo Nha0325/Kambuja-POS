@@ -19,7 +19,7 @@ console.log('[DEBUG] Auth routes mounted: ' + (authRoutes.length > 0 ? 'YES (' +
 
 // connect to the database
 connectToDatabase().then(async function() {
-    const Alert = require('./models/Alert.model');
+    const Alert = require('./models/system/Alert.model');
     const alertCount = await Alert.countDocuments();
     if (alertCount === 0) {
         await Alert.insertMany([

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { Link } from "react-router-dom"
-import { cashierService } from "../../services/cashier.service"
-import formatDate from "../../utils/formatDate"
+import { cashierService } from "../../services/users/cashier.service"
+import formatDate from "../../utils/formatters/formatDate"
 import useCurrent from "../../hooks/auth/useCurrent"
 
 function TodaySales() {

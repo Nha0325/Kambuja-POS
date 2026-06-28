@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../../../configs/api";
+import { api } from "../../../utils/config/api";
 import { LuSearch, LuEye } from "react-icons/lu";
 import { FaBoxesStacked, FaStore, FaTriangleExclamation, FaCircleExclamation } from "react-icons/fa6";
 

@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LuTrash2, LuPencil, LuSearch, LuPlus, LuTags, LuPrinter } from "react-icons/lu";
-import { baseUrl } from "../../../configs/env";
-import { useCollection } from "../../../hooks/useCollection";
-import { useQuery } from "../../../hooks/useQuery";
+import { baseUrl } from "../../../utils/config/env";
+import { useCollection } from "../../../hooks/common/useCollection";
+import { useQuery } from "../../../hooks/common/useQuery";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
-import ProductLabelPrintModal from "../../../components/ProductLabelPrintModal";
+import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
 
 function Product() {
   const [search, setSearch] = useState("");

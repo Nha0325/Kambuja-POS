@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { adminManagerService } from "../../../services/adminManager.service"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import formatDate from "../../../utils/formatters/formatDate"
 import {
   FaStore,
   FaUserShield,

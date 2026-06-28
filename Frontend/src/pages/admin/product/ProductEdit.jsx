@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useQuery } from "../../../hooks/useQuery";
-import useStorage from "../../../hooks/useStorage";
-import { useCollection } from "../../../hooks/useCollection";
-import { useFindById } from "../../../hooks/useFindById";
-import { baseUrl } from "../../../configs/env";
-import ProductCodePreview from "../../../components/ProductCodePreview";
-import ProductLabelPrintModal from "../../../components/ProductLabelPrintModal";
+import { useQuery } from "../../../hooks/common/useQuery";
+import useStorage from "../../../hooks/common/useStorage";
+import { useCollection } from "../../../hooks/common/useCollection";
+import { useFindById } from "../../../hooks/common/useFindById";
+import { baseUrl } from "../../../utils/config/env";
+import ProductCodePreview from "../../../components/product/ProductCodePreview";
+import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
 
 function EditProduct() {
   const [image, setImage] = useState(null);

@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
-import { adminService } from "../../../services/admin.service"
-import { productService } from "../../../services/product.service"
+import { adminService } from "../../../services/users/admin.service"
+import { productService } from "../../../services/inventory/product.service"
 import { LuSlidersHorizontal, LuInfo, LuPackage } from "react-icons/lu"
 import { adminSurface } from "../adminPageUi"
 

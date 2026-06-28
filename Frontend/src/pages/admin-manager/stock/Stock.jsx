@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { FaDownload, FaMagnifyingGlass, FaTriangleExclamation, FaFilter, FaXmark, FaEye, FaPenToSquare, FaClockRotateLeft } from "react-icons/fa6"
-import { adminService } from "../../../services/admin.service"
-import { api } from "../../../configs/api"
-import { downloadCsv } from "../../../utils/downloadCsv"
-import { formatApiError } from "../../../utils/formatApiError"
+import { adminService } from "../../../services/users/admin.service"
+import { api } from "../../../utils/config/api"
+import { downloadCsv } from "../../../utils/helpers/downloadCsv"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
 import {
   cardClass,
   inputClass,
@@ -14,7 +14,7 @@ import {
   tableHeadClass,
   modalClass,
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
 
 function getShopName(row) {
   if (row.shopId && typeof row.shopId === "object") return row.shopId.name || row.shopId.code || "-"

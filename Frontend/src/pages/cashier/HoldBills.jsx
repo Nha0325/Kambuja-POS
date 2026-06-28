@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import useFetchData from "../../hooks/useFetchData";
-import formatUsd from "../../utils/formatCurrency";
-import Loading from "../../components/Loading";
+import useFetchData from "../../hooks/common/useFetchData";
+import formatUsd from "../../utils/formatters/formatCurrency";
+import Loading from "../../components/ui/Loading";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { api } from "../../configs/api";
+import { api } from "../../utils/config/api";
 import {
   FaCalendarDay,
   FaCashRegister,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { notificationService } from "../../../services/notification.service"
-import formatDate from "../../../utils/formatDate"
+import { notificationService } from "../../../services/engagement/notification.service"
+import formatDate from "../../../utils/formatters/formatDate"
 import { adminSurface } from "../adminPageUi"
 
 function NotificationLogs() {

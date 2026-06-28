@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useSaleReport } from "../../../hooks/useSaleReport";
+import { useSaleReport } from "../../../hooks/reports/useSaleReport";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
-import { adminManagerService } from "../../../services/adminManager.service"
-import { formatApiError } from "../../../utils/formatApiError"
-import formatDate from "../../../utils/formatDate"
+import { adminManagerService } from "../../../services/users/adminManager.service"
+import { formatApiError } from "../../../utils/formatters/formatApiError"
+import formatDate from "../../../utils/formatters/formatDate"
 
 import { 
   cardClass, 
@@ -14,7 +14,7 @@ import {
   tableHeadCellClass, 
   tableCellClass 
 } from "../adminManagerUi"
-import { PageHeader, TableEmpty, StatusBadge } from "../components/AdminManagerUi"
+import { PageHeader, TableEmpty, StatusBadge } from "../../../components/admin/AdminManagerUi"
 
 
 function Admins() {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { useCollection } from "../../../hooks/useCollection";
+import { useCollection } from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
-import { useFindById } from "../../../hooks/useFindById";
+import { useFindById } from "../../../hooks/common/useFindById";
 
 function EditSupplier() {
   const [businessName, setBusinessName] = useState("");

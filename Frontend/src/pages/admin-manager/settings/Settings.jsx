@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react"
 import { FaGlobe, FaBell, FaDatabase, FaShieldHalved, FaCreditCard } from "react-icons/fa6"
-import { PageHeader } from "../components/AdminManagerUi"
+import { PageHeader } from "../../../components/admin/AdminManagerUi"
 import { cardClass } from "../adminManagerUi"
 import toast from "react-hot-toast"
-import { adminManagerService } from "../../../services/adminManager.service"
+import { adminManagerService } from "../../../services/users/adminManager.service"
 
 const customInputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20"
 const customInputErrorClass = "h-10 w-full rounded-lg border border-red-300 dark:border-red-500/50 bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"

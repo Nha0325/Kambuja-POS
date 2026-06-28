@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { adminService } from "../../../services/admin.service"
+import { adminService } from "../../../services/users/admin.service"
 import { adminSurface } from "../adminPageUi"
 
 function ShopSettings() {

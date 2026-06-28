@@ -1,7 +1,7 @@
 import { useState } from "react";
-import useFetchData from "../../../hooks/useFetchData";
+import useFetchData from "../../../hooks/common/useFetchData";
 import { Link } from "react-router-dom";
-import formatDate from "../../../utils/formatDate";
+import formatDate from "../../../utils/formatters/formatDate";
 import { FaCreditCard } from "react-icons/fa6";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import { TbTruckDelivery } from "react-icons/tb";

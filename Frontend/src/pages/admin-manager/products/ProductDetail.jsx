@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { api } from "../../../configs/api";
-import { baseUrl } from "../../../configs/env";
+import { api } from "../../../utils/config/api";
+import { baseUrl } from "../../../utils/config/env";
 import { LuArrowLeft, LuPackageSearch, LuHistory, LuListOrdered } from "react-icons/lu";
 import { FaStore, FaBoxOpen, FaMoneyBillWave, FaShieldHalved } from "react-icons/fa6";
 

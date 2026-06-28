@@ -9,7 +9,7 @@ import {
   IoPersonOutline,
   IoSaveOutline,
 } from "react-icons/io5";
-import { useCollection } from "../../../hooks/useCollection";
+import { useCollection } from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
 
 const inputClass =

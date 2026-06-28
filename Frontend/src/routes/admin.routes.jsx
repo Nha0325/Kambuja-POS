@@ -1,5 +1,5 @@
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/Protected"
+import Protected from "../components/auth/Protected"
 import AdminLayout from "../layouts/AdminLayout"
 import Home from "../pages/admin/dashboard"
 import { SupplierCreate, SupplierEdit, SupplierList } from "../pages/admin/supplier"
@@ -8,12 +8,12 @@ import { CategoryCreate, CategoryEdit, CategoryList } from "../pages/admin/categ
 import { PrintLabel, ProductCreate, ProductEdit, ProductList } from "../pages/admin/product"
 import { PurchaseCreate, PurchaseList } from "../pages/admin/purchase"
 import { CashierCreate, CashierEdit, CashierList } from "../pages/admin/user"
-import ListSale from "../pages/sale/ListSale"
+import ListSale from "../pages/cashier/pos/ListSale"
 import { SaleReport, StockReport } from "../pages/admin/report"
 import { Inventory, StockAdjustment, StockIn, History } from "../pages/admin/inventory"
 import { NotificationChannels, NotificationLogs } from "../pages/admin/notification"
 import ShopSettings from "../pages/admin/settings"
-import { ROLES } from "../utils/role"
+import { ROLES } from "../utils/helpers/role"
 
 const adminElement = (
   <Protected allowedRoles={[ROLES.ADMIN]}>
