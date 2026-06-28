@@ -134,13 +134,23 @@ exports.signin = async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV == "production",
             maxAge: process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
-            domain: process.env.COOKIE_DOMAIN ? process.env.COOKIE_DOMAIN : "localhost",
+            domain: process.env.COOKIE_DOMAIN || undefined,
             sameSite: process.env.COOKIE_SAMESITE
         })
 
         res.status(200).json({
             success: true,
-            result:{
+            message: "Login success",
+            data: {
+                user: {
+                    username: user.username,
+                    email: user.email,
+                    role: normalizeRole(user.role),
+                    shopId: user.shopId,
+                },
+                accessToken: token
+            },
+            result:{ // keeping result for backward compatibility if needed
                 username: user.username,
                 email: user.email,
                 role: normalizeRole(user.role),
@@ -166,7 +176,7 @@ exports.signout = async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV == "production",
             maxAge: process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
-            domain: process.env.COOKIE_DOMAIN ? process.env.COOKIE_DOMAIN : "localhost",
+            domain: process.env.COOKIE_DOMAIN || undefined,
             sameSite: process.env.COOKIE_SAMESITE
         })
         res.status(200).json({
@@ -187,9 +197,12 @@ exports.me = async (req, res, next) => {
             })
         }
 
+        const userData = await req.user.populate("shopId", "name code status")
         res.status(200).json({
             success: true,
-            result: await req.user.populate("shopId", "name code status")
+            message: "Current user",
+            data: userData,
+            result: userData // keeping for backward compatibility
         })
     } catch (error) {
         next(error)

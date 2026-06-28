@@ -10,7 +10,7 @@ import { PurchaseCreate, PurchaseList } from "../pages/admin/purchase"
 import { CashierCreate, CashierEdit, CashierList } from "../pages/admin/user"
 import ListSale from "../pages/sale/ListSale"
 import { SaleReport, StockReport } from "../pages/admin/report"
-import { Inventory, StockAdjustment, StockIn } from "../pages/admin/inventory"
+import { Inventory, StockAdjustment, StockIn, History } from "../pages/admin/inventory"
 import { NotificationChannels, NotificationLogs } from "../pages/admin/notification"
 import ShopSettings from "../pages/admin/settings"
 import { ROLES } from "../utils/role"
@@ -31,6 +31,7 @@ export const adminRoutes = (
   <>
     <Route path="/admin" element={stockElement}>
       <Route path="inventory" element={<Inventory />} />
+      <Route path="inventory/history" element={<History />} />
       <Route path="inventory/stock-in" element={<StockIn />} />
       <Route path="inventory/adjustment" element={<StockAdjustment />} />
       <Route path="inventory/adjust" element={<Navigate to="/admin/inventory/adjustment" replace />} />

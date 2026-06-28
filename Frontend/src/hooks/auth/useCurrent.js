@@ -4,45 +4,60 @@ import toast from "react-hot-toast"
 import { formatApiError } from "../../utils/formatApiError"
 
 const useCurrent = () => {
-
     const [isLoading, setIsLoading] = useState(true)
     const [data, setData] = useState(null)
 
     useEffect(() => {
-        const fetchData = async() => {
-        if (localStorage.getItem("posAuth") !== "true") {
-            setData(null)
-            setIsLoading(false)
-            return
-        }
-     
-        try {
-            const res = await api.get('/auth/me')
-            if(res.data?.success){
-                setData(res.data?.result)
-            }
-        } catch (error) {
-            if (error?.response?.status === 401) {
-                localStorage.removeItem("posAuth")
-            }
-            if (error?.response?.status !== 401) {
-                const msg = formatApiError(error)
-                toast.error(msg)
-            }
-            setData(null)
-        } finally{
-            setIsLoading(false)
-        }
-    }
-    fetchData()
+        let mounted = true;
 
-    },[])
+        const fetchData = async() => {
+            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+            
+            if (!token && localStorage.getItem("posAuth") !== "true") {
+                if (mounted) {
+                    setData(null)
+                    setIsLoading(false)
+                }
+                return
+            }
+         
+            try {
+                const res = await api.get('/auth/me')
+                if (res.data?.success && mounted) {
+                    setData(res.data?.data || res.data?.result || null)
+                }
+            } catch (error) {
+                if (error?.response?.status === 401) {
+                    localStorage.removeItem("posAuth")
+                    localStorage.removeItem("accessToken")
+                    localStorage.removeItem("token")
+                    localStorage.removeItem("user")
+                }
+                if (error?.response?.status !== 401 && error?.name !== 'CanceledError') {
+                    const msg = formatApiError(error)
+                    toast.error(msg)
+                }
+                if (mounted) {
+                    setData(null)
+                }
+            } finally {
+                if (mounted) {
+                    setIsLoading(false)
+                }
+            }
+        }
+        
+        fetchData()
+        
+        return () => {
+            mounted = false;
+        };
+    }, [])
 
     return {
         isLoading,
         data
     }
-
 }
 
 export default useCurrent

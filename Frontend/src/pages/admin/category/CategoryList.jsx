@@ -16,12 +16,14 @@ function Category() {
   const [statusFilter, setStatusFilter] = useState("All");
 
   const condition = statusFilter !== "All" ? `status=${statusFilter}` : "";
-  const { data, totalPage, isLoading, meta } = useFetchData("categories", page, limit, search, refetch, condition);
+  const { data, totalPage, isLoading } = useFetchData("categories", page, limit, search, refetch, condition);
+  const { data: allCategories } = useFetchData("categories", 1, 9999, "", refetch);
+  const { data: allProducts } = useFetchData("products", 1, 9999, "", refetch);
   const { remove, isLoading: isDeleting } = useCollection("categories");
 
-  const totalCategories = meta?.totalCategories || 0;
-  const activeCategories = meta?.totalActive || 0;
-  const productsLinked = meta?.totalProductsLinked || 0;
+  const totalCategories = allCategories?.length || 0;
+  const activeCategories = allCategories?.filter(c => c.status === "ACTIVE" || c.isActive === true || !c.status).length || 0;
+  const productsLinked = allProducts?.filter(p => p.category || p.categoryId).length || 0;
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure? you want to delete!")) {
@@ -155,7 +157,15 @@ function Category() {
               )}
 
               {!isLoading &&
-                data?.map((item, idx) => (
+                data?.map((item, idx) => {
+                  const productsCount = allProducts?.filter(p => 
+                    p.categoryId === item._id ||
+                    p.category?._id === item._id ||
+                    p.category === item.name ||
+                    p.category === item._id
+                  ).length || 0;
+
+                  return (
                   <tr
                     key={item?._id || idx}
                     className={adminSurface.row}
@@ -165,7 +175,7 @@ function Category() {
                     </td>
                     <td className={`${adminSurface.td}`}>
                       <div className="flex flex-col">
-                        <span className="font-bold text-[#F8FAFC]">{item.name || "-"}</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{item.name || "-"}</span>
                         {item.note && (
                           <span className="text-xs text-[#6B7280] mt-0.5 max-w-xs truncate" title={item.note}>{item.note}</span>
                         )}
@@ -173,7 +183,7 @@ function Category() {
                     </td>
                     <td className={`${adminSurface.td}`}>
                       <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-[#2A2E36] text-[#A9A6BB] text-xs font-bold">
-                        {item.productsCount || 0}
+                        {productsCount}
                       </span>
                     </td>
                     <td className={`${adminSurface.td}`}>
@@ -208,7 +218,7 @@ function Category() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )})}
             </tbody>
           </table>
         </div>

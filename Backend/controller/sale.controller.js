@@ -2,14 +2,20 @@ const calculatePaymentStatus = require("../helper/calculatePaymentStatus")
 const Product = require("../models/Product.model")
 const Sale = require("../models/Sale.model")
 const { generateInvoiceNumber } = require("./counter.controller")
-const Inventory = require("../models/Inventory.model")
-const StockMovement = require("../models/StockMovement.model")
 const Payment = require("../models/Payment.model")
 const Receipt = require("../models/Receipt.model")
 const AuditLog = require("../models/AuditLog.model")
 const runTransaction = require("../helper/runTransaction")
-const { notifySaleCreated } = require("../services/notification.service")
 const { checkStockAndAlert } = require("../helper/alert.helper")
+const unitHelper = require("../helper/unit.helper")
+const { notifySaleCreated } = require("../services/notification.service")
+const {
+    getProductStock,
+    setProductStock,
+    getDefaultLocationId,
+    syncInventory,
+    createStockMovement,
+} = require("../helper/stock.helper")
 
 const createHttpError = (statusCode, message) => {
     const error = new Error(message)
@@ -20,7 +26,7 @@ const createHttpError = (statusCode, message) => {
 exports.create = async (req, res, next) => {
     try {
         let {items, paidAmount} = req.body
-        
+
         paidAmount = Number(paidAmount || 0);
 
         // Ensure user is authenticated
@@ -60,8 +66,8 @@ exports.create = async (req, res, next) => {
             }
 
             const productKey = String(product)
-            normalizedItems.push({ product, quantity })
-            quantityByProduct.set(productKey, (quantityByProduct.get(productKey) || 0) + quantity)
+            normalizedItems.push({ product, quantity, saleUnit: item.saleUnit })
+            quantityByProduct.set(productKey, (quantityByProduct.get(productKey) || 0) + quantity) // this is just for fetching, not exact base quantity
         }
 
         //step 1: Fetch all products at once to validate stock and price
@@ -73,40 +79,70 @@ exports.create = async (req, res, next) => {
 
         const productById = new Map(products.map((product) => [product._id.toString(), product]))
         const saleItems = []
+        const requiredQtyByProduct = new Map()
         let totalCost = 0
 
         //step 2: Validate stock and backend-owned prices for each product
-        for(const [productId, quantity] of quantityByProduct.entries()){
-            const product = productById.get(productId)
+        for (const item of normalizedItems) {
+            const product = productById.get(String(item.product))
             if(!product){
                 return res.status(404).json({
                     success:false,
-                    message: `Product not found with ID: ${productId}`
+                    message: `Product not found with ID: ${item.product}`
                 })
             }
-            if(product.currentStock < quantity){
-                return res.status(400).json({
-                    success: false,
-                    message: `Insufficient stock for product: ${product.name}`
-                })
-            }
+            const inputUnit = item.saleUnit || product.unitConfig?.baseUnit?.code;
+            const convertedQtyBase = unitHelper.convertToBaseQty(item.quantity, inputUnit, product);
+
+            requiredQtyByProduct.set(
+                String(product._id),
+                (requiredQtyByProduct.get(String(product._id)) || 0) + convertedQtyBase
+            )
             if(!Number.isFinite(Number(product.salePrice)) || Number(product.salePrice) < 0){
                 return res.status(400).json({
                     success: false,
                     message: `Invalid sale price for product: ${product.name}`
                 })
             }
+
+            item.convertedQtyBase = convertedQtyBase;
+        }
+
+        for (const [productId, requiredQty] of requiredQtyByProduct.entries()) {
+            const product = productById.get(productId)
+            const currentStockBase = getProductStock(product)
+
+            if(currentStockBase < requiredQty){
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient stock for product: ${product.name}`
+                })
+            }
         }
 
         for (const item of normalizedItems) {
             const product = productById.get(String(item.product))
-            const unitPrice = Number(product.salePrice)
-            const totalPrice = unitPrice * item.quantity
+            const unitPrice = Number(product.salePrice) // Should use the frontend provided one, wait, no, frontend provides it but we override it here. Wait, what about saleUnit?
+            // If they purchase by case, we should use pricing.sellPricePerPurchaseUnit.
+            const isPurchaseUnit = item.saleUnit === product.unitConfig?.purchaseUnit?.code;
+            const actualUnitPrice = isPurchaseUnit ? (product.pricing?.sellPricePerPurchaseUnit || product.salePrice) : (product.pricing?.sellPricePerBaseUnit || product.salePrice);
+            const totalPrice = actualUnitPrice * item.quantity
+
+            const costPerBaseUnit = Number(product.pricing?.costPerBaseUnit || product.costPrice || 0);
+            const totalCostValue = costPerBaseUnit * item.convertedQtyBase;
+            const profit = totalPrice - totalCostValue;
 
             saleItems.push({
                 product: product._id,
                 quantity: item.quantity,
-                unitPrice,
+                saleUnit: item.saleUnit,
+                convertedQtyBase: item.convertedQtyBase,
+                unitsPerPurchaseUnit: product.unitConfig?.unitsPerPurchaseUnit,
+                baseUnit: product.unitConfig?.baseUnit?.code,
+                pricePerUnit: actualUnitPrice,
+                costPerBaseUnit,
+                profit,
+                unitPrice: actualUnitPrice,
                 totalPrice,
             })
             totalCost += totalPrice
@@ -118,14 +154,19 @@ exports.create = async (req, res, next) => {
                 message: "Total cost must be greater than zero."
             });
         }
-        
+
         //Step 3: Calculate payment status and generate invoice
         const paymentStatus = calculatePaymentStatus(totalCost, paidAmount)
 
         const savedSale = await runTransaction(async (session) => {
             const invoiceNumber = await generateInvoiceNumber(session)
+            const locationId = await getDefaultLocationId(req.shopId, session)
+            const workingStock = new Map(
+                products.map((product) => [product._id.toString(), getProductStock(product)])
+            )
             const sale = new Sale({
                 shopId: req.shopId,
+                locationId,
                 user: req.user._id,
                 items: saleItems,
                 invoiceNumber,
@@ -138,41 +179,56 @@ exports.create = async (req, res, next) => {
             await sale.save(session ? { session } : undefined)
 
             for (const item of saleItems) {
+                const productId = String(item.product)
+                const quantityBefore = workingStock.get(productId)
+                const quantityAfter = quantityBefore - Number(item.convertedQtyBase)
+                if (quantityAfter < 0) {
+                    const productName = productById.get(productId)?.name || item.product
+                    throw createHttpError(400, `Insufficient stock for product: ${productName}`)
+                }
+
+                const stockMatch = {
+                    _id: item.product,
+                    ...req.shopFilter,
+                    $or: [
+                        { stock: quantityBefore },
+                        { stock: { $exists: false }, stockQtyBase: quantityBefore },
+                        { stock: { $exists: false }, stockQtyBase: { $exists: false }, currentStock: quantityBefore },
+                    ],
+                }
                 const product = await Product.findOneAndUpdate(
-                    { _id: item.product, ...req.shopFilter, currentStock: { $gte: item.quantity } },
-                    { $inc: { currentStock: -item.quantity } },
+                    stockMatch,
+                    { $set: { stock: quantityAfter, currentStock: quantityAfter, stockQtyBase: quantityAfter } },
                     { new: true, ...(session ? { session } : {}) }
                 )
                 if (!product) {
                     const productName = productById.get(String(item.product))?.name || item.product
                     throw createHttpError(400, `Insufficient stock for product: ${productName}`)
                 }
-                const quantityAfter = Number(product.currentStock)
-                const quantityBefore = quantityAfter + Number(item.quantity)
+                setProductStock(product, quantityAfter)
+                workingStock.set(productId, quantityAfter)
 
                 void checkStockAndAlert(product);
 
-                await Inventory.findOneAndUpdate(
-                    { shopId: req.shopId, product: product._id },
-                    { quantity: quantityAfter },
-                    {
-                        new: true,
-                        upsert: true,
-                        runValidators: true,
-                        ...(session ? { session } : {}),
-                    }
-                )
-                await StockMovement.create([{
+                await syncInventory({ shopId: req.shopId, locationId, product, stock: quantityAfter, session })
+                await createStockMovement({
                     shopId: req.shopId,
-                    product: product._id,
-                    user: req.user._id,
+                    locationId,
+                    product,
+                    userId: req.user._id,
                     type: "SALE",
-                    quantity: -Number(item.quantity),
-                    quantityBefore,
-                    quantityAfter,
+                    qtyChange: -Number(item.convertedQtyBase),
+                    inputQty: -Number(item.quantity),
+                    inputUnit: item.saleUnit,
+                    convertedQtyBase: Number(item.convertedQtyBase),
+                    beforeQty: quantityBefore,
+                    afterQty: quantityAfter,
+                    reason: "POS sale",
                     referenceType: "Sale",
                     referenceId: sale._id,
-                }], session ? { session } : undefined)
+                    note: `POS sale ${invoiceNumber}`,
+                    session,
+                })
             }
 
             if (paidAmount > 0) {
@@ -228,8 +284,8 @@ exports.findAll = async (req, res, next) => {
 
         if(req.query.search){
             querySearch["$or"] = [
-                { $expr: { 
-                    $regexMatch: { input: { $toString: "$invoiceNumber" }, regex: req.query.search, options: "i" } 
+                { $expr: {
+                    $regexMatch: { input: { $toString: "$invoiceNumber" }, regex: req.query.search, options: "i" }
                 }}
             ]
         }
@@ -237,8 +293,8 @@ exports.findAll = async (req, res, next) => {
         const docs = await Sale
                             .find(querySearch)
                             .populate("user","username name role")
-                            .populate("items.product", "name imageUrl salePrice costPrice currentStock")
-                            .skip(skip) 
+                            .populate("items.product", "name imageUrl salePrice costPrice stock currentStock")
+                            .skip(skip)
                             .limit(limit)
                             .sort({_id: -1})
                             .exec()
@@ -262,7 +318,7 @@ exports.findOne = async (req, res, next) => {
         const doc =await Sale
                           .findOne({ _id: id, ...req.shopFilter })
                             .populate("user","username name role")
-                            .populate("items.product", "name imageUrl salePrice costPrice currentStock")
+                            .populate("items.product", "name imageUrl salePrice costPrice stock currentStock")
         if(!doc){
             return res.status(404).json({
                 success: false,
@@ -298,7 +354,11 @@ exports.checkStock = async (req, res, next) => {
                 message: "Product not found!"
             })
         }
-        if(doc.currentStock < stock){
+
+        // Always validate using base quantity in case we are passed multiple purchase unit combinations
+        const currentStockBase = getProductStock(doc);
+
+        if(currentStockBase < stock){
             return res.status(400).json({
                 success: false,
                 message: `Insufficient stock for product: ${doc.name}`
@@ -309,7 +369,7 @@ exports.checkStock = async (req, res, next) => {
         res.status(200).json({
             success: true,
             result: "In stock"
-        })      
+        })
     } catch (error) {
         next(error)
     }
@@ -333,7 +393,7 @@ exports.addPayment = async (req, res, next) => {
                 success: false,
                 message: "Sale not found with that ID!"
             })
-        } 
+        }
 
         const totalCost = Number(sale.totalCost || 0)
         const paidAmount = Number(sale.paidAmount || 0) + additionalPaid
@@ -379,7 +439,7 @@ exports.findToday = async (req, res, next) => {
             createdAt: { $gte: start, $lte: end },
         })
             .populate("user", "username role")
-            .populate("items.product", "name code salePrice")
+            .populate("items.product", "name code salePrice stock currentStock")
             .sort({ createdAt: -1 })
 
         res.status(200).json({

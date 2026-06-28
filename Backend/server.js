@@ -33,8 +33,8 @@ connectToDatabase().then(async function() {
         console.log('Seeded sample alerts');
     }
 
-    app.listen(port, function() {
-        console.log('Server is running on port ' + port);
+    app.listen(port, "0.0.0.0", function() {
+        console.log('Server is running on 0.0.0.0:' + port);
     });
 }).catch(function(error) {
     console.error('Failed to connect to database:', error.message);

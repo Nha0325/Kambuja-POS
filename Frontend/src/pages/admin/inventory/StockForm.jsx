@@ -96,7 +96,7 @@ function StockForm({ mode }) {
       <div className={adminSurface.header}>
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#3350BF]/20 text-[#22D3EE] border border-[#3350BF]/50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-[#3350BF]/20 text-violet-600 dark:text-[#22D3EE] border border-violet-200 dark:border-[#3350BF]/50">
               {isStockIn ? <LuPackagePlus size={20} /> : <LuSlidersHorizontal size={20} />}
             </div>
             <div>
@@ -121,12 +121,12 @@ function StockForm({ mode }) {
 
           {/* Section 1: Product Selection */}
           <div className="space-y-5">
-            <h2 className="flex items-center gap-2 text-sm font-bold text-[#F8FAFC] border-b border-[#2A2E36] pb-3">
-              <LuPackage className="text-[#22D3EE]" /> Product Details
+            <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
+              <LuPackage className="text-violet-600 dark:text-[#22D3EE]" /> Product Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Select Product*</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Select Product*</label>
                 <select
                   required
                   className={`${adminSurface.select} w-full`}
@@ -145,7 +145,7 @@ function StockForm({ mode }) {
               {!isStockIn && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Type*</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Type*</label>
                     <select
                       required
                       className={`${adminSurface.select} w-full`}
@@ -158,7 +158,7 @@ function StockForm({ mode }) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Reason*</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Reason*</label>
                     <select
                       required
                       className={`${adminSurface.select} w-full`}
@@ -178,7 +178,7 @@ function StockForm({ mode }) {
               )}
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Quantity*</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Quantity*</label>
                 <input
                   required
                   type="number"
@@ -195,12 +195,12 @@ function StockForm({ mode }) {
           {/* Section 2: Stock In Specifics */}
           {isStockIn && (
             <div className="space-y-5">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-[#F8FAFC] border-b border-[#2A2E36] pb-3">
-                <LuFileText className="text-[#22D3EE]" /> Receiving Details
+              <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
+                <LuFileText className="text-violet-600 dark:text-[#22D3EE]" /> Receiving Details
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Supplier</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Supplier</label>
                   <select
                     className={`${adminSurface.select} w-full`}
                     value={form.supplierId}
@@ -216,7 +216,7 @@ function StockForm({ mode }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Unit Cost (Optional)</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Unit Cost (Optional)</label>
                   <div className="relative">
                     <input
                       type="number"
@@ -231,7 +231,7 @@ function StockForm({ mode }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#A9A6BB]">Reference / PO #</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Reference / PO #</label>
                   <input
                     type="text"
                     className={`${adminSurface.input} w-full`}
@@ -246,8 +246,8 @@ function StockForm({ mode }) {
 
           {/* Section 3: Notes */}
           <div className="space-y-5">
-            <h2 className="flex items-center gap-2 text-sm font-bold text-[#F8FAFC] border-b border-[#2A2E36] pb-3">
-              <LuInfo className="text-[#22D3EE]" /> Additional Notes
+            <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
+              <LuInfo className="text-violet-600 dark:text-[#22D3EE]" /> Additional Notes
             </h2>
             <textarea
               className={`${adminSurface.input} w-full py-3 h-auto min-h-[100px] resize-y`}
@@ -258,7 +258,7 @@ function StockForm({ mode }) {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-[#2A2E36]">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-slate-200 dark:border-[#2A2E36]">
             <Link
               to="/admin/inventory"
               className={adminSurface.secondaryButton}

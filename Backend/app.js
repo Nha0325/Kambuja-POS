@@ -1,6 +1,7 @@
 require("./config/env")
 const express = require("express")
 const errorHandler = require('./helper/error-handler');
+
 const qs = require("qs")
 const cookieParser = require("cookie-parser")
 const categoryRouter = require('./routes/category.routes');
@@ -25,6 +26,8 @@ const notificationRouter = require("./routes/notification.route")
 const posRouter = require("./routes/pos.route")
 const alertRouter = require("./routes/alert.route")
 const systemLogRoutes = require("./routes/systemLog.routes")
+const unitRouter = require("./routes/unit.route")
+const unitTemplateRouter = require("./routes/unitTemplate.route")
 const authGuard = require("./guards/auth.guard")
 const morgan = require("morgan")
 const helmet = require("helmet")
@@ -39,7 +42,10 @@ const allowedOrigins = [
     process.env.LOCAL_DOMAIN,
     process.env.CLIENT_DOMAIN,
     "http://localhost:5173",
-    "http://localhost:5174"
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    ...(process.env.CLIENT_ORIGINS ? process.env.CLIENT_ORIGINS.split(",") : [])
 ]
     .map((origin) => origin?.trim())
     .filter(Boolean)
@@ -47,13 +53,7 @@ const allowedOrigins = [
 app.use(helmet({crossOriginResourcePolicy: false}))
 
 app.use(cors({
-    origin: (origin, callback) => {
-        if(!origin || allowedOrigins.includes(origin)){
-            callback(null, true)
-        }else{
-            callback(new Error("Not allowed by CORS"))
-        }
-    },
+    origin: allowedOrigins,
     credentials: true,
     allowedHeaders:['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders:['Set-Cookie', 'Authorization']
@@ -104,11 +104,14 @@ app.use("/api/v1/locations", authGuard, locationRouter)
 app.use("/api/v1/shops", authGuard, shopRouter)
 app.use("/api/v1/product-codes", authGuard, productCodeRouter)
 app.use("/api/v1/inventory", authGuard, inventoryRouter)
+app.use("/api/v1/stock", authGuard, inventoryRouter)
 app.use("/api/v1/stock-movements", authGuard, stockMovementRouter)
 app.use("/api/v1/payments", authGuard, paymentRouter)
 app.use("/api/v1/receipts", authGuard, receiptRouter)
 app.use("/api/v1/notifications", authGuard, notificationRouter)
 app.use("/api/v1/alerts", authGuard, alertRouter)
+app.use("/api/v1/units", authGuard, unitRouter)
+app.use("/api/v1/unit-templates", authGuard, unitTemplateRouter)
 const heldBillRouter = require("./routes/heldBill.routes")
 const dailyCloseRouter = require("./routes/dailyClose.routes")
 
@@ -117,7 +120,9 @@ app.use("/api/v1/daily-close", authGuard, dailyCloseRouter)
 app.use("/api/v1/pos", authGuard, posRouter)
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/system-logs", systemLogRoutes)
-app.use("/upload", express.static('upload'))
+const path = require("path")
+app.use("/upload", express.static(path.join(__dirname, "upload")))
+app.use("/uploads", express.static(path.join(__dirname, "upload")))
 app.use(errorHandler)
 
 module.exports = app

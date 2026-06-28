@@ -2,37 +2,44 @@ const calculatePaymentStatus = require("../helper/calculatePaymentStatus")
 const Product = require("../models/Product.model")
 const Purchase = require("../models/Purchase.model")
 const { generateInvoiceNumber } = require("./counter.controller")
-const Inventory = require("../models/Inventory.model")
-const StockMovement = require("../models/StockMovement.model")
+const {
+    getProductStock,
+    setProductStock,
+    getDefaultLocationId,
+    syncInventory,
+    createStockMovement,
+} = require("../helper/stock.helper")
 
 const applyReceivedStock = async (req, purchase, items) => {
     for(const item of items){
-        const product = await Product.findOneAndUpdate(
-            { _id: item.product, ...req.shopFilter },
-            { $inc: { currentStock: item.quantity } },
-            { new: true }
-        )
+        const product = await Product.findOne({ _id: item.product, ...req.shopFilter })
         if (!product) {
             throw new Error(`Product not found with ID: ${item.product}`)
         }
 
-        const quantityAfter = Number(product.currentStock)
-        const quantityBefore = quantityAfter - Number(item.quantity)
-        await Inventory.findOneAndUpdate(
-            { shopId: req.shopId, product: product._id },
-            { quantity: quantityAfter },
-            { new: true, upsert: true, runValidators: true }
-        )
-        await StockMovement.create({
+        const qtyChange = Number(item.convertedQtyBase || item.quantity)
+        const quantityBefore = getProductStock(product)
+        const quantityAfter = quantityBefore + qtyChange
+        const locationId = await getDefaultLocationId(req.shopId)
+
+        setProductStock(product, quantityAfter)
+        await product.save()
+        await syncInventory({ shopId: req.shopId, locationId, product, stock: quantityAfter })
+        await createStockMovement({
             shopId: req.shopId,
+            locationId,
             product: product._id,
-            user: req.user._id,
-            type: "STOCK_IN",
-            quantity: Number(item.quantity),
-            quantityBefore,
-            quantityAfter,
+            userId: req.user._id,
+            type: "RECEIVE_STOCK",
+            qtyChange,
+            beforeQty: quantityBefore,
+            afterQty: quantityAfter,
+            supplierId: purchase.supplier,
+            invoiceNo: purchase.invoiceNumber,
+            reason: "Supplier stock in",
             referenceType: "Purchase",
             referenceId: purchase._id,
+            note: "Purchase received",
         })
     }
 }
@@ -148,7 +155,7 @@ exports.findAll = async (req, res, next) => {
                             .find(querySearch)
                             .populate("user","username name role")
                             .populate("supplier", "businessName phone")
-                            .populate("items.product", "name imageUrl salePrice costPrice currentStock")
+                            .populate("items.product", "name imageUrl salePrice costPrice stock currentStock")
                             .skip(skip) 
                             .limit(limit)
                             .sort({_id: -1})
@@ -174,7 +181,7 @@ exports.findOne = async (req, res, next) => {
                           .findOne({ _id: id, ...req.shopFilter })
                             .populate("user","username name role")
                             .populate("supplier", "businessName phone")
-                            .populate("items.product", "name imageUrl salePrice costPrice currentStock")
+                            .populate("items.product", "name imageUrl salePrice costPrice stock currentStock")
         if(!doc){
             return res.status(404).json({
                 success: false,

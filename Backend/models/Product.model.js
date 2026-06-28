@@ -26,6 +26,41 @@ const schema = new mongoose.Schema({
         type: String,
         required: [true, "Image is required"]
     },
+    barcode: {
+        type: String,
+        default: ""
+    },
+    sku: {
+        type: String,
+        default: ""
+    },
+    supplier: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Supplier"
+    },
+    description: {
+        type: String,
+        trim: true,
+    },
+
+    status: {
+        type: String,
+        enum: ["ACTIVE", "INACTIVE"],
+        default: "ACTIVE",
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    lowStockThreshold: {
+        type: Number,
+        min: [0, "Low stock threshold must be greater than or equal zero"],
+        default: 5
+    },
+    reorderLevel: {
+        type: Number,
+        default: 5
+    },
     costPrice: {
         type: Number,
         min: [0, "Cost price must be greater than or equal zero"],
@@ -36,6 +71,11 @@ const schema = new mongoose.Schema({
         min: [0, "Sale price must be greater than or equal zero"],
         required: [true,"Sale price is required"]
 
+    },
+    stock: {
+        type: Number,
+        min: [0, "Stock must be greater than or equal zero"],
+        default: 0
     },
     currentStock: {
         type: Number,
@@ -48,6 +88,19 @@ const schema = new mongoose.Schema({
 
 }, {timestamps: true})
 
-const Product = mongoose.model("Product", schema)
+schema.pre("validate", function syncStockFields() {
+    const stock = Number(this.stock ?? this.currentStock ?? 0)
+    this.stock = stock
+    this.currentStock = stock
 
+    const threshold = Number(this.lowStockThreshold ?? this.reorderLevel ?? 5)
+    this.lowStockThreshold = threshold
+    this.reorderLevel = threshold
+})
+
+schema.index({ shopId: 1, barcode: 1 }, { unique: true, sparse: true });
+schema.index({ shopId: 1, sku: 1 }, { unique: true, sparse: true });
+schema.index({ shopId: 1, code: 1 }, { unique: true, sparse: true });
+
+const Product = mongoose.model("Product", schema)
 module.exports = Product

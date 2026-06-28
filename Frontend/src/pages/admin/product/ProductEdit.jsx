@@ -6,6 +6,8 @@ import useStorage from "../../../hooks/useStorage";
 import { useCollection } from "../../../hooks/useCollection";
 import { useFindById } from "../../../hooks/useFindById";
 import { baseUrl } from "../../../configs/env";
+import ProductCodePreview from "../../../components/ProductCodePreview";
+import ProductLabelPrintModal from "../../../components/ProductLabelPrintModal";
 
 function EditProduct() {
   const [image, setImage] = useState(null);
@@ -13,6 +15,8 @@ function EditProduct() {
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
+  const [sku, setSku] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [costPrice, setCostPrice] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [currentStock, setCurrentStock] = useState(0);
@@ -20,6 +24,7 @@ function EditProduct() {
   const [oldImageUrl, setOldImageUrl] = useState("");
   const [status, setStatus] = useState(true);
   const [reorderLevel, setReorderLevel] = useState(10);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
 
   const route = useParams();
   const navigate = useNavigate();
@@ -76,9 +81,13 @@ function EditProduct() {
       const data = {
         name,
         category,
+        sku: sku.trim(),
+        barcode: barcode.trim(),
         costPrice: cost,
         salePrice: sale,
-        currentStock: Number(currentStock),
+        lowStockThreshold: Number(reorderLevel),
+        reorderLevel: Number(reorderLevel),
+        status: status ? "ACTIVE" : "INACTIVE",
         note,
       };
 
@@ -106,10 +115,14 @@ function EditProduct() {
     if (product && isFinding === false) {
       setName(product?.name || "");
       setCategory(product?.category?._id || "");
+      setSku(product?.sku || "");
+      setBarcode(product?.barcode || "");
       setCostPrice(product?.costPrice || "");
-      setCurrentStock(product?.currentStock ?? 0);
+      setCurrentStock(product?.stock ?? product?.currentStock ?? 0);
       setSalePrice(product?.salePrice || "");
       setNote(product?.note || "");
+      setStatus(product?.status === "ACTIVE" || product?.status === undefined ? true : false);
+      setReorderLevel(product?.lowStockThreshold ?? product?.reorderLevel ?? 10);
 
       if (product?.imageUrl) {
         setPreview(`${baseUrl}/upload/${product?.imageUrl}`);
@@ -198,14 +211,50 @@ function EditProduct() {
                   </div>
 
                   <div>
+                    <label className={labelClass}>Product Code</label>
+                    <input 
+                      type="text"
+                      disabled
+                      readOnly
+                      value={product?.code || "Auto-generated"}
+                      className={inputClass}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>SKU</label>
+                    <input 
+                      type="text"
+                      value={sku}
+                      onChange={(e) => setSku(e.target.value)}
+                      placeholder="Enter SKU" 
+                      className={inputClass} 
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Barcode</label>
+                    <input 
+                      type="text"
+                      value={barcode}
+                      onChange={(e) => setBarcode(e.target.value)}
+                      placeholder="Scan or type barcode" 
+                      className={inputClass} 
+                    />
+                  </div>
+
+                  <div>
                     <label className={labelClass}>Current Stock</label>
                     <input 
                       type="number"
-                      min="0"
+                      readOnly
+                      disabled
                       value={currentStock}
-                      onChange={(e) => setCurrentStock(e.target.value)}
-                      className={inputClass} 
+                      className={inputClass}
                     />
+                    <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">
+                      Stock is changed from Receive Stock or Stock Adjustment.
+                    </p>
                   </div>
 
                   <div>
@@ -315,6 +364,23 @@ function EditProduct() {
               </div>
             </div>
 
+            <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
+                <div className="flex items-center justify-between gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4">
+                  <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">Barcode & QR Preview</span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded">Save product before scanning in POS</span>
+                </div>
+                <div className="p-5 flex flex-col items-center bg-[#f8fafc] dark:bg-[#09090b]">
+                   <ProductCodePreview value={product?.code || barcode || sku} type="CODE128" />
+                   <button
+                     type="button"
+                     onClick={() => setPrintModalOpen(true)}
+                     className="mt-4 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#020617] dark:text-[#f8fafc] transition hover:bg-[#f8fafc] dark:hover:bg-white/5 active:scale-95"
+                   >
+                     Print Barcode / QR Label
+                   </button>
+                </div>
+            </div>
+
             {/* Visibility & Status Card */}
             <div className="overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
               <div className="flex items-center gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] px-5 py-4 text-sm font-bold text-[#020617] dark:text-[#f8fafc]">
@@ -396,6 +462,13 @@ function EditProduct() {
           </div>
         </form>
       </div>
+
+      <ProductLabelPrintModal 
+        open={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        product={product}
+        previewData={{ name, salePrice, sku, barcode }}
+      />
     </div>
   );
 }

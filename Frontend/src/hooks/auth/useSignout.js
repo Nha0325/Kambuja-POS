@@ -12,10 +12,16 @@ const useSignout = () => {
             setIsLoading(true)
             const res = await api.get('/auth/signout',)
             localStorage.removeItem("posAuth")
+            localStorage.removeItem("accessToken")
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
             return res.data
         } catch (error) {
             if (error?.response?.status === 401) {
                 localStorage.removeItem("posAuth")
+                localStorage.removeItem("accessToken")
+                localStorage.removeItem("token")
+                localStorage.removeItem("user")
             }
             const msg = formatApiError(error)
             toast.error(msg)

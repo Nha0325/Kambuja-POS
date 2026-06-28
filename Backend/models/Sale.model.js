@@ -33,6 +33,13 @@ const schema = new mongoose.Schema({
                 required: true,
                 min: 1
             },
+            saleUnit: String,
+            convertedQtyBase: Number,
+            baseUnit: String,
+            unitsPerPurchaseUnit: Number,
+            pricePerUnit: Number,
+            costPerBaseUnit: Number,
+            profit: Number,
             unitPrice: {
                 type: Number,
                 required: true
@@ -41,14 +48,12 @@ const schema = new mongoose.Schema({
                 type: Number,
                 required: true
             }
-
         }
     ],
     totalCost: {
         type: Number,
         min: [0, "total cost can't be negative"],
         required: [true, "total cost is required"]
-
     },
     paidAmount: {
         type: Number,
@@ -70,9 +75,7 @@ const schema = new mongoose.Schema({
         enum: ["paid", "due", "partial"],
         required: true
     }
-
 }, { timestamps: true })
 
-const Sale = mongoose.model("Sale",schema)
-
+const Sale = mongoose.model("Sale", schema)
 module.exports = Sale

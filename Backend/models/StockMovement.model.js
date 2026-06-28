@@ -10,7 +10,6 @@ const schema = new mongoose.Schema({
     locationId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Location",
-        required: true,
         index: true,
     },
     product: {
@@ -18,27 +17,62 @@ const schema = new mongoose.Schema({
         ref: "Product",
         required: true,
     },
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     type: {
         type: String,
-        enum: ["STOCK_IN", "SALE", "ADJUSTMENT", "RETURN"],
+        enum: ["RECEIVE_STOCK", "SALE", "STOCK_ADJUSTMENT", "RETURN", "CANCEL_SALE", "STOCK_IN", "ADJUSTMENT"],
         required: true,
     },
     quantity: {
         type: Number,
         required: true,
     },
+    qtyChange: {
+        type: Number,
+    },
+    inputQty: Number,
+    inputUnit: String,
+    convertedQtyBase: Number,
+    baseUnit: String,
+    purchaseUnit: String,
+    unitsPerPurchaseUnit: Number,
     quantityBefore: {
         type: Number,
         required: true,
     },
+    beforeQty: {
+        type: Number,
+    },
     quantityAfter: {
         type: Number,
         required: true,
+    },
+    afterQty: {
+        type: Number,
+    },
+    supplierId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Supplier",
+    },
+    invoiceNo: {
+        type: String,
+        trim: true,
+    },
+    reason: {
+        type: String,
+        trim: true,
     },
     referenceType: {
         type: String,
@@ -53,5 +87,22 @@ const schema = new mongoose.Schema({
         trim: true,
     },
 }, { timestamps: true })
+
+schema.pre("validate", function syncMovementAliases() {
+    this.productId = this.productId || this.product
+    this.createdBy = this.createdBy || this.user
+
+    const qtyChange = Number(this.qtyChange ?? this.quantity ?? 0)
+    this.qtyChange = qtyChange
+    this.quantity = qtyChange
+
+    const beforeQty = Number(this.beforeQty ?? this.quantityBefore ?? 0)
+    this.beforeQty = beforeQty
+    this.quantityBefore = beforeQty
+
+    const afterQty = Number(this.afterQty ?? this.quantityAfter ?? 0)
+    this.afterQty = afterQty
+    this.quantityAfter = afterQty
+})
 
 module.exports = mongoose.model("StockMovement", schema)

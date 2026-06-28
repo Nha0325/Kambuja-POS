@@ -39,7 +39,7 @@ exports.lookup = async (req, res, next) => {
         const code = await ProductCode.findOne({
             code: req.params.code,
             ...req.shopFilter,
-        }).populate("product", "name code imageUrl salePrice costPrice currentStock")
+            }).populate("product", "name code imageUrl salePrice costPrice stock currentStock stockQtyBase unitConfig pricing")
 
         if (!code) {
             return res.status(404).json({ success: false, error: "Product code not found" })

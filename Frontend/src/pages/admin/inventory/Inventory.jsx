@@ -11,10 +11,12 @@ import {
   LuSlidersHorizontal,
   LuChevronLeft,
   LuChevronRight,
-  LuFilter
+  LuFilter,
+  LuClock
 } from "react-icons/lu"
 import dayjs from "dayjs"
 import { adminSurface } from "../adminPageUi"
+import { getImageUrl } from "../../../utils/getImageUrl"
 
 function Inventory() {
   const [rows, setRows] = useState([])
@@ -31,22 +33,25 @@ function Inventory() {
 
   // Derived metrics
   const totalProducts = rows.length
-  const totalStockUnits = rows.reduce((sum, row) => sum + Number(row.quantity || 0), 0)
-  const lowStockCount = rows.filter((row) => Number(row.quantity || 0) > 0 && Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length
-  const outOfStockCount = rows.filter((row) => Number(row.quantity || 0) === 0).length
+  const getRowStock = (row) => Number(row.stock ?? row.quantity ?? row.product?.stock ?? row.product?.stockQtyBase ?? row.product?.currentStock ?? 0)
+  const totalStockUnits = rows.reduce((sum, row) => sum + getRowStock(row), 0)
+  const lowStockCount = rows.filter((row) => row.stockStatus === "LOW_STOCK").length
+  const outOfStockCount = rows.filter((row) => row.stockStatus === "OUT_OF_STOCK").length
 
   // Unique categories for filter
-  const categories = [...new Set(rows.map(row => row.product?.category?.name).filter(Boolean))]
+  const categories = [...new Set(rows.map(row => row.category?.name || row.product?.category?.name).filter(Boolean))]
 
   // Filtering
   const filteredRows = rows.filter(row => {
-    const qty = Number(row.quantity || 0)
-    const min = Number(row.reorderLevel || 0)
-    const status = qty === 0 ? "out_of_stock" : (qty <= min ? "low_stock" : "in_stock")
+    const status = row.stockStatus || "IN_STOCK"
+    const categoryName = row.category?.name || row.product?.category?.name
 
-    const matchesSearch = row.product?.name?.toLowerCase().includes(search.toLowerCase()) ||
+    const matchesSearch = row.productName?.toLowerCase().includes(search.toLowerCase()) ||
+                          row.sku?.toLowerCase().includes(search.toLowerCase()) ||
+                          row.barcode?.toLowerCase().includes(search.toLowerCase()) ||
+                          row.product?.name?.toLowerCase().includes(search.toLowerCase()) ||
                           row.product?.code?.toLowerCase().includes(search.toLowerCase())
-    const matchesCategory = categoryFilter ? row.product?.category?.name === categoryFilter : true
+    const matchesCategory = categoryFilter ? categoryName === categoryFilter : true
     const matchesStatus = statusFilter ? status === statusFilter : true
 
     return matchesSearch && matchesCategory && matchesStatus
@@ -62,6 +67,17 @@ function Inventory() {
     return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]"><span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span>In Stock</span>
   }
 
+  const formatStock = (stockQtyBase, unitsPerPurchaseUnit, purchaseUnitName, baseUnitName) => {
+    if (!unitsPerPurchaseUnit || unitsPerPurchaseUnit <= 1) {
+      return `${stockQtyBase} ${baseUnitName || ''}`;
+    }
+    const caseQty = Math.floor(stockQtyBase / unitsPerPurchaseUnit);
+    const remainQty = stockQtyBase % unitsPerPurchaseUnit;
+    if (caseQty === 0) return `${remainQty} ${baseUnitName || ''}`;
+    if (remainQty === 0) return `${caseQty} ${purchaseUnitName || ''}`;
+    return `${caseQty} ${purchaseUnitName || ''} ${remainQty} ${baseUnitName || ''}`;
+  }
+
   return (
     <section className={adminSurface.page}>
       {/* Header */}
@@ -73,7 +89,10 @@ function Inventory() {
             Manage your inventory, monitor stock levels, and track product availability.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:flex">
+        <div className="grid grid-cols-3 gap-3 sm:flex">
+          <Link to="/admin/inventory/history" className={adminSurface.secondaryButton}>
+            <LuClock size={18} /> History
+          </Link>
           <Link to="/admin/inventory/adjustment" className={adminSurface.secondaryButton}>
             <LuSlidersHorizontal size={18} /> Adjust
           </Link>
@@ -160,9 +179,9 @@ function Inventory() {
             className={`${adminSurface.select} w-full`}
           >
             <option value="">All Statuses</option>
-            <option value="in_stock">In Stock</option>
-            <option value="low_stock">Low Stock</option>
-            <option value="out_of_stock">Out of Stock</option>
+            <option value="IN_STOCK">In Stock</option>
+            <option value="LOW_STOCK">Low Stock</option>
+            <option value="OUT_OF_STOCK">Out of Stock</option>
           </select>
         </div>
 
@@ -176,6 +195,7 @@ function Inventory() {
                 <th className={adminSurface.th}>Category</th>
                 <th className={adminSurface.th}>Supplier</th>
                 <th className={`${adminSurface.th} text-right`}>Current Stock</th>
+                <th className={`${adminSurface.th} text-right`}>Display Stock</th>
                 <th className={`${adminSurface.th} text-right`}>Min Stock</th>
                 <th className={`${adminSurface.th} text-center`}>Status</th>
                 <th className={`${adminSurface.th} text-right`}>Last Updated</th>
@@ -183,28 +203,34 @@ function Inventory() {
             </thead>
             <tbody>
               {paginatedRows.map((row) => {
-                const qty = Number(row.quantity || 0)
-                const min = Number(row.reorderLevel || 0)
+                const qty = getRowStock(row)
+                const min = Number(row.lowStockThreshold ?? row.reorderLevel ?? 0)
+                const unitConfig = row.product?.unitConfig || {};
+                const displayStock = formatStock(qty, unitConfig.unitsPerPurchaseUnit, unitConfig.purchaseUnit?.nameKh, unitConfig.baseUnit?.nameKh);
                 return (
                   <tr key={row._id} className={adminSurface.row}>
                     <td className={adminSurface.td}>
                       <div className="flex items-center gap-3">
-                        {row.product?.imageUrl ? (
-                          <img src={row.product.imageUrl} alt="" className="h-10 w-10 rounded-md object-cover border border-[#2A2E36]" />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#111318] text-[#22D3EE] border border-[#2A2E36]">
-                            <LuPackage size={20} />
-                          </div>
-                        )}
-                        <span className="font-semibold text-[#F8FAFC]">{row.product?.name || "-"}</span>
+                        <img
+                          src={getImageUrl(row.product?.imageUrl || row.product?.image || row.product?.productImage)}
+                          alt={row.product?.name || "Product"}
+                          className="h-10 w-10 rounded-lg border border-[#2A2E36] object-cover bg-slate-100"
+                          onError={(e) => {
+                            e.currentTarget.src = "/placeholder-product.svg";
+                          }}
+                        />
+                        <span className="font-semibold text-[#F8FAFC]">{row.productName || row.product?.name || "-"}</span>
                       </div>
                     </td>
-                    <td className={`${adminSurface.td} font-medium text-[#A9A6BB]`}>{row.product?.code || "-"}</td>
-                    <td className={`${adminSurface.td} text-[#6B7280]`}>{row.product?.category?.name || "-"}</td>
+                    <td className={`${adminSurface.td} font-medium text-[#A9A6BB]`}>
+                      {row.sku || row.barcode || row.product?.sku || row.product?.barcode || row.product?.code || "-"}
+                    </td>
+                    <td className={`${adminSurface.td} text-[#6B7280]`}>{row.category?.name || row.product?.category?.name || "-"}</td>
                     <td className={`${adminSurface.td} text-[#6B7280]`}>
-                      {row.product?.supplier?.businessName || row.product?.supplier?.name || row.supplier?.businessName || row.supplier?.name || "-"}
+                      {row.supplier?.businessName || row.supplier?.name || row.product?.supplier?.businessName || row.product?.supplier?.name || "-"}
                     </td>
                     <td className={`${adminSurface.td} text-right font-bold text-[#F8FAFC]`}>{qty}</td>
+                    <td className={`${adminSurface.td} text-right font-medium text-emerald-400`}>{displayStock}</td>
                     <td className={`${adminSurface.td} text-right text-[#A9A6BB]`}>{min}</td>
                     <td className={`${adminSurface.td} text-center`}>
                       {getStatusBadge(qty, min)}
@@ -217,7 +243,7 @@ function Inventory() {
               })}
               {paginatedRows.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-5 py-12 text-center text-[#6B7280]">
+                  <td colSpan="9" className="px-5 py-12 text-center text-[#6B7280]">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <LuSearch size={32} className="text-[#6B7280] opacity-50" />
                       <p>No inventory matching your filters.</p>

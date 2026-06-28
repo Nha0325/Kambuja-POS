@@ -5,8 +5,18 @@ const NotificationLog = require("../models/NotificationLog.model")
 const Shop = require("../models/Shop.model")
 const { writeAuditLog } = require("../helper/audit")
 const { checkStockAndAlert } = require("../helper/alert.helper")
+const unitHelper = require("../helper/unit.helper")
+const runTransaction = require("../helper/runTransaction")
+const {
+    getProductStock,
+    setProductStock,
+    getLowStockThreshold,
+    getDefaultLocationId,
+    syncInventory,
+    createStockMovement,
+} = require("../helper/stock.helper")
 
-const ADJUSTMENT_REASONS = ["Damaged", "Lost", "Expired", "Manual Correction", "Stock Count", "Other"]
+const ADJUSTMENT_REASONS = ["Damaged", "Expired", "Lost", "Physical count correction", "Return from customer", "Other", "Missing", "Manual Correction", "Count Correction", "Stock Count", "Opening Balance"]
 
 const validationError = (res, message) => (
     res.status(400).json({ success: false, message, error: message })
@@ -29,29 +39,6 @@ const buildNote = (note, details = []) => {
     return `${note} | ${values.join(" | ")}`
 }
 
-const updateInventory = async (shopId, locationId, productId, quantity, body = {}) => {
-    return Inventory.findOneAndUpdate(
-        { shopId, locationId, product: productId },
-        {
-            $set: {
-                quantity,
-                ...(body.reorderLevel !== undefined ? { reorderLevel: Number(body.reorderLevel) } : {}),
-                ...(body.maxStock !== undefined ? { maxStock: Number(body.maxStock) } : {}),
-            },
-            $setOnInsert: {
-                shopId,
-                locationId,
-                product: productId,
-            },
-        },
-        { new: true, upsert: true, runValidators: true }
-    ).populate({
-        path: "product",
-        select: "name code imageUrl costPrice salePrice currentStock category supplier",
-        populate: { path: "category", select: "name" },
-    })
-}
-
 const notifyLowStockIfNeeded = async ({ shopId, product, inventory, quantityBefore, quantityAfter }) => {
     const maxStock = Number(inventory?.maxStock || 0)
     const reorderLevel = Number(inventory?.reorderLevel || 0)
@@ -71,47 +58,52 @@ const notifyLowStockIfNeeded = async ({ shopId, product, inventory, quantityBefo
     })
 }
 
-const createStockMovement = async ({
-    req,
-    shopId,
-    locationId,
-    product,
-    type,
-    quantity,
-    quantityBefore,
-    quantityAfter,
-    note,
-    referenceType,
-}) => {
-    return StockMovement.create({
-        shopId,
-        locationId,
-        product: product._id,
-        user: req.user._id || req.user.id,
-        type,
-        quantity,
-        quantityBefore,
-        quantityAfter,
-        referenceType,
-        note: note || "",
-    })
+const getStockStatus = (stock, lowStockThreshold) => {
+    if (stock <= 0) return "OUT_OF_STOCK"
+    if (stock <= lowStockThreshold) return "LOW_STOCK"
+    return "IN_STOCK"
+}
+
+const mapInventoryProduct = (product) => {
+    const stock = getProductStock(product)
+    const lowStockThreshold = getLowStockThreshold(product)
+
+    return {
+        _id: product._id,
+        productId: product._id,
+        productName: product.name,
+        sku: product.sku || product.code,
+        barcode: product.barcode,
+        category: product.category,
+        supplier: product.supplier,
+        stock,
+        quantity: stock,
+        currentStock: stock,
+        baseUnit: product.unitConfig?.baseUnit,
+        purchaseUnit: product.unitConfig?.purchaseUnit,
+        unitsPerPurchaseUnit: product.unitConfig?.unitsPerPurchaseUnit || 1,
+        lowStockThreshold,
+        reorderLevel: lowStockThreshold,
+        stockStatus: getStockStatus(stock, lowStockThreshold),
+        product,
+        shopId: product.shopId,
+        updatedAt: product.updatedAt,
+    }
 }
 
 exports.list = async (req, res, next) => {
     try {
         const filter = { ...req.shopFilter }
         if (req.query.locationId) filter.locationId = req.query.locationId
-        const docs = await Inventory.find(filter)
+        const docs = await Product.find({ ...filter, isDeleted: { $ne: true } })
             .populate("shopId", "name code")
-            .populate("locationId", "name code")
-            .populate({
-                path: "product",
-                select: "name code imageUrl costPrice salePrice currentStock category supplier",
-                populate: { path: "category", select: "name" },
-            })
+            .populate("category", "name")
+            .populate("supplier", "name")
             .sort({ updatedAt: -1 })
 
-        res.status(200).json({ success: true, result: docs })
+        const mappedDocs = docs.map(mapInventoryProduct)
+
+        res.status(200).json({ success: true, result: mappedDocs })
     } catch (error) {
         next(error)
     }
@@ -126,8 +118,10 @@ exports.movements = async (req, res, next) => {
         const docs = await StockMovement.find(filter)
             .populate("shopId", "name code")
             .populate("locationId", "name code")
-            .populate("product", "name code imageUrl currentStock")
+            .populate("product", "name code sku barcode imageUrl stock currentStock unitConfig")
             .populate("user", "username name role")
+            .populate("createdBy", "username name role")
+            .populate("supplierId", "name businessName")
             .sort({ createdAt: -1 })
             .limit(500)
 
@@ -141,12 +135,24 @@ exports.lowStock = async (req, res, next) => {
     try {
         const filter = { ...req.shopFilter }
         if (req.query.locationId) filter.locationId = req.query.locationId
-        const docs = await Inventory.find({
+        const docs = await Product.find({
             ...filter,
-            $expr: { $lte: ["$quantity", "$reorderLevel"] },
-        }).populate("product", "name code imageUrl salePrice")
+            isDeleted: { $ne: true },
+            $expr: {
+                $lte: [
+                    { $ifNull: ["$stock", "$currentStock"] },
+                    { $ifNull: ["$lowStockThreshold", { $ifNull: ["$reorderLevel", 5] }] },
+                ],
+            },
+        })
+            .populate("shopId", "name code")
+            .populate("category", "name")
+            .populate("supplier", "name")
+            .sort({ updatedAt: -1 })
 
-        res.status(200).json({ success: true, result: docs })
+        const mappedDocs = docs.map(mapInventoryProduct)
+
+        res.status(200).json({ success: true, result: mappedDocs })
     } catch (error) {
         next(error)
     }
@@ -185,17 +191,23 @@ exports.lowStock50 = async (req, res, next) => {
 
 exports.stockIn = async (req, res, next) => {
     try {
-        const { productId, supplierId, referenceNumber, note } = req.body
-        const quantity = Number(req.body.quantity)
-        const unitCost = req.body.unitCost === undefined || req.body.unitCost === ""
+        const { productId, supplierId, note } = req.body
+        const invoiceNo = req.body.invoiceNo || req.body.referenceNo || req.body.referenceNumber
+        const quantityPurchaseUnit = Number(req.body.quantityPurchaseUnit ?? req.body.quantity)
+        const costPrice = req.body.costPerPurchaseUnit !== undefined
+            ? req.body.costPerPurchaseUnit
+            : req.body.costPrice !== undefined
+                ? req.body.costPrice
+                : req.body.unitCost
+        const unitCost = costPrice === undefined || costPrice === ""
             ? undefined
-            : Number(req.body.unitCost)
+            : Number(costPrice)
 
         if (!productId) {
             return validationError(res, "productId is required")
         }
 
-        if (!isPositiveNumber(quantity)) {
+        if (!isPositiveNumber(quantityPurchaseUnit)) {
             return validationError(res, "Quantity must be greater than 0")
         }
 
@@ -210,54 +222,69 @@ exports.stockIn = async (req, res, next) => {
 
         const shopId = resolveShopId(req, product)
         let locationId = resolveLocationId(req)
-        
-        if (!locationId && shopId) {
-            const Location = require("../models/Location.model")
-            const defaultLoc = await Location.findOne({ shop: shopId }).sort({ isDefault: -1 })
-            if (defaultLoc) {
-                locationId = defaultLoc._id
-            } else {
-                const newLoc = await Location.create({ shop: shopId, name: "Main Location", isDefault: true, type: "Branch" })
-                locationId = newLoc._id
-            }
-        }
-        
+        if (!locationId) locationId = await getDefaultLocationId(shopId)
+
         const userId = req.user?._id || req.user?.id
         if (!shopId || !locationId || !userId) {
             return res.status(400).json({ success: false, message: "Shop ID, Location ID, and User ID are required", error: "Missing required scope identifiers" })
         }
 
-        const quantityBefore = Number(product.currentStock || 0)
-        const quantityAfter = quantityBefore + quantity
+        const quantityBefore = getProductStock(product)
+        const inputUnit = req.body.inputUnit || req.body.unit || product.unitConfig?.purchaseUnit?.code || product.unitConfig?.baseUnit?.code
+        const unitsPerPurchaseUnit = Number(req.body.unitsPerPurchaseUnit || product.unitConfig?.unitsPerPurchaseUnit || 1)
+        const convertedQtyBase = req.body.totalBaseQty !== undefined
+            ? Number(req.body.totalBaseQty)
+            : inputUnit === product.unitConfig?.purchaseUnit?.code
+                ? quantityPurchaseUnit * unitsPerPurchaseUnit
+                : unitHelper.convertToBaseQty(quantityPurchaseUnit, inputUnit, product)
 
-        product.currentStock = quantityAfter
-        await product.save()
+        if (!isPositiveNumber(convertedQtyBase)) {
+            return validationError(res, "Total base quantity must be greater than 0")
+        }
+
+        const quantityAfter = quantityBefore + convertedQtyBase
+
+        setProductStock(product, quantityAfter)
+        await runTransaction(async (session) => {
+            await product.save(session ? { session } : undefined)
+            await syncInventory({ shopId, locationId, product, stock: quantityAfter, session })
+            await createStockMovement({
+                shopId,
+                locationId,
+                product,
+                type: "RECEIVE_STOCK",
+                qtyChange: convertedQtyBase,
+                beforeQty: quantityBefore,
+                afterQty: quantityAfter,
+                userId,
+                supplierId,
+                invoiceNo,
+                reason: "Supplier stock in",
+                inputQty: quantityPurchaseUnit,
+                inputUnit,
+                convertedQtyBase,
+                baseUnit: product.unitConfig?.baseUnit?.code,
+                purchaseUnit: product.unitConfig?.purchaseUnit?.code,
+                unitsPerPurchaseUnit,
+                referenceType: "ReceiveStock",
+                note: buildNote(note, [
+                    supplierId ? `Supplier ID: ${supplierId}` : "",
+                    invoiceNo ? `Invoice: ${invoiceNo}` : "",
+                    unitCost !== undefined ? `Cost Per Purchase Unit: ${unitCost}` : "",
+                    req.body.receivedDate ? `Received Date: ${req.body.receivedDate}` : "",
+                ]),
+                session,
+            })
+        })
         void checkStockAndAlert(product);
 
-        const inventory = await updateInventory(shopId, locationId, product._id, quantityAfter, req.body)
+        const inventory = await syncInventory({ shopId, locationId, product, stock: quantityAfter })
         await notifyLowStockIfNeeded({ shopId, product, inventory, quantityBefore, quantityAfter })
 
-        await createStockMovement({
-            req,
-            shopId,
-            locationId,
-            product,
-            type: "STOCK_IN",
-            quantity,
-            quantityBefore,
+        await writeAuditLog(req, "RECEIVE_STOCK", "Product", product._id, {
+            quantity: convertedQtyBase,
             quantityAfter,
-            referenceType: "StockIn",
-            note: buildNote(note, [
-                supplierId ? `Supplier ID: ${supplierId}` : "",
-                referenceNumber ? `Reference: ${referenceNumber}` : "",
-                unitCost !== undefined ? `Unit Cost: ${unitCost}` : "",
-            ]),
-        })
-
-        await writeAuditLog(req, "STOCK_IN", "Product", product._id, {
-            quantity,
-            quantityAfter,
-            referenceNumber,
+            invoiceNo,
         })
 
         return res.status(200).json({
@@ -276,19 +303,24 @@ exports.adjustment = async (req, res, next) => {
     try {
         const { productId, note } = req.body
         const type = String(req.body.type || "").toUpperCase()
-        const quantity = Number(req.body.quantity)
+        const adjustmentType = String(req.body.adjustmentType || type).toUpperCase()
         const reason = String(req.body.reason || "").trim()
 
         if (!productId) {
             return validationError(res, "productId is required")
         }
 
-        if (!["INCREASE", "DECREASE"].includes(type)) {
-            return validationError(res, "Adjustment type must be INCREASE or DECREASE")
+        if (!["INCREASE", "DECREASE", "SET STOCK", "SET_STOCK", "SET_EXACT"].includes(adjustmentType)) {
+            return validationError(res, "Adjustment type must be INCREASE, DECREASE, or SET_EXACT")
         }
 
-        if (!isPositiveNumber(quantity)) {
-            return validationError(res, "Quantity must be greater than 0")
+        let quantity = Number(req.body.quantity)
+        if (!["SET STOCK", "SET_STOCK", "SET_EXACT"].includes(adjustmentType)) {
+            if (!isPositiveNumber(quantity)) {
+                return validationError(res, "Quantity must be greater than 0")
+            }
+        } else if (!Number.isFinite(quantity) || quantity < 0) {
+            return validationError(res, "Exact stock quantity must be greater than or equal to 0")
         }
 
         if (!ADJUSTMENT_REASONS.includes(reason)) {
@@ -302,53 +334,63 @@ exports.adjustment = async (req, res, next) => {
 
         const shopId = resolveShopId(req, product)
         let locationId = resolveLocationId(req)
-
-        if (!locationId && shopId) {
-            const Location = require("../models/Location.model")
-            const defaultLoc = await Location.findOne({ shop: shopId }).sort({ isDefault: -1 })
-            if (defaultLoc) {
-                locationId = defaultLoc._id
-            } else {
-                const newLoc = await Location.create({ shop: shopId, name: "Main Location", isDefault: true, type: "Branch" })
-                locationId = newLoc._id
-            }
-        }
+        if (!locationId) locationId = await getDefaultLocationId(shopId)
 
         const userId = req.user?._id || req.user?.id
         if (!shopId || !locationId || !userId) {
             return res.status(400).json({ success: false, message: "Shop ID, Location ID, and User ID are required", error: "Missing required scope identifiers" })
         }
 
-        const quantityBefore = Number(product.currentStock || 0)
-        const delta = type === "INCREASE" ? quantity : -quantity
+        const quantityBefore = getProductStock(product)
+
+        const inputUnit = req.body.inputUnit || req.body.unit || product.unitConfig?.baseUnit?.code
+        const convertedQtyBase = unitHelper.convertToBaseQty(quantity, inputUnit, product)
+
+        let delta = 0
+        if (["SET STOCK", "SET_STOCK", "SET_EXACT"].includes(adjustmentType)) {
+            delta = convertedQtyBase - quantityBefore
+        } else {
+            delta = adjustmentType === "INCREASE" ? convertedQtyBase : -convertedQtyBase
+        }
+
         const quantityAfter = quantityBefore + delta
 
         if (quantityAfter < 0) {
             return validationError(res, "Adjustment cannot make stock negative")
         }
 
-        product.currentStock = quantityAfter
-        await product.save()
+        setProductStock(product, quantityAfter)
+        await runTransaction(async (session) => {
+            await product.save(session ? { session } : undefined)
+            await syncInventory({ shopId, locationId, product, stock: quantityAfter, session })
+            await createStockMovement({
+                shopId,
+                locationId,
+                product,
+                type: "STOCK_ADJUSTMENT",
+                qtyChange: delta,
+                beforeQty: quantityBefore,
+                afterQty: quantityAfter,
+                userId,
+                reason,
+                inputQty: quantity,
+                inputUnit,
+                convertedQtyBase: delta,
+                baseUnit: product.unitConfig?.baseUnit?.code,
+                purchaseUnit: product.unitConfig?.purchaseUnit?.code,
+                unitsPerPurchaseUnit: product.unitConfig?.unitsPerPurchaseUnit,
+                referenceType: "StockAdjustment",
+                note: buildNote(note, [`Reason: ${reason}`, `Type: ${adjustmentType}`]),
+                session,
+            })
+        })
         void checkStockAndAlert(product);
 
-        const inventory = await updateInventory(shopId, locationId, product._id, quantityAfter, req.body)
+        const inventory = await syncInventory({ shopId, locationId, product, stock: quantityAfter })
         await notifyLowStockIfNeeded({ shopId, product, inventory, quantityBefore, quantityAfter })
 
-        await createStockMovement({
-            req,
-            shopId,
-            locationId,
-            product,
-            type: "ADJUSTMENT",
-            quantity: delta,
-            quantityBefore,
-            quantityAfter,
-            referenceType: "Adjustment",
-            note: buildNote(note, [`Reason: ${reason}`, `Type: ${type}`]),
-        })
-
-        await writeAuditLog(req, "ADJUSTMENT", "Product", product._id, {
-            type,
+        await writeAuditLog(req, "STOCK_ADJUSTMENT", "Product", product._id, {
+            type: adjustmentType,
             quantity: delta,
             quantityAfter,
             reason,

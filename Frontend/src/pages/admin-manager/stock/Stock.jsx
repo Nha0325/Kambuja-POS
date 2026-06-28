@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { FaDownload, FaMagnifyingGlass, FaTriangleExclamation, FaFilter, FaXmark, FaEye, FaPenToSquare, FaClockRotateLeft } from "react-icons/fa6"
 import { adminService } from "../../../services/admin.service"
+import { api } from "../../../configs/api"
 import { downloadCsv } from "../../../utils/downloadCsv"
 import { formatApiError } from "../../../utils/formatApiError"
 import {
@@ -22,14 +23,14 @@ function getShopName(row) {
 
 const getStockPercent = (row) => {
   const maxStock = Number(row.maxStock || 0);
-  const quantity = Number(row.quantity || 0);
+  const quantity = Number(row.currentStock ?? 0);
   if (maxStock <= 0) return null;
   return Math.round((quantity / maxStock) * 100);
 };
 
 // Returns "OUT" | "LOW" | "OK"
 const getStockStatus = (row) => {
-  const quantity = Number(row.quantity || 0);
+  const quantity = Number(row.currentStock ?? 0);
   const reorderLevel = Number(row.reorderLevel || 0);
   if (quantity <= 0) return "OUT";
   if (quantity <= reorderLevel) return "LOW";
@@ -56,7 +57,7 @@ function Stock() {
   const loadStock = useCallback(() => {
     setIsLoading(true)
     setError("")
-    return adminService.inventory()
+    return api.get("/admin-manager/products", { params: { limit: 1000 } })
       .then((response) => setRows(response.data.result || []))
       .catch((loadError) => {
         if (loadError?.response?.status !== 401) {
@@ -100,7 +101,7 @@ function Stock() {
              const mProdId = typeof m.product === 'object' ? m.product?._id : m.product;
              const mShopId = typeof m.shopId === 'object' ? m.shopId?._id : m.shopId;
              
-             const rProdId = typeof targetRow.product === 'object' ? targetRow.product?._id : targetRow.product;
+             const rProdId = targetRow._id;
              const rShopId = typeof targetRow.shopId === 'object' ? targetRow.shopId?._id : targetRow.shopId;
              
              return mProdId === rProdId && mShopId === rShopId;
@@ -123,7 +124,7 @@ function Stock() {
   const categoriesList = useMemo(() => {
     const list = new Set()
     rows.forEach(r => {
-      const cat = r.product?.category?.name || r.category || r.product?.category
+      const cat = r.category?.name || r.category
       if (cat && typeof cat === 'string') list.add(cat)
     })
     return Array.from(list).sort()
@@ -135,8 +136,10 @@ function Stock() {
     return rows.filter((row) => {
       // 1. Search filter
       const matchesSearch = !term || (
-        row.product?.name?.toLowerCase().includes(term) ||
-        row.product?.code?.toLowerCase().includes(term) ||
+        row.name?.toLowerCase().includes(term) ||
+        row.code?.toLowerCase().includes(term) ||
+        row.barcode?.toLowerCase().includes(term) ||
+        row.sku?.toLowerCase().includes(term) ||
         getShopName(row).toLowerCase().includes(term)
       )
       if (!matchesSearch) return false
@@ -164,7 +167,7 @@ function Stock() {
     })
   }, [rows, search, shopFilter, categoryFilter, statusFilter, statFilter])
 
-  const totalQuantity = rows.reduce((sum, row) => sum + Number(row.quantity || 0), 0)
+  const totalQuantity = rows.reduce((sum, row) => sum + Number(row.currentStock ?? 0), 0)
   const lowStockCount = rows.filter((row) => {
      const s = getStockStatus(row);
      return s === "LOW" || s === "OUT";
@@ -177,9 +180,10 @@ function Stock() {
       "admin-manager-stock.csv",
       [
         { label: "Shop", value: (row) => getShopName(row) },
-        { label: "Product", value: (row) => row.product?.name || "" },
-        { label: "Code", value: (row) => row.product?.code || "" },
-        { label: "Quantity", value: (row) => Number(row.quantity || 0) },
+        { label: "Product", value: (row) => row.name || "" },
+        { label: "Code", value: (row) => row.code || "" },
+        { label: "Barcode/SKU", value: (row) => row.barcode || row.sku || "" },
+        { label: "Quantity", value: (row) => Number(row.currentStock ?? 0) },
         { label: "Max Stock", value: (row) => Number(row.maxStock || 0) },
         { label: "Stock %", value: (row) => {
             const p = getStockPercent(row);
@@ -328,9 +332,9 @@ function Stock() {
                 <th className={tableHeadCellClass}>Shop</th>
                 <th className={tableHeadCellClass}>Product</th>
                 <th className={tableHeadCellClass}>Code</th>
-                <th className={`${tableHeadCellClass} text-right`}>Quantity</th>
-                <th className={`${tableHeadCellClass} text-right`}>Max Stock</th>
-                <th className={`${tableHeadCellClass} text-right`}>Stock %</th>
+                <th className={tableHeadCellClass}>Barcode/SKU</th>
+                <th className={`${tableHeadCellClass} text-right`}>Current Stock</th>
+                <th className={`${tableHeadCellClass} text-right`}>Stock Display</th>
                 <th className={`${tableHeadCellClass} text-right`}>Reorder Level</th>
                 <th className={`${tableHeadCellClass} text-center`}>Status</th>
                 <th className={`${tableHeadCellClass} text-right`}>Actions</th>
@@ -345,7 +349,6 @@ function Stock() {
                 </TableEmpty>
               ) : displayedRows.map((row) => {
                 const status = getStockStatus(row)
-                const percent = getStockPercent(row)
 
                 const badgeClass =
                   status === "OUT"
@@ -361,11 +364,22 @@ function Stock() {
                     onClick={() => { setSelectedRow(row); setShowHistory(false); }}
                   >
                     <td className={tableCellClass}>{getShopName(row)}</td>
-                    <td className={`${tableCellClass} font-bold text-[#020617] dark:text-[#f8fafc]`}>{row.product?.name || "-"}</td>
-                    <td className={`${tableCellClass} font-mono text-[#7033ff]`}>{row.product?.code || "-"}</td>
-                    <td className={`${tableCellClass} text-right font-bold`}>{Number(row.quantity || 0).toLocaleString()}</td>
-                    <td className={`${tableCellClass} text-right`}>{Number(row.maxStock || 0) > 0 ? Number(row.maxStock).toLocaleString() : "-"}</td>
-                    <td className={`${tableCellClass} text-right`}>{percent !== null ? `${percent}%` : "-"}</td>
+                    <td className={`${tableCellClass} font-bold text-[#020617] dark:text-[#f8fafc]`}>{row.name || "-"}</td>
+                    <td className={`${tableCellClass} font-mono text-[#7033ff]`}>{row.code || "-"}</td>
+                    <td className={`${tableCellClass} text-sm text-[#64748b]`}>{row.barcode || row.sku || "-"}</td>
+                    <td className={`${tableCellClass} text-right font-bold`}>{Number(row.currentStock ?? 0).toLocaleString()}</td>
+                    <td className={`${tableCellClass} text-right font-semibold text-[#7033ff]`}>
+                      {(() => {
+                        const baseQty = row.currentStock ?? 0;
+                        const baseCode = row.unitConfig?.baseUnit?.code || "";
+                        if (row.unitConfig?.unitsPerPurchaseUnit > 1 && row.unitConfig?.purchaseUnit) {
+                          const bulk = Math.floor(baseQty / row.unitConfig.unitsPerPurchaseUnit);
+                          const rem = baseQty % row.unitConfig.unitsPerPurchaseUnit;
+                          return `${bulk} ${row.unitConfig.purchaseUnit.code} ${rem > 0 ? `${rem} ${baseCode}` : ''}`;
+                        }
+                        return `${baseQty} ${baseCode}`;
+                      })()}
+                    </td>
                     <td className={`${tableCellClass} text-right`}>{Number(row.reorderLevel || 0).toLocaleString()}</td>
                     <td className={`${tableCellClass} text-center`}>
                       <span className={badgeClass}>
@@ -462,11 +476,11 @@ function Stock() {
                   <div className="grid grid-cols-2 gap-y-6 gap-x-6">
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Product</p>
-                      <p className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{selectedRow.product?.name || "-"}</p>
+                      <p className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{selectedRow.name || "-"}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Code</p>
-                      <p className="text-sm font-bold text-[#7033ff] font-mono">{selectedRow.product?.code || "-"}</p>
+                      <p className="text-sm font-bold text-[#7033ff] font-mono">{selectedRow.code || "-"}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop</p>
@@ -474,7 +488,7 @@ function Stock() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Category</p>
-                      <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedRow.product?.category?.name || selectedRow.category || "Uncategorized"}</p>
+                      <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedRow.category?.name || "Uncategorized"}</p>
                     </div>
                     
                     <div className="col-span-2 pt-4 border-t border-[#e5e7eb] dark:border-[#27272a]">
@@ -482,7 +496,7 @@ function Stock() {
                       
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#f8fafc] dark:bg-[#09090b] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a]">
                         <div className="flex flex-col items-center justify-center text-center">
-                           <span className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{Number(selectedRow.quantity || 0).toLocaleString()}</span>
+                           <span className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{Number(selectedRow.currentStock ?? 0).toLocaleString()}</span>
                            <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">Quantity</span>
                         </div>
                         <div className="flex flex-col items-center justify-center text-center border-l border-[#e5e7eb] dark:border-[#27272a]">

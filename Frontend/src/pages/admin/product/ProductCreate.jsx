@@ -4,21 +4,27 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useStorage from "../../../hooks/useStorage";
 import useCollection from "../../../hooks/useCollection";
+import ProductCodePreview from "../../../components/ProductCodePreview";
+import ProductLabelPrintModal from "../../../components/ProductLabelPrintModal";
 
 function CreateProduct() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
+  const [supplier, setSupplier] = useState("");
+  const [sku, setSku] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [costPrice, setCostPrice] = useState("");
-  const [currentStock, setCurrentStock] = useState(0);
   const [note, setNote] = useState("");
   const [reorderLevel, setReorderLevel] = useState(10);
   const [status, setStatus] = useState(true);
-  
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [printModalOpen, setPrintModalOpen] = useState(false);
 
   const { data: categories } = useFetchData("categories", 1, 100);
+  const { data: suppliers } = useFetchData("suppliers", 1, 100);
   const { uploadFile } = useStorage();
   const { create, isLoading } = useCollection("products");
   const navigate = useNavigate();
@@ -82,11 +88,16 @@ function CreateProduct() {
       const payload = {
         name,
         category,
+        supplier: supplier || undefined,
+        sku: sku.trim(),
+        barcode: barcode.trim(),
         salePrice: sale,
         costPrice: cost,
-        currentStock: Number(currentStock),
-        note,
+        lowStockThreshold: Number(reorderLevel),
         reorderLevel: Number(reorderLevel),
+        note,
+        description: note,
+        status: status ? "ACTIVE" : "INACTIVE",
       };
       if (filename) payload.imageUrl = filename;
 
@@ -116,24 +127,24 @@ function CreateProduct() {
         <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">Create New Product</h1>
 
         <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-          
+
           {/* Left card: Product Details */}
           <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
             <div className="flex items-center gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4 text-sm font-bold text-[#020617] dark:text-[#f8fafc]">
               Product Details
             </div>
-            
+
             <div className="p-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className={labelClass}>Product Name*</label>
-                  <input 
+                  <input
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    type="text" 
-                    placeholder="Enter product name" 
-                    className={inputClass} 
+                    type="text"
+                    placeholder="Enter product name"
+                    className={inputClass}
                   />
                 </div>
 
@@ -149,7 +160,7 @@ function CreateProduct() {
                       </span>
                     </div>
                   ) : (
-                    <select 
+                    <select
                       required
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
@@ -165,7 +176,7 @@ function CreateProduct() {
 
                 <div>
                   <label className={labelClass}>SKU / Product Code</label>
-                  <input 
+                  <input
                     type="text"
                     disabled
                     readOnly
@@ -173,30 +184,68 @@ function CreateProduct() {
                     className={`${inputClass}`}
                   />
                 </div>
+                <div>
+                  <label className={labelClass}>SKU</label>
+                  <input
+                    type="text"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                    className={inputClass}
+                    placeholder="Enter SKU"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Barcode</label>
+                  <input
+                    type="text"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    className={inputClass}
+                    placeholder="Scan or type barcode"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Default Supplier</label>
+                  <select
+                    value={supplier}
+                    onChange={(e) => setSupplier(e.target.value)}
+                    className={selectClass}
+                  >
+                    <option value="">No default supplier</option>
+                    {suppliers?.map(item => (
+                      <option value={item._id} key={item._id}>{item.businessName || item.name}</option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className={labelClass}>Current Stock</label>
-                  <input 
+                  <input
                     type="number"
-                    min="0"
-                    value={currentStock}
-                    onChange={(e) => setCurrentStock(e.target.value)}
-                    className={inputClass} 
+                    value={0}
+                    readOnly
+                    disabled
+                    className={inputClass}
                   />
+                  <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">
+                    Stock is added from Receive Stock page.
+                  </p>
                 </div>
 
                 <div>
                   <label className={labelClass}>Cost Price ($)*</label>
                   <div className="relative">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
-                    <input 
+                    <input
                       required
                       type="number"
                       step="0.01"
                       value={costPrice}
                       onChange={(e) => setCostPrice(e.target.value)}
                       className={`${inputClass} pl-8`}
-                      placeholder="0.00" 
+                      placeholder="0.00"
                     />
                   </div>
                 </div>
@@ -205,21 +254,21 @@ function CreateProduct() {
                   <label className={labelClass}>Sale Price ($)*</label>
                   <div className="relative">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
-                    <input 
+                    <input
                       required
                       type="number"
                       step="0.01"
                       value={salePrice}
                       onChange={(e) => setSalePrice(e.target.value)}
                       className={`${inputClass} pl-8`}
-                      placeholder="0.00" 
+                      placeholder="0.00"
                     />
                   </div>
                 </div>
 
                 <div className="md:col-span-2">
                   <label className={labelClass}>Note</label>
-                  <textarea 
+                  <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     className={textareaClass}
@@ -238,7 +287,7 @@ function CreateProduct() {
               </div>
               <div className="p-5">
                 {!preview ? (
-                  <label 
+                  <label
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     className="flex h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] transition-colors hover:border-[#7033ff] hover:bg-[#7033ff]/5"
@@ -253,7 +302,7 @@ function CreateProduct() {
                 ) : (
                   <div className="relative flex h-[180px] w-full items-center justify-center rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-2">
                     <img src={preview} alt="Preview" className="h-full w-full object-contain" />
-                    <button 
+                    <button
                       type="button"
                       onClick={handleRemoveImage}
                       className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-[#e5e7eb] text-red-600 hover:bg-red-50 transition-colors dark:bg-[#111113] dark:border-[#27272a] dark:text-red-400 dark:hover:bg-red-500/10"
@@ -265,6 +314,25 @@ function CreateProduct() {
                 )}
               </div>
             </div>
+
+            {(barcode || sku) && (
+              <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
+                <div className="flex items-center justify-between gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4">
+                  <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">Barcode & QR Preview</span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded">Save product before scanning in POS</span>
+                </div>
+                <div className="p-5 flex flex-col items-center bg-[#f8fafc] dark:bg-[#09090b]">
+                   <ProductCodePreview value={barcode || sku} type="CODE128" />
+                   <button
+                     type="button"
+                     onClick={() => setPrintModalOpen(true)}
+                     className="mt-4 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#020617] dark:text-[#f8fafc] transition hover:bg-[#f8fafc] dark:hover:bg-white/5 active:scale-95"
+                   >
+                     Print Barcode / QR Label
+                   </button>
+                </div>
+              </div>
+            )}
 
             <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
               <div className="flex items-center gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4 text-sm font-bold text-[#020617] dark:text-[#f8fafc]">
@@ -284,7 +352,7 @@ function CreateProduct() {
 
                 <div>
                   <label className={labelClass}>Low Stock Alert Threshold</label>
-                  <input 
+                  <input
                     type="number"
                     min="1"
                     value={reorderLevel}
@@ -298,13 +366,13 @@ function CreateProduct() {
           </div>
 
           <div className="lg:col-span-2 flex items-center justify-end gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-5 py-4">
-            <Link 
+            <Link
               to="/admin/products"
               className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex h-10 items-center justify-center"
             >
               Cancel
             </Link>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center"
@@ -314,6 +382,12 @@ function CreateProduct() {
           </div>
         </form>
       </div>
+
+      <ProductLabelPrintModal 
+        open={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        previewData={{ name, salePrice, sku, barcode }}
+      />
     </div>
   );
 }

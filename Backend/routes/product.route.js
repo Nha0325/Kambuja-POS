@@ -1,5 +1,5 @@
 const express = require("express")
-const { create, findAll, findOne, findOneByCode, update, remove } = require("../controller/product.controller")
+const { create, findAll, findOne, findOneByCode, update, remove, scanByCode, lookupProduct } = require("../controller/product.controller")
 const restrict = require("../guards/restrict.guard")
 const shopScopeGuard = require("../guards/shop-scope.guard")
 
@@ -11,6 +11,10 @@ router
     .route("/")
     .post(restrict("ADMIN"),create)
     .get(restrict("ADMIN_MANAGER","ADMIN","CASHIER"),findAll)
+router
+    .get("/lookup/:code", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), lookupProduct)
+router
+    .get("/scan/:code", restrict("ADMIN", "CASHIER"), scanByCode)
 router
     .get("/code/:code",restrict("ADMIN_MANAGER","ADMIN","CASHIER"), findOneByCode)
 router

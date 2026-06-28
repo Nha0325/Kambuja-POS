@@ -159,8 +159,24 @@ exports.dashboard = async (req, res, next) => {
                 }
             ]),
 
-            Product.countDocuments({ currentStock: { $lte: 0 }, isDeleted: { $ne: true } }),
-            Product.countDocuments({ currentStock: { $gt: 0, $lte: 5 }, isDeleted: { $ne: true } }), // Using 5 as fallback minStock threshold since it's not defined
+            Product.countDocuments({
+                isDeleted: { $ne: true },
+                $expr: { $lte: [{ $ifNull: ["$stock", "$currentStock"] }, 0] },
+            }),
+            Product.countDocuments({
+                isDeleted: { $ne: true },
+                $expr: {
+                    $and: [
+                        { $gt: [{ $ifNull: ["$stock", "$currentStock"] }, 0] },
+                        {
+                            $lte: [
+                                { $ifNull: ["$stock", "$currentStock"] },
+                                { $ifNull: ["$lowStockThreshold", 5] },
+                            ],
+                        },
+                    ],
+                },
+            }),
 
             Subscription.countDocuments({ status: "Active" }),
             Subscription.countDocuments({ status: "Expired" }),
@@ -168,15 +184,15 @@ exports.dashboard = async (req, res, next) => {
 
             Shop.find({ isDeleted: { $ne: true } }).select("name code status createdAt").sort({ createdAt: -1 }).limit(5),
             User.find({ role: ROLES.ADMIN, isDeleted: { $ne: true } }).select("username email status createdAt").sort({ createdAt: -1 }).limit(5),
-            
+
             Sale.aggregate([
                 { $match: { createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) } } },
                 { $group: { _id: { $month: "$createdAt" }, total: { $sum: "$totalCost" } } },
                 { $sort: { "_id": 1 } }
             ]),
-            
+
             Product.aggregate([
-                { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+                { $group: { _id: "$category", count: { $sum: 1 } } },
                 { $lookup: { from: "categories", localField: "_id", foreignField: "_id", as: "category" } },
                 { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
                 { $project: { name: { $ifNull: ["$category.name", "Uncategorized"] }, count: 1 } },
@@ -235,12 +251,12 @@ exports.listShops = async (req, res, next) => {
         const docs = await Shop.find(filter)
             .populate(shopPopulate)
             .sort({ createdAt: -1 })
-            
+
         const shopsWithCounts = await Promise.all(docs.map(async (shop) => {
             const cashierCount = await User.countDocuments({ shopId: shop._id, role: 'CASHIER' })
             const productCount = await Product.countDocuments({ shopId: shop._id })
             const categoryCount = await Category.countDocuments({ shopId: shop._id })
-            
+
             const hasRelatedData = await Promise.all([
                 User.countDocuments({ shopId: shop._id }),
                 Location.countDocuments({ shop: shop._id }),
@@ -249,7 +265,7 @@ exports.listShops = async (req, res, next) => {
                 StockMovement.countDocuments({ shopId: shop._id }),
                 Receipt.countDocuments({ shopId: shop._id })
             ]).then(counts => counts.some(count => count > 0) || productCount > 0 || categoryCount > 0)
-            
+
             return {
                 ...shop.toObject(),
                 cashierCount,
@@ -316,7 +332,7 @@ exports.createShop = async (req, res, next) => {
         await ownerAdminCheck.ownerAdmin.save()
 
         await writeAuditLog(req, "CREATE", "Shop", shop._id)
-        
+
         const Notification = require("../models/Notification.model");
         await Notification.create({
             title: "New Shop Created",
@@ -324,7 +340,7 @@ exports.createShop = async (req, res, next) => {
             type: "SHOP_CREATED",
             shopId: shop._id
         });
-        
+
         await createAdminActivityAlert(req.user, "Shop created", `Shop ${shop.name} (${shop.code}) was created.`, { shopId: shop._id });
 
         const result = await Shop.findById(shop._id).populate(shopPopulate)
@@ -469,7 +485,7 @@ exports.archiveShop = async (req, res, next) => {
     try {
         const shop = await Shop.findByIdAndUpdate(
             req.params.id,
-            { 
+            {
                 status: "ARCHIVED",
                 isDeleted: true,
                 archivedAt: new Date(),
@@ -477,13 +493,13 @@ exports.archiveShop = async (req, res, next) => {
             },
             { new: true, runValidators: true }
         ).populate(shopPopulate)
-        
+
         if (!shop) {
             return res.status(404).json({ success: false, error: "Shop not found" })
         }
-        
+
         await writeAuditLog(req, "ARCHIVE", "Shop", shop._id)
-        
+
         const Notification = require("../models/Notification.model");
         await Notification.create({
             title: "Shop Archived",
@@ -491,7 +507,7 @@ exports.archiveShop = async (req, res, next) => {
             type: "SHOP_ARCHIVED",
             shopId: shop._id
         });
-        
+
         await createAdminActivityAlert(req.user, "Shop deactivated", `Shop ${shop.name} (${shop.code}) has been deactivated (archived).`, { shopId: shop._id });
 
         return res.status(200).json({ success: true, result: shop })
@@ -504,7 +520,7 @@ exports.restoreShop = async (req, res, next) => {
     try {
         const shop = await Shop.findByIdAndUpdate(
             req.params.id,
-            { 
+            {
                 status: "ACTIVE",
                 isDeleted: false,
                 archivedAt: null,
@@ -512,13 +528,13 @@ exports.restoreShop = async (req, res, next) => {
             },
             { new: true, runValidators: true }
         ).populate(shopPopulate)
-        
+
         if (!shop) {
             return res.status(404).json({ success: false, error: "Shop not found" })
         }
-        
+
         await writeAuditLog(req, "RESTORE", "Shop", shop._id)
-        
+
         const Notification = require("../models/Notification.model");
         await Notification.create({
             title: "Shop Restored",
@@ -526,7 +542,7 @@ exports.restoreShop = async (req, res, next) => {
             type: "SHOP_RESTORED",
             shopId: shop._id
         });
-        
+
         await createAdminActivityAlert(req.user, "Shop restored", `Shop ${shop.name} (${shop.code}) has been restored.`, { shopId: shop._id });
 
         return res.status(200).json({ success: true, result: shop })
@@ -597,14 +613,14 @@ exports.createAdmin = async (req, res, next) => {
             status: status || "ACTIVE",
         })
         await writeAuditLog(req, "CREATE", "User", admin._id, { role: ROLES.ADMIN })
-        
+
         const Notification = require("../models/Notification.model");
         await Notification.create({
             title: "Admin Created",
             message: `Admin user ${admin.username} was created.`,
             type: "ADMIN_CREATED"
         });
-        
+
         await createAdminActivityAlert(req.user, "Admin owner created", `Admin user ${admin.username} was created.`, { userId: admin._id });
 
         admin.password = undefined
@@ -681,12 +697,12 @@ exports.platformReports = async (req, res, next) => {
 
         let start, end;
         const now = new Date();
-        
+
         if (period === 'today') {
             start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         } else if (period === 'week') {
-            const day = now.getDay() || 7; 
+            const day = now.getDay() || 7;
             start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + 1);
             end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         } else if (period === 'month') {
@@ -709,7 +725,7 @@ exports.platformReports = async (req, res, next) => {
         const averageSale = totalSales > 0 ? totalRevenue / totalSales : 0;
 
         const trendMap = new Map();
-        
+
         sales.forEach(sale => {
             const date = new Date(sale.createdAt);
             let label;
@@ -718,7 +734,7 @@ exports.platformReports = async (req, res, next) => {
             } else {
                 label = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
             }
-            
+
             if (!trendMap.has(label)) {
                 trendMap.set(label, { label, revenue: 0, sales: 0 });
             }
@@ -806,7 +822,7 @@ const getCurrentStockAlerts = async () => {
     for (const p of products) {
         const quantity = Number(p.quantity ?? p.stock ?? p.currentStock ?? 0);
         const reorder = Number(p.reorderLevel ?? p.lowStockAlert ?? p.minStock ?? p.minimumStock ?? 0);
-        
+
         if (reorder > 0) {
             let type = null;
             let alertTitle = "";
@@ -853,7 +869,7 @@ const getCurrentStockAlerts = async () => {
             }
         }
     }
-    
+
     alerts.sort((a, b) => new Date(b.time) - new Date(a.time));
     return { alerts, lowCount, criticalCount, outCount };
 };
@@ -883,7 +899,7 @@ exports.alerts = async (req, res, next) => {
             if (a.type === "LOGIN_SUCCESS") summary.loginAlerts++;
             if (a.type === "LOGIN_FAILED") summary.failedLoginAlerts++;
             if (a.type === "SUSPICIOUS_ACTIVITY") summary.suspiciousActivityAlerts++;
-            
+
             return {
                 _id: a._id,
                 time: a.createdAt,
@@ -1054,13 +1070,13 @@ exports.createBackup = async (req, res, next) => {
         const day = String(date.getDate()).padStart(2, '0');
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-        
+
         const fileName = `kambuja-pos-backup-${year}-${month}-${day}-${hours}-${minutes}.archive.gz`;
         const outputPath = path.join(backupsDir, fileName);
 
         const isWindows = process.platform === "win32";
         const mongoDumpCommand = isWindows ? "mongodump.exe" : "mongodump";
-        
+
         const args = [
             '--uri', dbUri,
             `--archive=${outputPath}`,
@@ -1073,7 +1089,7 @@ exports.createBackup = async (req, res, next) => {
         mongodumpProcess.on('error', async (err) => {
             if (responded) return;
             responded = true;
-            
+
             const Notification = require("../models/Notification.model");
             await Notification.create({
                 title: "Backup Failed",
@@ -1090,13 +1106,13 @@ exports.createBackup = async (req, res, next) => {
         mongodumpProcess.on('close', async (code) => {
             if (responded) return;
             responded = true;
-            
+
             const Notification = require("../models/Notification.model");
-            
+
             if (code === 0 && fs.existsSync(outputPath)) {
                 const stats = fs.statSync(outputPath);
                 const sizeMB = stats.size / (1024 * 1024);
-                
+
                 await Notification.create({
                     title: "Backup Success",
                     message: `Database backup ${fileName} created successfully.`,
@@ -1130,15 +1146,15 @@ exports.deleteBackup = async (req, res, next) => {
     try {
         const fs = require('fs');
         const path = require('path');
-        
+
         const fileName = req.params.id;
         if (!fileName || typeof fileName !== 'string' || fileName.includes('/') || fileName.includes('\\') || fileName.includes('..') || !fileName.endsWith('.gz')) {
              return res.status(400).json({ success: false, message: "Invalid backup file name." });
         }
-        
+
         const backupsDir = path.join(__dirname, '..', 'backups');
         const filePath = path.join(backupsDir, fileName);
-        
+
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
             res.status(200).json({ success: true, message: "Backup deleted successfully." });
@@ -1154,15 +1170,15 @@ exports.downloadBackup = async (req, res, next) => {
     try {
         const fs = require('fs');
         const path = require('path');
-        
+
         const fileName = req.params.id;
         if (!fileName || typeof fileName !== 'string' || fileName.includes('/') || fileName.includes('\\') || fileName.includes('..') || !fileName.endsWith('.gz')) {
              return res.status(400).send("Invalid backup file name.");
         }
-        
+
         const backupsDir = path.join(__dirname, '..', 'backups');
         const filePath = path.join(backupsDir, fileName);
-        
+
         if (fs.existsSync(filePath)) {
             res.download(filePath, fileName);
         } else {
@@ -1177,12 +1193,12 @@ exports.getNotifications = async (req, res, next) => {
     try {
         const Notification = require("../models/Notification.model");
         const limit = parseInt(req.query.limit) || 10;
-        
+
         const notifications = await Notification.find({ roleTarget: "ADMIN_MANAGER" })
             .populate("shopId", "name")
             .sort({ createdAt: -1 })
             .limit(limit);
-        
+
         let mapped = notifications.map(n => ({
             _id: n._id,
             title: n.title,
@@ -1195,7 +1211,7 @@ exports.getNotifications = async (req, res, next) => {
         })).filter(a => !["LOW_STOCK", "CRITICAL_STOCK", "OUT_OF_STOCK"].includes(a.type));
 
         const stockData = await getCurrentStockAlerts();
-        
+
         mapped = [...stockData.alerts, ...mapped];
         mapped.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -1213,9 +1229,9 @@ exports.getUnreadCount = async (req, res, next) => {
             isRead: false,
             type: { $nin: ["LOW_STOCK", "CRITICAL_STOCK", "OUT_OF_STOCK"] }
         });
-        
+
         const stockData = await getCurrentStockAlerts();
-        
+
         res.status(200).json({ success: true, count: count + stockData.lowCount + stockData.criticalCount + stockData.outCount });
     } catch (error) {
         next(error);
@@ -1243,6 +1259,128 @@ exports.markAllAsRead = async (req, res, next) => {
             { isRead: true, readAt: new Date() }
         );
         res.status(200).json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getProducts = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        let filter = { isDeleted: { $ne: true } };
+
+        if (req.query.q) {
+            filter.$or = [
+                { name: { $regex: req.query.q, $options: "i" } },
+                { barcode: { $regex: req.query.q, $options: "i" } },
+                { sku: { $regex: req.query.q, $options: "i" } }
+            ];
+        }
+
+        if (req.query.shopId) {
+            filter.shopId = req.query.shopId;
+        }
+
+        if (req.query.categoryId) {
+            filter.category = req.query.categoryId;
+        }
+
+        if (req.query.stockStatus) {
+            if (req.query.stockStatus === 'OUT_OF_STOCK') {
+                filter.$expr = { $lte: [{ $ifNull: ["$stock", "$currentStock"] }, 0] };
+            } else if (req.query.stockStatus === 'LOW_STOCK') {
+                filter.$expr = {
+                    $and: [
+                        { $gt: [{ $ifNull: ["$stock", "$currentStock"] }, 0] },
+                        {
+                            $lte: [
+                                { $ifNull: ["$stock", "$currentStock"] },
+                                { $ifNull: ["$lowStockThreshold", 5] },
+                            ],
+                        },
+                    ],
+                };
+            } else if (req.query.stockStatus === 'IN_STOCK') {
+                filter.$expr = {
+                    $gt: [
+                        { $ifNull: ["$stock", "$currentStock"] },
+                        { $ifNull: ["$lowStockThreshold", 5] },
+                    ],
+                };
+            }
+        }
+
+        let sort = {};
+        if (req.query.sortBy) {
+            sort[req.query.sortBy] = req.query.sortOrder === 'desc' ? -1 : 1;
+        } else {
+            sort = { createdAt: -1 };
+        }
+
+        let productQuery = Product.find(filter)
+            .populate({
+                path: 'shopId',
+                select: 'name code provinceKh provinceEn status',
+                populate: {
+                    path: 'ownerAdminId',
+                    select: 'username fullName'
+                }
+            })
+            .populate('category', 'name')
+            .populate('supplier', 'name')
+            .sort(sort)
+            .skip(skip)
+            .limit(limit);
+
+        const [products, total] = await Promise.all([
+            productQuery.exec(),
+            Product.countDocuments(filter)
+        ]);
+
+        // Manual province filtering if needed
+        let finalProducts = products;
+        if (req.query.province) {
+            finalProducts = products.filter(p =>
+                p.shopId && (
+                    p.shopId.provinceKh === req.query.province ||
+                    p.shopId.provinceEn === req.query.province
+                )
+            );
+        }
+
+        res.status(200).json({
+            success: true,
+            totalPage: Math.ceil(total / limit),
+            total,
+            result: finalProducts
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getProduct = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id)
+            .populate({
+                path: 'shopId',
+                select: 'name code provinceKh provinceEn status',
+                populate: {
+                    path: 'ownerAdminId',
+                    select: 'username fullName'
+                }
+            })
+            .populate('category', 'name')
+            .populate('supplier', 'name');
+
+        if (!product || product.isDeleted) {
+            return res.status(404).json({ success: false, error: "Product not found" });
+        }
+
+        res.status(200).json({ success: true, result: product });
     } catch (error) {
         next(error);
     }

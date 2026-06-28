@@ -12,6 +12,17 @@ export const useSignin = () => {
             setIsLoading(true)
             const res = await api.post('/auth/signin',{email, password})
             if (res.data?.success) {
+                const accessToken = res.data?.data?.accessToken || res.data?.result?.token;
+                const user = res.data?.data?.user || res.data?.result;
+                
+                if (accessToken) {
+                    localStorage.setItem("accessToken", accessToken);
+                    localStorage.setItem("token", accessToken); // For backward compatibility
+                }
+                if (user) {
+                    localStorage.setItem("user", JSON.stringify(user));
+                }
+                
                 localStorage.setItem("posAuth", "true")
             }
             return res.data

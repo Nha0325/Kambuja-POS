@@ -17,7 +17,6 @@ process.env.SUPER_USERNAME = process.env.BOOTSTRAP_ADMIN_MANAGER_NAME || process
 process.env.SUPER_EMAIL = process.env.BOOTSTRAP_ADMIN_MANAGER_EMAIL || process.env.SUPER_EMAIL
 process.env.SUPER_PASSWORD = process.env.BOOTSTRAP_ADMIN_MANAGER_PASSWORD || process.env.SUPER_PASSWORD
 process.env.COOKIE_EXPIRE ||= "1"
-process.env.COOKIE_DOMAIN ||= "localhost"
 process.env.COOKIE_SAMESITE ||= "lax"
 process.env.LOCAL_DOMAIN ||= corsOrigins[0] || "http://localhost:5173"
 process.env.CLIENT_DOMAIN ||= corsOrigins[1] || corsOrigins[0] || "http://localhost:5173"

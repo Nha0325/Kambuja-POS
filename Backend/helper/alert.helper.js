@@ -102,7 +102,7 @@ exports.createAdminActivityAlert = async (actor, action, message, metadata) => {
 // Keep existing function signature for backward compatibility
 exports.checkStockAndAlert = async (product) => {
     try {
-        const stock = Number(product.currentStock || 0);
+        const stock = Number(product.stock ?? product.stockQtyBase ?? product.currentStock ?? 0);
         let reorderLevel = 10; // default
 
         // Fetch reorderLevel from Inventory
@@ -110,8 +110,8 @@ exports.checkStockAndAlert = async (product) => {
         const inventory = await Inventory.findOne({ product: product._id, shopId: product.shopId });
         if (inventory && inventory.reorderLevel !== undefined) {
             reorderLevel = Number(inventory.reorderLevel);
-        } else if (product.reorderLevel !== undefined) {
-            reorderLevel = Number(product.reorderLevel);
+        } else if (product.lowStockThreshold !== undefined || product.reorderLevel !== undefined) {
+            reorderLevel = Number(product.lowStockThreshold ?? product.reorderLevel);
         }
 
         let type = null;

@@ -132,7 +132,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
         <div className="hidden min-w-0 items-center gap-2 sm:flex">
           {isAdminShell ? (
             <>
-              <span className="text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">Admin Manager</span>
+              <span className="text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{isAdminManagerShell ? "Admin Manager" : "Admin"}</span>
               <span className="text-sm font-medium text-[#e5e7eb] dark:text-[#27272a]">/</span>
               <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{title}</span>
             </>

@@ -18,9 +18,15 @@ if ! load_env_file "$PROJECT_ROOT/Backend/.env"; then
   exit 1
 fi
 
-BACKEND_PORT="${PORT:-${SERVER_PORT:-5000}}"
-FRONTEND_PORT="${FRONTEND_PORT:-5173}"
+BACKEND_PORT="${PORT:-${SERVER_PORT:-8080}}"
+FRONTEND_PORT="${FRONTEND_PORT:-5174}"
 NGROK_API_PORT="${NGROK_API_PORT:-4040}"
+
+LAN_IP=$(hostname -I | awk '{print $1}')
+if [ -z "$LAN_IP" ]; then
+  LAN_IP="127.0.0.1"
+fi
+export LAN_IP
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
 USE_NGROK=false
@@ -246,11 +252,15 @@ if ((run_backend)); then
   log "Starting Backend..."
   check_mongodb
   (
+    export PORT="$BACKEND_PORT"
+    export CLIENT_ORIGINS="http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,http://$LAN_IP:5173,http://$LAN_IP:5174"
     cd "$PROJECT_ROOT/Backend"
     npm run migrate:roles >> "$LOG_DIR/backend.log" 2>&1
     npm run seed >> "$LOG_DIR/backend.log" 2>&1
   )
   (
+    export PORT="$BACKEND_PORT"
+    export CLIENT_ORIGINS="http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,http://$LAN_IP:5173,http://$LAN_IP:5174"
     cd "$PROJECT_ROOT/Backend"
     if node -e "process.exit(require('./package.json').scripts.dev ? 0 : 1)" 2>/dev/null; then
       npm run dev > "$LOG_DIR/backend.log" 2>&1
@@ -271,9 +281,14 @@ fi
 if ((run_frontend)); then
   log "Starting Frontend..."
   (
+    export VITE_API_URL="http://$LAN_IP:$BACKEND_PORT/api/v1"
     cd "$PROJECT_ROOT/Frontend"
+    
+    # Force Vite to see the correct API URL even if the user runs npm run dev manually later
+    echo "VITE_API_URL=\"http://$LAN_IP:$BACKEND_PORT/api/v1\"" > .env.local
+    
     if node -e "process.exit(require('./package.json').scripts.dev ? 0 : 1)" 2>/dev/null; then
-      npm run dev -- --port "$FRONTEND_PORT" --strictPort > "$LOG_DIR/frontend.log" 2>&1
+      npm run dev -- --host 0.0.0.0 --port "$FRONTEND_PORT" --strictPort > "$LOG_DIR/frontend.log" 2>&1
     elif node -e "process.exit(require('./package.json').scripts.start ? 0 : 1)" 2>/dev/null; then
       npm start > "$LOG_DIR/frontend.log" 2>&1
     else
@@ -335,8 +350,8 @@ echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}  Kambuja POS Dev Environment Started${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
-((run_backend))  && echo -e "  ${CYAN}Backend   ${NC}→ http://localhost:$BACKEND_PORT"
-((run_frontend)) && echo -e "  ${CYAN}Frontend  ${NC}→ http://localhost:$FRONTEND_PORT"
+((run_backend))  && echo -e "  ${CYAN}Backend   ${NC}→ http://$LAN_IP:$BACKEND_PORT/api/v1"
+((run_frontend)) && echo -e "  ${CYAN}Frontend  ${NC}→ http://$LAN_IP:$FRONTEND_PORT"
 [ -n "$PUBLIC_API_URL" ] && echo -e "  ${CYAN}Public Tunnel   ${NC}→ $PUBLIC_API_URL"
 echo -e "${GREEN}═══════════════════════════════════════════════════${NC}"
 echo -e "  Logs in ${YELLOW}./logs/${NC}"

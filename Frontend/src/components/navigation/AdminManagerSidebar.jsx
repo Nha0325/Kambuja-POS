@@ -21,7 +21,8 @@ const primaryItems = [
   { to: "/admin-manager/subscriptions", label: "Subscriptions", icon: FaIdCard },
   { to: "/admin-manager/alerts", label: "Alerts", icon: FaBell },
   { to: "/admin-manager/reports", label: "Reports", icon: FaChartColumn },
-  { to: "/admin-manager/stock", label: "Stock Overview", icon: FaBoxesStacked },
+  { to: "/admin-manager/products", label: "Products Monitor", icon: FaBoxesStacked },
+  { to: "/admin-manager/stock", label: "Global Inventory", icon: FaBoxesStacked },
   { to: "/admin-manager/system-logs", label: "System Logs", icon: FaFileLines },
   { to: "/admin-manager/system-health", label: "System Health", icon: FaHeartPulse },
 ]

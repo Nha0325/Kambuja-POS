@@ -11,8 +11,9 @@ router.get("/overview", controller.overview)
 router.get("/movements", controller.movements)
 router.get("/low-stock", controller.lowStock)
 router.get("/low-stock-50", controller.lowStock50)
-router.post("/stock-in", restrict("ADMIN_MANAGER", "ADMIN"), controller.stockIn)
-router.post("/adjust", restrict("ADMIN_MANAGER", "ADMIN"), controller.adjust)
-router.post("/adjustment", restrict("ADMIN_MANAGER", "ADMIN"), controller.adjustment)
+router.post("/receive", restrict("ADMIN"), controller.stockIn)
+router.post("/stock-in", restrict("ADMIN"), controller.stockIn)
+router.post("/adjust", restrict("ADMIN"), controller.adjust)
+router.post("/adjustment", restrict("ADMIN"), controller.adjustment)
 
 module.exports = router

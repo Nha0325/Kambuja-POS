@@ -136,7 +136,7 @@ function CreatePurchase() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-8xl">
         <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl mb-6">Create Purchase</h1>
 
         <form onSubmit={handleSubmit} className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-5 md:p-6 shadow-none">

@@ -33,3 +33,19 @@ Kambuja POS is built using a modern, scalable JavaScript stack:
 ## Security & Git Safety Notes
 - **Environment Variables:** This project relies on `.env` files for configuration. Do **not** commit real secrets, API keys, or database URIs to version control. Always use the `.env.example` templates provided.
 - **Tracking:** Keep your `.env`, `Frontend/.env`, and `Backend/.env` files out of Git tracking. Ensure that `package-lock.json` remains tracked for dependency consistency.
+
+## Local LAN Testing & Mobile Scanning
+When testing the POS application on a mobile device over a local Wi-Fi network (LAN IP like `10.91.x.x`):
+- Phone browser camera does not work reliably on `http://LAN_IP` because `getUserMedia` requires a secure context.
+- Use HTTPS domain/tunnel for correct testing.
+- Example correct URLs:
+  - `https://pos.kambujapos.com/cashier/pos`
+  - `https://api.kambujapos.com/api/v1`
+
+**Quick test workaround for Brave/Chrome:**
+1. Open `brave://flags` or `chrome://flags`
+2. Search for "Insecure origins treated as secure"
+3. Add your local IP with port (e.g., `http://10.91.21.48:5174`)
+4. Enable and relaunch the browser
+
+**Hardware Scanners**: Standard USB/Bluetooth barcode scanners operating in keyboard-emulation mode will continue to work perfectly fine regardless of HTTPS.

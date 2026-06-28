@@ -1,8 +1,8 @@
 const Product = require("../models/Product.model")
-const qs = require('qs')
 const { generateProductCode } = require("./counter.controller")
-const Inventory = require("../models/Inventory.model")
 const ProductCode = require("../models/ProductCode.model")
+const Inventory = require("../models/Inventory.model")
+const { getLowStockThreshold } = require("../helper/stock.helper")
 
 const cashierSafeProduct = (product) => {
     const safe = product.toObject ? product.toObject() : { ...product };
@@ -16,13 +16,81 @@ const cashierSafeProduct = (product) => {
     return safe;
 }
 
+const normalizeStatus = (value) => {
+    if (typeof value === "boolean") return value ? "ACTIVE" : "INACTIVE"
+    if (!value) return undefined
+    const status = String(value).trim().toUpperCase()
+    return ["ACTIVE", "INACTIVE"].includes(status) ? status : undefined
+}
+
 const normalizeProductPayload = (body) => {
     const payload = { ...(body || {}) }
     delete payload._id
     delete payload.shopId
     delete payload.code
+    delete payload.stock
+    delete payload.currentStock
+    delete payload.stockQtyBase
 
-    ;["costPrice", "salePrice", "currentStock"].forEach((field) => {
+    // Accept categoryId alias
+    if (payload.categoryId && !payload.category) {
+        payload.category = payload.categoryId
+    }
+    delete payload.categoryId
+
+    // Accept supplierId alias
+    if (payload.supplierId && !payload.supplier) {
+        payload.supplier = payload.supplierId
+    }
+    delete payload.supplierId
+
+    // Accept image alias for imageUrl
+    if (payload.image && !payload.imageUrl) {
+        payload.imageUrl = payload.image
+    }
+    delete payload.image
+
+    // Normalise low-stock threshold
+    const threshold = payload.lowStockThreshold ?? payload.lowStockThresholdBase ?? payload.reorderLevel
+    if (threshold !== undefined) {
+        payload.lowStockThreshold = Number(threshold)
+        payload.reorderLevel = Number(threshold)
+    }
+    delete payload.lowStockThresholdBase
+
+    // Accept sellPrice alias for salePrice
+    if (payload.sellPrice !== undefined && payload.salePrice === undefined) {
+        payload.salePrice = payload.sellPrice
+    }
+    delete payload.sellPrice
+
+    // Remove all unit-conversion fields
+    delete payload.unitTemplate
+    delete payload.baseUnit
+    delete payload.purchaseUnit
+    delete payload.unitsPerPurchaseUnit
+    delete payload.allowedSaleUnits
+    delete payload.saleUnits
+    delete payload.unitConfig
+    delete payload.costPerPurchaseUnit
+    delete payload.costPerBaseUnit
+    delete payload.salePricePerBaseUnit
+    delete payload.sellPricePerBaseUnit
+    delete payload.salePricePerPurchaseUnit
+    delete payload.sellPricePerPurchaseUnit
+    delete payload.pricing
+    delete payload.packagingDisplay
+
+    // Normalise status
+    const status = normalizeStatus(payload.status)
+    if (status) {
+        payload.status = status
+    } else {
+        delete payload.status
+    }
+
+    // Coerce numeric fields
+    ;["costPrice", "salePrice", "lowStockThreshold", "reorderLevel"].forEach((field) => {
         if (payload[field] !== undefined) {
             payload[field] = Number(payload[field])
         }
@@ -40,8 +108,9 @@ const validateProductNumbers = (payload) => {
         return "Cost price must be greater than or equal zero."
     }
 
-    if (payload.currentStock !== undefined && (!Number.isFinite(payload.currentStock) || payload.currentStock < 0)) {
-        return "Current stock must be greater than or equal zero."
+    const threshold = payload.lowStockThreshold ?? payload.lowStockThresholdBase ?? payload.reorderLevel
+    if (threshold !== undefined && (!Number.isFinite(Number(threshold)) || Number(threshold) < 0)) {
+        return "Low stock threshold must be greater than or equal zero."
     }
 
     return null
@@ -59,26 +128,39 @@ exports.create = async (req, res,next) => {
         }
 
         const code = await generateProductCode()
+
+        // Prevent duplicates in the same shop
+        const orConditions = [{ code }]
+        if (payload.barcode) orConditions.push({ barcode: payload.barcode })
+        if (payload.sku) orConditions.push({ sku: payload.sku })
+
+        const existing = await Product.findOne({
+            shopId: req.shopId,
+            $or: orConditions
+        })
+
+        if (existing) {
+            return res.status(409).json({
+                success: false,
+                error: "Product with this barcode, SKU, or code already exists in this shop."
+            })
+        }
+
         const newDoc = await Product.create({
             ...payload,
             code,
-            currentStock: payload.currentStock ?? 0,
             shopId: req.shopId,
+            stock: 0,
+            currentStock: 0,
+            lowStockThreshold: getLowStockThreshold(payload),
+            reorderLevel: getLowStockThreshold(payload),
         })
-        await Promise.all([
-            Inventory.create({
-                shopId: req.shopId,
-                product: newDoc._id,
-                quantity: newDoc.currentStock,
-                reorderLevel: Number(payload.reorderLevel || 5),
-            }),
-            ProductCode.create({
-                shopId: req.shopId,
-                product: newDoc._id,
-                code: newDoc.code,
-                type: "SKU",
-            }),
-        ])
+        await ProductCode.create({
+            shopId: req.shopId,
+            product: newDoc._id,
+            code: newDoc.code,
+            type: "SKU",
+        })
         res.status(201).json({
             success: true,
             result: newDoc
@@ -107,7 +189,7 @@ exports.findAll = async (req, res, next) => {
                               .replace(/\b(gte|gt|lte|lt|in)\b/g, match => `$${match}`)
 
         const filters = JSON.parse(filterString)
-        
+
         if (req.query.search) {
            querySearch["$or"] = [
             { name: { $regex: req.query.search, $options: "i" } },
@@ -129,6 +211,14 @@ exports.findAll = async (req, res, next) => {
           .populate({
             path: "category",
             select: "name"
+          })
+          .populate({
+            path: "shopId",
+            select: "name"
+          })
+          .populate({
+            path: "supplier",
+            select: "name businessName"
           })
           .exec();
 
@@ -154,16 +244,19 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
     try {
         const id = req.params.id
-        const doc =await Product.findOne({ _id: id, ...req.shopFilter }).populate("category", "name")
+        const doc =await Product.findOne({ _id: id, ...req.shopFilter })
+            .populate("category", "name")
+            .populate("shopId", "name")
+            .populate("supplier", "name businessName")
         if(!doc){
             return res.status(404).json({
                 success: false,
                 error: "Document not found with that ID!"
             })
         }
-        
+
         const resultDoc = (req.user && req.user.role === 'CASHIER') ? cashierSafeProduct(doc) : doc;
-        
+
         res.status(200).json({
             success: true,
             result: resultDoc
@@ -176,14 +269,17 @@ exports.findOne = async (req, res, next) => {
 exports.findOneByCode = async (req, res, next) => {
     try {
         const code = req.params.code
-        const doc =await Product.findOne({code, ...req.shopFilter}).populate("category", "name")
+        const doc =await Product.findOne({code, ...req.shopFilter})
+            .populate("category", "name")
+            .populate("shopId", "name")
+            .populate("supplier", "name businessName")
         if(!doc){
             return res.status(404).json({
                 success: false,
                 error: "Document not found with that ID!"
             })
         }
-        
+
         const resultDoc = (req.user && req.user.role === 'CASHIER') ? cashierSafeProduct(doc) : doc;
 
         res.status(200).json({
@@ -247,5 +343,107 @@ exports.remove = async (req, res, next) => {
         })
     } catch (error) {
         next(error)
+    }
+}
+
+exports.scanByCode = async (req, res, next) => {
+    try {
+        const code = (req.params.code || "").trim()
+        if (!code) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid barcode"
+            })
+        }
+
+        const doc = await Product.findOne({
+            ...req.shopFilter,
+            isDeleted: { $ne: true },
+            $or: [
+                { barcode: code },
+                { sku: code },
+                { code: code },
+            ],
+        })
+            .populate("category", "name")
+
+        if (!doc) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            })
+        }
+
+        if (doc.status !== "ACTIVE") {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            })
+        }
+
+        const currentStock = Number(doc.stock ?? doc.currentStock ?? 0)
+        if (currentStock <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Product is out of stock"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Product found",
+            data: {
+                _id: doc._id,
+                name: doc.name,
+                barcode: doc.barcode || "",
+                sku: doc.sku || "",
+                code: doc.code,
+                imageUrl: doc.imageUrl || "",
+                category: doc.category?.name || "",
+                stock: currentStock,
+                salePrice: doc.salePrice,
+                costPrice: doc.costPrice,
+                status: doc.status,
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.lookupProduct = async (req, res, next) => {
+    try {
+        const code = req.params.code;
+        if (!code) {
+            return res.status(400).json({ success: false, error: "Code is required" });
+        }
+        
+        const doc = await Product.findOne({
+            ...req.shopFilter,
+            $or: [
+                { code },
+                { barcode: code },
+                { sku: code }
+            ]
+        })
+        .populate("category", "name")
+        .populate("shopId", "name")
+        .populate("supplier", "name businessName");
+        
+        if (!doc) {
+            return res.status(404).json({
+                success: false,
+                error: "Product not found"
+            });
+        }
+        
+        const resultDoc = (req.user && req.user.role === 'CASHIER') ? cashierSafeProduct(doc) : doc;
+        
+        res.status(200).json({
+            success: true,
+            result: resultDoc
+        });
+    } catch (error) {
+        next(error);
     }
 }

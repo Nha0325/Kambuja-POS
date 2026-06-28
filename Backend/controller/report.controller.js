@@ -2,6 +2,7 @@ const Product = require("../models/Product.model")
 const Purchase = require("../models/Purchase.model")
 const Sale = require("../models/Sale.model")
 const Supplier = require("../models/Supplier.model")
+const StockMovement = require("../models/StockMovement.model")
 
 exports.generalReport = async (req, res, next) => {
     try {
@@ -138,27 +139,146 @@ exports.saleReport = async (req, res, next) => {
 
 exports.stockReport = async (req, res, next) => {
     try {
-        if(!req.query?.stockQty){
-            return res.status(400).json({
-                success: false,
-                error:"please provide stock qty"
-            })
+        const filter = { ...req.shopFilter, isDeleted: false }
+        
+        if (req.query.shopId && (!req.user.shopId || req.user.role === 'ADMIN_MANAGER')) {
+            filter.shopId = req.query.shopId
         }
 
-        const filter = { ...req.shopFilter }
-        if (req.query.locationId) filter.locationId = req.query.locationId
+        if (req.query.categoryId) filter.category = req.query.categoryId
+        if (req.query.supplierId) filter.supplier = req.query.supplierId
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, 'i')
+            filter.$or = [
+                { name: searchRegex },
+                { sku: searchRegex },
+                { barcode: searchRegex },
+                { code: searchRegex }
+            ]
+        }
 
-        const docs = await Product.find({
-            ...filter,
-            currentStock: {
-                $lte: req.query.stockQty * 1
+        const products = await Product.find(filter)
+            .populate("shopId", "name")
+            .populate("category", "name")
+            .populate("supplier", "name")
+            .lean()
+
+        const productIds = products.map(p => p._id)
+
+        const smFilter = { productId: { $in: productIds } }
+        
+        if (req.query.dateFrom || req.query.dateTo) {
+            smFilter.createdAt = {}
+            if (req.query.dateFrom) {
+                smFilter.createdAt.$gte = new Date(new Date(req.query.dateFrom).setHours(0,0,0,0))
+            }
+            if (req.query.dateTo) {
+                smFilter.createdAt.$lte = new Date(new Date(req.query.dateTo).setHours(23,59,59,999))
+            }
+        }
+
+        const movements = await StockMovement.aggregate([
+            { $match: smFilter },
+            {
+                $group: {
+                    _id: "$productId",
+                    receivedQty: {
+                        $sum: { $cond: [{ $eq: ["$type", "RECEIVE_STOCK"] }, "$qtyChange", 0] }
+                    },
+                    soldQty: {
+                        $sum: { $cond: [{ $eq: ["$type", "SALE"] }, "$qtyChange", 0] }
+                    },
+                    adjustedQty: {
+                        $sum: { $cond: [{ $eq: ["$type", "STOCK_ADJUSTMENT"] }, "$qtyChange", 0] }
+                    },
+                    lastMovementAt: { $max: "$createdAt" }
+                }
+            }
+        ])
+
+        const movementMap = {}
+        movements.forEach(m => {
+            movementMap[m._id.toString()] = m
+        })
+
+        let totalProducts = 0
+        let totalStockQuantity = 0
+        let totalStockValue = 0
+        let totalLowStock = 0
+        let totalOutOfStock = 0
+        let totalReceivedQty = 0
+        let totalSoldQty = 0
+        let totalAdjustedQty = 0
+
+        let result = products.map(p => {
+            const currentStock = p.currentStock || 0
+            const costPerBaseUnit = p.pricing?.costPerBaseUnit || p.costPrice || 0
+            const stockValue = currentStock * costPerBaseUnit
+            const lowStockThreshold = p.lowStockThreshold || 0
+            
+            let stockStatus = 'IN_STOCK'
+            if (currentStock <= 0) {
+                stockStatus = 'OUT_OF_STOCK'
+            } else if (currentStock <= lowStockThreshold) {
+                stockStatus = 'LOW_STOCK'
             }
 
-        }).populate("category", "name")
+            const mov = movementMap[p._id.toString()] || {}
+            const receivedQty = mov.receivedQty || 0
+            const soldQty = Math.abs(mov.soldQty || 0)
+            const adjustedQty = mov.adjustedQty || 0
+            const lastMovementAt = mov.lastMovementAt || null
+
+            return {
+                productId: p._id,
+                productName: p.name,
+                shopId: p.shopId?._id,
+                shopName: p.shopId?.name,
+                sku: p.sku || p.code,
+                barcode: p.barcode,
+                categoryName: p.category?.name,
+                supplierName: p.supplier?.name,
+                currentStock,
+                baseUnit: p.unitConfig?.baseUnit?.nameEn || '',
+                lowStockThreshold,
+                stockStatus,
+                costPerBaseUnit,
+                stockValue,
+                receivedQty,
+                soldQty,
+                adjustedQty,
+                lastMovementAt
+            }
+        })
+
+        if (req.query.status) {
+            result = result.filter(r => r.stockStatus === req.query.status)
+        }
+
+        result.forEach(r => {
+            totalProducts++
+            totalStockQuantity += r.currentStock
+            totalStockValue += r.stockValue
+            if (r.stockStatus === 'LOW_STOCK') totalLowStock++
+            if (r.stockStatus === 'OUT_OF_STOCK') totalOutOfStock++
+            totalReceivedQty += r.receivedQty
+            totalSoldQty += r.soldQty
+            totalAdjustedQty += r.adjustedQty
+        })
 
         res.status(200).json({
             success: true,
-            result: docs
+            summary: {
+                totalProducts,
+                totalStockQuantity,
+                totalStockValue,
+                lowStockProducts: totalLowStock,
+                outOfStockProducts: totalOutOfStock,
+                receivedQty: totalReceivedQty,
+                soldQty: totalSoldQty,
+                adjustedQty: totalAdjustedQty
+            },
+            result
         })
     } catch (error) {
         next(error)

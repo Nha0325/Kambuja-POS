@@ -13,6 +13,9 @@ import Alerts from "../pages/admin-manager/alerts"
 import { CreateLocation, EditLocation, Locations } from "../pages/admin-manager/locations"
 import { Subscriptions } from "../pages/admin-manager/subscriptions"
 import PosAccess from "../pages/admin-manager/access"
+
+import ProductList from "../pages/admin-manager/products/ProductList"
+import ProductDetail from "../pages/admin-manager/products/ProductDetail"
 import { ROLES } from "../utils/role"
 
 export const adminManagerRoutes = (
@@ -45,5 +48,7 @@ export const adminManagerRoutes = (
     <Route path="alerts" element={<Alerts />} />
     <Route path="settings" element={<Settings />} />
     <Route path="access" element={<PosAccess />} />
+    <Route path="products" element={<ProductList />} />
+    <Route path="products/:id" element={<ProductDetail />} />
   </Route>
 )
