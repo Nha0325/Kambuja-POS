@@ -1,14 +1,12 @@
 import { Navigate, Route } from "react-router-dom"
 import Protected from "../components/Protected"
 import CashierLayout from "../layouts/CashierLayout"
-import POS from "../pages/cashier/POS"
-import RoleAwarePOS from "../pages/cashier/RoleAwarePOS"
-import Checkout from "../pages/cashier/Checkout"
+import POS from "../pages/sale/POS"
+import Invoice from "../pages/sale/Invoice"
 import HoldBills from "../pages/cashier/HoldBills"
 import StockCheck from "../pages/cashier/StockCheck"
 import DailyClose from "../pages/cashier/DailyClose"
 import SalesHistory from "../pages/cashier/SalesHistory"
-import Invoice from "../pages/cashier/Invoice"
 import { ROLES } from "../utils/role"
 
 const cashierLayout = (
@@ -26,10 +24,10 @@ const posLayout = (
 export const cashierRoutes = (
   <>
     <Route path="/cashier/pos" element={posLayout}>
-      <Route index element={<RoleAwarePOS />} />
+      <Route index element={<POS />} />
     </Route>
     <Route path="/cashier" element={cashierLayout}>
-      <Route path="checkout" element={<Checkout />} />
+      <Route path="checkout" element={<Navigate to="/cashier/pos" replace />} />
       <Route path="hold-orders" element={<HoldBills />} />
       <Route path="sales-history" element={<SalesHistory />} />
       <Route path="stock-check" element={<StockCheck />} />
