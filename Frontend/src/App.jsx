@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { BrowserRouter, useLocation, useNavigate } from "react-router-dom"
 import { Toaster } from "react-hot-toast"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import AppRoutes from "./routes"
 
 function AuthInvalidRedirect() {
@@ -33,6 +34,7 @@ function App() {
       </BrowserRouter>
 
       <Toaster />
+      <SpeedInsights />
     </>
   );
 }
