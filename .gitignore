@@ -41,8 +41,8 @@ Backend/build/
 # =========================
 # DATABASE LOCAL DATA
 # =========================
-data/
-data/mongodb/
+/data/
+/data/mongodb/
 *.wt
 *.bson
 mongod.lock
