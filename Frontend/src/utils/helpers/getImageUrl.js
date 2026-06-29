@@ -1,6 +1,13 @@
-const API_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL) 
-  ? (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL).replace(/\/api\/v1\/?$/, "") 
-  : "http://localhost:8080";
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL) {
+    return (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL).replace(/\/api\/v1\/?$/, "")
+  }
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+    return "https://kambuja-pos.up.railway.app"
+  }
+  return "http://localhost:8080"
+}
+const API_URL = getApiUrl();
 
 export function getImageUrl(image) {
   if (!image) return "/placeholder-product.svg";
