@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { LuTrash2, LuPencil, LuSearch, LuPlus, LuTags, LuPrinter } from "react-icons/lu";
+import { LuTrash2, LuPencil, LuSearch, LuPlus, LuTags } from "react-icons/lu";
+import { FaBarcode, FaQrcode } from "react-icons/fa6";
 import { baseUrl } from "../../../utils/config/env";
 import { useCollection } from "../../../hooks/common/useCollection";
 import { useQuery } from "../../../hooks/common/useQuery";
@@ -15,6 +16,7 @@ function Product() {
   const [limit, setLimit] = useState(10);
   const [refetch, setRefetch] = useState(false);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [printModalType, setPrintModalType] = useState("barcode");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { data: products, totalPage, isLoading } = useQuery("products", search, page, limit, refetch);
@@ -166,14 +168,27 @@ function Product() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             type="button"
-                            title="Print Label"
+                            title="Print Barcode"
                             onClick={() => {
                               setSelectedProduct(item);
+                              setPrintModalType('barcode');
                               setPrintModalOpen(true);
                             }}
                             className={adminSurface.iconButton}
                           >
-                            <LuPrinter />
+                            <FaBarcode />
+                          </button>
+                          <button
+                            type="button"
+                            title="Print QR Code"
+                            onClick={() => {
+                              setSelectedProduct(item);
+                              setPrintModalType('qrcode');
+                              setPrintModalOpen(true);
+                            }}
+                            className={adminSurface.iconButton}
+                          >
+                            <FaQrcode />
                           </button>
                           <Link
                             to={`/admin/products/${item._id}/edit`}
@@ -213,6 +228,7 @@ function Product() {
         open={printModalOpen}
         onClose={() => setPrintModalOpen(false)}
         product={selectedProduct}
+        initialPrintType={printModalType}
       />
     </div>
   );

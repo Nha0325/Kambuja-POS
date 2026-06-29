@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 function EditUser() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const role = "CASHIER";
 
   const route = useParams();
@@ -18,11 +19,15 @@ function EditUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await update(route.id, {
+      const payload = {
         username,
         email,
         role,
-      });
+      };
+      if (password) {
+        payload.password = password;
+      }
+      const res = await update(route.id, payload);
       if (res) {
         toast.success("User updated successfully!");
         navigate("/admin/cashiers");
@@ -69,6 +74,19 @@ function EditUser() {
               className="input input-bordered w-full"
               placeholder="Enter email"
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="block">Password (Optional)</label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              className="input input-bordered w-full"
+              placeholder="Enter new password (min 6 chars)"
+              minLength={6}
+            />
+            <p className="text-xs text-gray-500 mt-1">Leave blank if you don't want to change the password.</p>
           </div>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">

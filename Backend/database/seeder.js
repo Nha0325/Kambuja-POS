@@ -1,7 +1,7 @@
 require("../config/env")
 const bcryptjs = require("bcryptjs")
 const { connectToDatabase } = require("./db")
-const User = require("../models/User.model")
+const User = require("../models/users/User.model")
 const { ROLES } = require("../constants/roles")
 
 const run = async () => {

@@ -190,6 +190,7 @@ function POS() {
       if (res.data?.success && res.data?.result) {
         addToCart(res.data.result);
         toast.success(`Added: ${res.data.result.name}`);
+        setIsCameraOpen(false);
       }
     } catch (err) {
       if (err.response?.status === 404) {
