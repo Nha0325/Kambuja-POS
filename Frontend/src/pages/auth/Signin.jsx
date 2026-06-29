@@ -59,7 +59,7 @@ const SignIn = () => {
       <main className="relative bg-white p-4 w-full max-w-5xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row min-h-[600px] overflow-hidden">
         
         {/* Mobile Background Image */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center p-8 md:hidden opacity-50 pointer-events-none">
+        <div className="absolute inset-0 z-0 flex items-center justify-center p-8 md:hidden opacity-100 pointer-events-none">
           <img 
             src="/Logo.jpg" 
             alt="Kambuja POS Logo Background" 
