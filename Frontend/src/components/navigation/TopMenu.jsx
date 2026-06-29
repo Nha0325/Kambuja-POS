@@ -159,8 +159,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
       <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-3 w-auto sm:w-1/3">
         
         {/* Language Switcher */}
-        {isAdminShell && (
-          <div className="hidden lg:flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white p-1 dark:border-[#27272a] dark:bg-[#111113]" id="language-switcher">
+        <div className="hidden lg:flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white p-1 dark:border-[#27272a] dark:bg-[#111113]" id="language-switcher">
             <button
               onClick={() => {
                 localStorage.setItem('language', 'en');
@@ -184,11 +183,9 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
               ខ្មែរ
             </button>
           </div>
-        )}
 
         {/* Theme Toggle Button */}
-        {isAdminShell && (
-          <button
+        <button
             type="button"
             onClick={onToggleTheme}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#64748b] dark:text-[#a1a1aa] hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
@@ -200,7 +197,6 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
               <LuMoon className="h-5 w-5" />
             )}
           </button>
-        )}
         
         {/* Settings Icon */}
         {isAdminShell && (
