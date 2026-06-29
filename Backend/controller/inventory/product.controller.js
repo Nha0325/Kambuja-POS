@@ -96,8 +96,8 @@ const normalizeProductPayload = (body) => {
         }
     })
 
-    if (payload.barcode === "") payload.barcode = undefined
-    if (payload.sku === "") payload.sku = undefined
+    if (payload.barcode === "") delete payload.barcode
+    if (payload.sku === "") delete payload.sku
 
     return payload
 }
@@ -143,9 +143,13 @@ exports.create = async (req, res,next) => {
         })
 
         if (existing) {
+            let conflictField = "code"
+            if (payload.barcode && existing.barcode === payload.barcode) conflictField = "barcode"
+            else if (payload.sku && existing.sku === payload.sku) conflictField = "sku"
+            
             return res.status(409).json({
                 success: false,
-                error: "Product with this barcode, SKU, or code already exists in this shop."
+                error: `This code/barcode already exists on another product: "${existing.name}"`
             })
         }
 

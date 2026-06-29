@@ -23,6 +23,7 @@ function CreateProduct() {
   const [preview, setPreview] = useState(null);
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [createdProduct, setCreatedProduct] = useState(null);
 
   const { data: categories } = useFetchData("categories", 1, 100);
   const { data: suppliers } = useFetchData("suppliers", 1, 100);
@@ -110,7 +111,8 @@ function CreateProduct() {
       const res = await create(payload);
       if (res) {
         toast.success("Created successfully!!");
-        navigate("/admin/products");
+        setCreatedProduct(res);
+        setPrintModalOpen(true);
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to create product.");
@@ -393,8 +395,14 @@ function CreateProduct() {
 
       <ProductLabelPrintModal 
         open={printModalOpen}
-        onClose={() => setPrintModalOpen(false)}
-        previewData={{ name, salePrice, sku, barcode }}
+        onClose={() => {
+          setPrintModalOpen(false);
+          if (createdProduct) {
+            navigate("/admin/products");
+          }
+        }}
+        product={createdProduct || { name, salePrice, sku, barcode, code: "PROD-XXXX" }}
+        previewData={!createdProduct ? { name, salePrice, sku, barcode } : null}
       />
     </div>
   );
