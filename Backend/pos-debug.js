@@ -130,14 +130,18 @@ async function deleteTestData() {
             }
             if (target === 'sales' || target === 'all') {
                 const Sale = require('./models/sales/Sale.model');
-                const SaleItem = require('./models/sales/SaleItem.model');
-                const Payment = require('./models/sales/Payment.model');
+                const DailyClose = require('./models/sales/DailyClose.model');
+                const Receipt = require('./models/sales/Receipt.model');
+                const Payment = require('./models/payment/Payment.model');
+                const StockMovement = require('./models/misc/StockMovement.model');
                 
                 let count = 0;
                 count += (await Sale.deleteMany({})).deletedCount;
-                count += (await SaleItem.deleteMany({})).deletedCount;
+                count += (await DailyClose.deleteMany({})).deletedCount;
+                count += (await Receipt.deleteMany({})).deletedCount;
                 count += (await Payment.deleteMany({})).deletedCount;
-                console.log(`Deleted ${count} sales records.`);
+                count += (await StockMovement.deleteMany({ type: "SALE" })).deletedCount;
+                console.log(`Deleted ${count} sales records (including DailyClose, Receipts, Payments, and StockMovements).`);
             }
             console.log("Data wipe complete.");
         } catch (error) {
