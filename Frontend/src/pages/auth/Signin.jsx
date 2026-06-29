@@ -61,12 +61,13 @@ const SignIn = () => {
         {/* ── Left Panel: Form ── */}
         <section className="relative z-10 w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
           <div className="max-w-sm w-full mx-auto">
-            {/* Mobile Logo (Top) */}
-            <div className="md:hidden flex justify-center mb-6">
+            {/* Mobile Logo (Top watermark effect) */}
+            <div className="md:hidden flex justify-center pointer-events-none">
               <img 
                 src="/Logo.jpg" 
                 alt="Kambuja POS Logo" 
                 className="w-full max-w-[280px] object-contain mx-auto"
+                style={{ marginBottom: '-100px', zIndex: -1, opacity: 0.9, position: 'relative' }}
               />
             </div>
             
