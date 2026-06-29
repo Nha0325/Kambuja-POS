@@ -302,6 +302,37 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                 </div>
                 <p className={`mt-1 truncate text-sm font-bold capitalize ${isAdminShell ? 'text-[#020617] dark:text-[#f8fafc]' : 'text-slate-900 dark:text-[#F8FAFC]'}`}>{username}</p>
               </li>
+              
+              {/* Mobile Language Switcher */}
+              <li className={`lg:hidden border-b p-3 ${isAdminShell ? 'border-[#e5e7eb] dark:border-[#27272a]' : 'border-slate-100 dark:border-[#2A2E36]'}`}>
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm font-semibold ${isAdminShell ? 'text-[#64748b] dark:text-[#a1a1aa]' : 'text-slate-500 dark:text-[#A9A6BB]'}`}>Language</span>
+                  <div className="flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white p-1 dark:border-[#27272a] dark:bg-[#111113]">
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('language', 'en');
+                        window.dispatchEvent(new Event('languagechange'));
+                      }}
+                      className={language === 'en'
+                        ? "rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-[#020617] dark:bg-[#27272a] dark:text-[#f8fafc]"
+                        : "rounded-md px-2.5 py-1 text-xs font-semibold text-[#64748b] hover:bg-slate-100 hover:text-[#020617] dark:text-[#a1a1aa] dark:hover:bg-white/5 dark:hover:text-[#f8fafc]"}
+                    >
+                      EN
+                    </button>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('language', 'km');
+                        window.dispatchEvent(new Event('languagechange'));
+                      }}
+                      className={language === 'km'
+                        ? "rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-[#020617] dark:bg-[#27272a] dark:text-[#f8fafc]"
+                        : "rounded-md px-2.5 py-1 text-xs font-semibold text-[#64748b] hover:bg-slate-100 hover:text-[#020617] dark:text-[#a1a1aa] dark:hover:bg-white/5 dark:hover:text-[#f8fafc]"}
+                    >
+                      ខ្មែរ
+                    </button>
+                  </div>
+                </div>
+              </li>
               {!isCashier && (
               <li>
                 <button
