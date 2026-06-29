@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../../../utils/config/api";
-import { baseUrl } from "../../../utils/config/env";
+import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import {
   LuArrowLeft, LuPackageSearch, LuHistory, LuListOrdered
 } from "react-icons/lu";
@@ -140,7 +140,7 @@ function ProductDetail() {
           <div className={`${cardClass} text-center`}>
             {product.imageUrl ? (
               <img
-                src={`${baseUrl}/upload/${product.imageUrl}`}
+                src={getImageUrl(product.imageUrl)}
                 alt={product.name}
                 className="mx-auto h-44 w-44 object-cover rounded-xl border border-[#e5e7eb] dark:border-[#27272a]"
               />

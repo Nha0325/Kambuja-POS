@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react"
 import { cashierService } from "../../services/users/cashier.service"
-import { baseUrl } from "../../utils/config/env"
+import { getImageUrl } from "../../utils/helpers/getImageUrl"
 
 function StockLookup() {
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`
@@ -35,11 +35,7 @@ function StockLookup() {
     return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-700">In Stock</span>
   }
 
-  const getImageUrl = (image) => {
-    if (!image) return "https://placehold.co/100x100?text=No+Image"
-    if (image.startsWith('http')) return image
-    return `${baseUrl}/upload/${image}`
-  }
+
 
   return (
     <section className="w-full max-w-full p-4 sm:p-6 bg-[#f8f9ff] min-h-screen">

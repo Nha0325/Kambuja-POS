@@ -5,7 +5,7 @@ import { useQuery } from "../../../hooks/common/useQuery";
 import useStorage from "../../../hooks/common/useStorage";
 import { useCollection } from "../../../hooks/common/useCollection";
 import { useFindById } from "../../../hooks/common/useFindById";
-import { baseUrl } from "../../../utils/config/env";
+import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import ProductCodePreview from "../../../components/product/ProductCodePreview";
 import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
 
@@ -132,7 +132,7 @@ function EditProduct() {
       setReorderLevel(product?.lowStockThreshold ?? product?.reorderLevel ?? 10);
 
       if (product?.imageUrl) {
-        setPreview(`${baseUrl}/upload/${product?.imageUrl}`);
+        setPreview(getImageUrl(product?.imageUrl));
         setOldImageUrl(product?.imageUrl);
       }
     }

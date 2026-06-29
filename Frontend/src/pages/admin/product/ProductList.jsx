@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LuTrash2, LuPencil, LuSearch, LuPlus, LuTags } from "react-icons/lu";
 import { FaBarcode, FaQrcode } from "react-icons/fa6";
-import { baseUrl } from "../../../utils/config/env";
+import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import { useCollection } from "../../../hooks/common/useCollection";
 import { useQuery } from "../../../hooks/common/useQuery";
 import { adminSurface } from "../adminPageUi";
@@ -153,7 +153,7 @@ function Product() {
                           {item?.imageUrl ? (
                             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#2A2E36] bg-[#111318]">
                               <img
-                                src={`${baseUrl}/upload/${item.imageUrl}`}
+                                src={getImageUrl(item.imageUrl)}
                                 alt={item?.name || "Product"}
                                 className="h-full w-full object-cover"
                               />

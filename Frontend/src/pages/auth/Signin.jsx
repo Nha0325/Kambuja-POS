@@ -69,7 +69,7 @@ const SignIn = () => {
 
         {/* ── Left Panel: Form ── */}
         <section className="relative z-10 w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-          <div className="max-w-sm w-full mx-auto bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none p-6 md:p-0 rounded-2xl md:rounded-none">
+          <div className="max-w-sm w-full mx-auto">
             <h1 className="text-[32px] font-medium text-gray-900 mb-8 tracking-tight">
               Sign in to Kambuja
             </h1>

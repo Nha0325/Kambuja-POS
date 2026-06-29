@@ -9,7 +9,7 @@ import ProductScanner from "../../../components/product/ProductScanner";
 
 import { LuScanBarcode } from "react-icons/lu";
 import { MdCameraAlt } from "react-icons/md";
-import { baseUrl } from "../../../utils/config/env";
+import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import { api } from "../../../utils/config/api";
 
 
@@ -328,7 +328,7 @@ function POS() {
                     <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted/30 p-2 flex items-center justify-center">
                       {lastScannedProduct.imageUrl || lastScannedProduct.image ? (
                         <img
-                          src={`${baseUrl}/upload/${lastScannedProduct.imageUrl || lastScannedProduct.image}`}
+                          src={getImageUrl(lastScannedProduct.imageUrl || lastScannedProduct.image)}
                           alt={lastScannedProduct.name}
                           className="h-full w-full object-contain"
                         />
@@ -369,7 +369,7 @@ function POS() {
                             <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted/30 p-2 flex items-center justify-center mb-2">
                               {item.imageUrl || item.image ? (
                                 <img
-                                  src={`${baseUrl}/upload/${item.imageUrl || item.image}`}
+                                  src={getImageUrl(item.imageUrl || item.image)}
                                   alt={item.name}
                                   className="h-full w-full object-contain"
                                 />
