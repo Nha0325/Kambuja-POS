@@ -33,6 +33,32 @@ connectToDatabase().then(async function() {
         console.log('Seeded sample alerts');
     }
 
+    const adminEmail = process.env.BOOTSTRAP_ADMIN_MANAGER_EMAIL || process.env.SUPER_EMAIL;
+    const adminPassword = process.env.BOOTSTRAP_ADMIN_MANAGER_PASSWORD || process.env.SUPER_PASSWORD;
+    const adminName = process.env.BOOTSTRAP_ADMIN_MANAGER_NAME || process.env.SUPER_USERNAME || 'Admin';
+
+    if (adminEmail && adminPassword) {
+        const User = require('./models/users/User.model');
+        const { ROLES } = require('./constants/roles');
+        const existSuper = await User.findOne({ email: adminEmail.trim().toLowerCase() });
+        
+        if (!existSuper) {
+            const bcryptjs = require("bcryptjs");
+            const hashed = await bcryptjs.hash(adminPassword, 10);
+            await new User({
+                username: adminName.trim(),
+                email: adminEmail.trim().toLowerCase(),
+                password: hashed,
+                role: ROLES.ADMIN_MANAGER,
+                shopId: null,
+                status: "ACTIVE",
+            }).save();
+            console.log('Bootstrap Admin Manager created automatically.');
+        } else {
+            console.log('Bootstrap Admin Manager already exists.');
+        }
+    }
+
     app.listen(port, "0.0.0.0", function() {
         console.log('Server is running on 0.0.0.0:' + port);
     });
