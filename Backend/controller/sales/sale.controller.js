@@ -132,6 +132,7 @@ exports.create = async (req, res, next) => {
             saleItems.push({
                 product: product._id,
                 quantity: item.quantity,
+                convertedQtyBase: item.convertedQtyBase,
                 pricePerUnit: actualUnitPrice,
                 profit,
                 unitPrice: actualUnitPrice,
@@ -365,56 +366,7 @@ exports.checkStock = async (req, res, next) => {
     }
 }
 
-exports.addPayment = async (req, res, next) => {
-    try {
-        const id = req.params.id
-        const additionalPaid = Number(req.body?.paidAmount || 0)
 
-        if(!Number.isFinite(additionalPaid) || additionalPaid <= 0){
-            return res.status(400).json({
-                success:false,
-                message: "Please provide a valid paid amount!"
-            })
-        }
-
-        const sale = await Sale.findOne({ _id: id, ...req.shopFilter }).lean()
-        if(!sale){
-            return res.status(404).json({
-                success: false,
-                message: "Sale not found with that ID!"
-            })
-        }
-
-        const totalCost = Number(sale.totalCost || 0)
-        const paidAmount = Number(sale.paidAmount || 0) + additionalPaid
-        const updatedSale = await Sale.findOneAndUpdate(
-            { _id: id, ...req.shopFilter },
-            {
-                paidAmount,
-                dueAmount: Math.max(0, totalCost - paidAmount),
-                changeAmount: Math.max(0, paidAmount - totalCost),
-                paymentStatus: calculatePaymentStatus(totalCost, paidAmount)
-            },
-            { new: true, runValidators: true }
-        )
-
-        await Payment.create({
-            shopId: req.shopId,
-            sale: updatedSale._id,
-            user: req.user._id,
-            amount: additionalPaid,
-            method: String(req.body?.method || "CASH").toUpperCase(),
-        })
-
-        res.status(200).json({
-            success: true,
-            result: updatedSale
-        })
-
-    } catch (error) {
-        next(error)
-    }
-}
 
 exports.findToday = async (req, res, next) => {
     try {

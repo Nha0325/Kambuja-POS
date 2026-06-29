@@ -1,7 +1,7 @@
 const express = require("express")
 const restrict = require('../../guards/restrict.guard')
 const shopScopeGuard = require('../../guards/shop-scope.guard')
-const { create, findAll, findToday, findOne, checkStock, addPayment } = require('../../controller/sales/sale.controller')
+const { create, findAll, findToday, findOne, checkStock } = require('../../controller/sales/sale.controller')
 
 const router = express.Router()
 
@@ -14,7 +14,6 @@ router
 
 router.get("/checkStock", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), checkStock)
 router.get("/today", restrict("ADMIN_MANAGER", "ADMIN", "CASHIER"), findToday)
-router.patch("/addPayment/:id", restrict("ADMIN", "CASHIER"), addPayment)
 
 router // Moved to bottom so it doesn't shadow other routes
     .route("/:id")

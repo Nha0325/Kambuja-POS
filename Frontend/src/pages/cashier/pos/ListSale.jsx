@@ -1,9 +1,8 @@
 import { useState } from "react";
 import useFetchData from "../../../hooks/common/useFetchData";
 import { Link } from "react-router";
-import { LuEye, LuCreditCard, LuSearch } from "react-icons/lu";
+import { LuEye, LuSearch } from "react-icons/lu";
 import formatDate from "../../../utils/formatters/formatDate";
-import SalePaymentModal from "./SalePaymentModal";
 import Loading from "../../../components/ui/Loading";
 import useCurrent from "../../../hooks/auth/useCurrent";
 import { ROLES, normalizeRole } from "../../../utils/helpers/role";
@@ -15,10 +14,7 @@ function ListSale() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
-
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState("");
-  const [refetch, setRefetch] = useState(false);
+  const [refetch] = useState(false);
 
   const { data, totalPage, isLoading } = useFetchData("sales", page, limit, search, refetch);
 
@@ -80,10 +76,6 @@ function ListSale() {
                   <th className={adminSurface.th}>Invoice</th>
                   <th className={adminSurface.th}>Sale By</th>
                   <th className={`${adminSurface.th} text-right`}>Total Cost</th>
-                  <th className={`${adminSurface.th} text-right`}>Paid Amount</th>
-                  <th className={`${adminSurface.th} text-right`}>Due Amount</th>
-                  <th className={`${adminSurface.th} text-right`}>Change</th>
-                  <th className={`${adminSurface.th} text-center`}>Status</th>
                   <th className={`${adminSurface.th} text-right`}>Date</th>
                   <th className={`${adminSurface.th} text-center`}>Action</th>
                 </tr>
@@ -91,22 +83,19 @@ function ListSale() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="10" className="p-8 text-center text-[#4E4E50]">
+                    <td colSpan="6" className="p-8 text-center text-[#4E4E50]">
                       Loading sales data...
                     </td>
                   </tr>
                 ) : data?.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="p-8 text-center font-medium text-[#4E4E50]">
+                    <td colSpan="6" className="p-8 text-center font-medium text-[#4E4E50]">
                       No sales records found.
                     </td>
                   </tr>
                 ) : (
                   data?.map((item, idx) => {
                     const totalCost = Number(item?.totalCost || 0);
-                    const paidAmount = Number(item?.paidAmount || 0);
-                    const dueAmount = Number(item?.dueAmount || 0);
-                    const changeAmount = Number(item?.changeAmount || 0);
 
                     return (
                       <tr key={item?._id || idx} className={adminSurface.row}>
@@ -114,37 +103,9 @@ function ListSale() {
                         <td className={`${adminSurface.td} font-bold uppercase`}>{item?.invoiceNumber || "-"}</td>
                         <td className={`${adminSurface.td} capitalize`}>{item?.user?.username || "-"}</td>
                         <td className={`${adminSurface.td} text-right font-medium`}>${totalCost.toFixed(2)}</td>
-                        <td className={`${adminSurface.td} text-right font-medium text-[#22C55E]`}>${paidAmount.toFixed(2)}</td>
-                        <td className={`${adminSurface.td} text-right font-semibold ${dueAmount > 0 ? "text-[#EF4444]" : "text-[#6B7280]"}`}>
-                          ${dueAmount.toFixed(2)}
-                        </td>
-                        <td className={`${adminSurface.td} text-right font-medium text-[#22D3EE]`}>${changeAmount.toFixed(2)}</td>
-                        <td className={`${adminSurface.td} text-center`}>
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase border ${
-                              item?.paymentStatus === "due" ? "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20" :
-                              item?.paymentStatus === "partial" ? "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20" :
-                              "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"
-                            }`}
-                          >
-                            {item.paymentStatus || "-"}
-                          </span>
-                        </td>
                         <td className={`${adminSurface.td} text-right text-[#A9A6BB]`}>{formatDate(item.createdAt)}</td>
                         <td className={adminSurface.td}>
                           <div className="flex items-center justify-center gap-2">
-                            <button 
-                              onClick={() => {
-                                setOpen(true); 
-                                setEditId(item._id);
-                              }} 
-                              type="button" 
-                              disabled={item.paymentStatus === 'paid'} 
-                              className={adminSurface.iconButton}
-                              title="Process Payment"
-                            >
-                              <LuCreditCard />
-                            </button>
                             <Link
                               to={`/sale/invoice/${item._id}`}
                               target="_blank"
@@ -173,17 +134,6 @@ function ListSale() {
           />
         </div>
       </div>
-
-      {open && (
-        <SalePaymentModal 
-          open={open} 
-          editId={editId} 
-          onClose={() => {
-            setOpen(false);
-            setRefetch(!refetch);
-          }}
-        />
-      )}
     </>
   );
 }

@@ -2,7 +2,6 @@ import SalesReportChart from "../../../components/dashboard/RevenueChart.jsx";
 import { Link } from "react-router";
 import { 
   LuBanknote, 
-  LuFileText, 
   LuTrendingUp, 
   LuTruck, 
   LuShoppingCart, 
@@ -58,12 +57,6 @@ function Home() {
       accentClass: "bg-violet-100 text-violet-600 dark:bg-[#3350BF]/10 dark:text-[#22D3EE]",
     },
     {
-      label: "Due Invoices (Sale)",
-      value: formatCurrency(report?.totalDueAmountSale),
-      icon: LuFileText,
-      accentClass: "bg-amber-100 text-amber-600 dark:bg-[#F59E0B]/10 dark:text-[#F59E0B]",
-    },
-    {
       label: "Due Purchases",
       value: formatCurrency(report?.totalDueAmountPurchase),
       icon: LuShoppingCart,
@@ -104,7 +97,7 @@ function Home() {
       </div>
 
       {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((metric) => (
           <DashboardMetric key={metric.label} {...metric} />
         ))}
@@ -160,7 +153,6 @@ function Home() {
               <tr>
                 <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Invoice ID</th>
                 <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Cashier</th>
-                <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Status</th>
                 <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36]">Date</th>
                 <th className="px-5 py-4 border-b border-slate-200 dark:border-[#2A2E36] text-right">Amount</th>
               </tr>
@@ -168,7 +160,7 @@ function Home() {
             <tbody className="divide-y divide-slate-100 dark:divide-[#2A2E36]">
               {isSalesLoading && (
                 <tr>
-                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#A9A6BB]" colSpan={5}>
+                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#A9A6BB]" colSpan={4}>
                     Loading recent sales...
                   </td>
                 </tr>
@@ -176,7 +168,7 @@ function Home() {
 
               {!isSalesLoading && recentSales?.length === 0 && (
                 <tr>
-                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#4E4E50]" colSpan={5}>
+                  <td className="px-5 py-10 text-center text-slate-500 dark:text-[#4E4E50]" colSpan={4}>
                     No recent sales found.
                   </td>
                 </tr>
@@ -187,21 +179,6 @@ function Home() {
                   <tr key={sale?._id} className="transition-colors hover:bg-slate-50 dark:hover:bg-[#22262D]">
                     <td className="px-5 py-4 font-semibold uppercase text-slate-900 dark:text-[#F8FAFC]">{sale?.invoiceNumber || "-"}</td>
                     <td className="px-5 py-4 text-slate-600 dark:text-[#A9A6BB]">{sale?.user?.username || "-"}</td>
-                    <td className="px-5 py-4">
-                      {sale?.paymentStatus?.toLowerCase() === 'paid' ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 dark:bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-green-700 dark:text-[#22C55E] border border-green-200 dark:border-[#22C55E]/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#22C55E]"></span> Paid
-                        </span>
-                      ) : sale?.paymentStatus?.toLowerCase() === 'partial' ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-[#F59E0B] border border-amber-200 dark:border-[#F59E0B]/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F59E0B]"></span> Partial
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-red-700 dark:text-[#EF4444] border border-red-200 dark:border-[#EF4444]/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-[#EF4444]"></span> Unpaid
-                        </span>
-                      )}
-                    </td>
                     <td className="px-5 py-4 text-slate-600 dark:text-[#A9A6BB]">
                       {sale?.createdAt ? formatDate(sale.createdAt, "DD MMM, YYYY HH:mm") : "-"}
                     </td>

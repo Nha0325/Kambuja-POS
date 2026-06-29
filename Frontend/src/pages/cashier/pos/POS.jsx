@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import useFetchData from "../../../hooks/common/useFetchData";
+
 import toast from "react-hot-toast";
 import useCollection from "../../../hooks/common/useCollection";
 import Modal from "../../../components/ui/Modal";
@@ -10,25 +10,14 @@ import { LuScanBarcode } from "react-icons/lu";
 import { MdCameraAlt } from "react-icons/md";
 import { baseUrl } from "../../../utils/config/env";
 import { api } from "../../../utils/config/api";
-import Loading from "../../../components/ui/Loading";
+
 
 function POS() {
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`;
-  const [category, setCategory] = useState(null);
-  const [condition, setCondition] = useState("");
   const [scanCode, setScanCode] = useState("");
   const [cartItems, setCartItems] = useState([]);
-  const [open, setOpen] = useState(false);
-  const { data: products, isLoading: productsLoading } = useFetchData("products", 1, 50, "", false, condition);
-  const { data: categories, isLoading: categoriesLoading } = useFetchData("categories", 1, 50);
   const [totalCost, setTotalCost] = useState(0);
   const { create, isLoading } = useCollection("sales");
-  const { create: holdBill, isLoading: holdLoading } = useCollection("held-bills");
-  const [printReceipt, setPrintReceipt] = useState(true);
-  const [paidAmount, setPaidAmount] = useState(0);
-  const [holdOpen, setHoldOpen] = useState(false);
-  const [customerName, setCustomerName] = useState("");
-  const [note, setNote] = useState("");
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [lastScannedCode, setLastScannedCode] = useState("");
   const lastScanTimeRef = useRef(0);
@@ -75,41 +64,7 @@ function POS() {
     fetchHeldBill();
   }, [searchParams]);
 
-  const handleHoldBill = async (e) => {
-    e.preventDefault();
-    if (cartItems.length <= 0) return toast.error("Cart is empty!");
 
-    const currentTotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
-    const payload = {
-      customerName,
-      note,
-      items: cartItems.map((item) => ({
-        product: item.productId,
-        name: item.name,
-        saleUnit: item.baseUnit,
-        quantity: Number(item.qty),
-        unitPrice: Number(item.price),
-        totalPrice: Number(item.lineTotal)
-      })),
-      totalCost: Number(currentTotal)
-    };
-
-    try {
-      const res = await holdBill(payload);
-      if (res) {
-        toast.success("Order held successfully!");
-        setHoldOpen(false);
-        setCustomerName("");
-        setNote("");
-        setCartItems([]);
-        if (searchParams.get('heldBill')) {
-          navigate("/cashier/hold-orders");
-        }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to hold bill");
-    }
-  };
 
   function addToCart(product) {
     if (!product) return;
@@ -238,15 +193,10 @@ function POS() {
     }, 0);
   };
 
-  const handlePayment = async (e) => {
-    e.preventDefault();
+  const handlePayment = async () => {
     if (cartItems.length <= 0) return toast.error("Please add product to cart!");
 
-    const paid = Number(paidAmount || 0);
     const currentTotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
-    if (paid < currentTotal) {
-      return toast.error("Paid amount must be greater than or equal to total amount");
-    }
 
     const payload = {
       items: cartItems.map((item) => ({
@@ -257,7 +207,7 @@ function POS() {
         totalPrice: Number(item.lineTotal)
       })),
       totalCost: Number(currentTotal),
-      paidAmount: paid
+      paidAmount: Number(currentTotal)
     };
 
     try {
@@ -269,14 +219,11 @@ function POS() {
           } catch (e) { console.error("Failed to complete held bill", e); }
         }
 
-        toast.success("Sale created successfully!");
-        setOpen(false);
-        setPaidAmount(0);
+        toast.success("Sale completed successfully!");
         setTotalCost(0);
         setCartItems([]);
-        if (printReceipt) {
-          window.open(`/cashier/invoice/${res._id}`, '_blank');
-        }
+        window.open(`/cashier/invoice/${res._id}`, '_blank');
+        
         if (searchParams.get('heldBill')) {
           navigate("/cashier/pos"); // clear query param
         }
@@ -284,12 +231,12 @@ function POS() {
       }
     } catch (error) {
       const serverMsg = error.response?.data?.details || error.response?.data?.message || error.response?.data?.error || "Sale submission failed";
-      let errorMessage = serverMsg; // Default to generic message
+      let errorMessage = serverMsg;
       if (error.response) {
         if (error.response.status === 404) {
           const htmlData = error.response.data;
           const match = htmlData.match(/<pre>Cannot POST (\/[^<]+)<\/pre>/);
-          errorMessage = match && match[1] ? `API endpoint '${match[1]}' not found or does not support POST requests. Please check the server status and API route configuration.` : "API endpoint not found. Please check the server status and API route configuration.";
+          errorMessage = match && match[1] ? `API endpoint '${match[1]}' not found.` : "API endpoint not found.";
         } else {
           errorMessage = error.response?.data?.details || error.response?.data?.message || error.response?.data?.error || errorMessage;
         }
@@ -325,17 +272,9 @@ function POS() {
   };
 
   const handleRemoveItem = (id) => setCartItems(prev => prev.filter(el => el.productId !== id));
-
-  const handleCategoryFilter = (catId) => {
-    setCategory(catId);
-    setCondition(catId ? `category=${catId}` : "");
-  };
-
   useEffect(() => {
     setTotalCost(cartItems.reduce((acc, item) => acc + item.lineTotal, 0));
   }, [cartItems]);
-
-  if (productsLoading || categoriesLoading) return <Loading />;
 
   return (
     <section className="min-h-[calc(100vh-64px)] bg-background text-foreground transition-colors duration-200">
@@ -441,54 +380,7 @@ function POS() {
                 </div>
               )}
 
-              {/* Categories (Fallback) */}
-              <div className="mt-8 pt-6 border-t border-border">
-                  <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">Manual Browse</h2>
-                  <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
-                    <button
-                      onClick={() => handleCategoryFilter(null)}
-                      className={`inline-flex h-9 shrink-0 items-center justify-center rounded-xl border px-4 text-xs font-bold uppercase tracking-wider transition ${!category ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20' : 'border-border bg-transparent text-foreground/80 hover:border-primary/40 hover:bg-primary/5 hover:text-primary'}`}
-                    >
-                      All
-                    </button>
-                    {categories?.map((cat) => (
-                      <button
-                        key={cat._id}
-                        onClick={() => handleCategoryFilter(cat._id)}
-                        className={`inline-flex h-9 shrink-0 items-center justify-center rounded-xl border px-4 text-xs font-bold uppercase tracking-wider transition ${category === cat._id ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20' : 'border-border bg-transparent text-foreground/80 hover:border-primary/40 hover:bg-primary/5 hover:text-primary'}`}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {/* Product Grid (Fallback) */}
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-2">
-                    {products?.length === 0 ? (
-                      <div className="col-span-full py-12 text-center text-sm font-medium text-muted-foreground">
-                        No products found
-                      </div>
-                    ) : (
-                      products?.map((item) => (
-                        <div key={item._id} onClick={() => addToCart(item)} className="group flex cursor-pointer flex-col rounded-xl border border-border bg-card p-2 shadow-xs transition hover:border-primary/50 hover:shadow-sm active:scale-[0.98]">
-                          <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted/30 p-2 flex items-center justify-center mb-2">
-                            {item.imageUrl || item.image ? (
-                              <img
-                                src={`${baseUrl}/upload/${item.imageUrl || item.image}`}
-                                alt={item.name}
-                                className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                              />
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest">No Img</span>
-                            )}
-                          </div>
-                          <h4 className="truncate text-center text-[11px] font-bold text-foreground/90">{item.name}</h4>
-                          <p className="mt-0.5 text-center text-xs font-extrabold text-primary">{formatUsd(item.salePrice)}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-              </div>
+
           </div>
         </div>
 
@@ -566,100 +458,16 @@ function POS() {
             </div>
             <div className="mt-4 flex gap-2">
               <button
-                onClick={() => setHoldOpen(true)}
-                disabled={cartItems.length === 0 || isLoading || holdLoading}
-                className="inline-flex h-12 flex-1 items-center justify-center rounded-xl border-2 border-primary/20 bg-background px-4 text-xs font-extrabold uppercase tracking-widest text-primary transition hover:border-primary/40 hover:bg-primary/5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handlePayment}
+                disabled={cartItems.length === 0 || isLoading}
+                className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-xs font-extrabold uppercase tracking-widest text-primary-foreground transition hover:bg-primary/95 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
               >
-                HOLD
-              </button>
-              <button
-                onClick={() => setOpen(true)}
-                disabled={cartItems.length === 0 || isLoading || holdLoading}
-                className="inline-flex h-12 flex-[2] items-center justify-center rounded-xl bg-primary px-4 text-xs font-extrabold uppercase tracking-widest text-primary-foreground transition hover:bg-primary/95 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-              >
-                COMPLETE SALE
+                {isLoading ? "PROCESSING..." : "COMPLETE SALE & PRINT"}
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Payment Modal */}
-      <Modal open={open} onClose={() => setOpen(false)} title="Payment">
-        <form onSubmit={handlePayment} className="mt-2 text-foreground">
-          <input
-            type="number"
-            value={paidAmount || ""}
-            onChange={(e) => setPaidAmount(Number(e.target.value) || 0)}
-            className="mb-4 h-12 w-full rounded-xl border border-border bg-background px-4 text-sm font-semibold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/60"
-            placeholder="Paid Amount ($)"
-            autoFocus
-          />
-
-          <div className="mb-5 space-y-3 rounded-xl bg-muted/40 p-5 border border-border/50">
-            <div className="flex justify-between text-sm font-bold text-emerald-500">
-              <span className="uppercase tracking-wider text-[11px]">Change:</span>
-              <span className="text-lg">{formatUsd(Math.max(0, Number(paidAmount || 0) - totalCost))}</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-destructive">
-              <span className="uppercase tracking-wider text-[11px]">Due:</span>
-              <span className="text-lg">{formatUsd(Math.max(0, totalCost - Number(paidAmount || 0)))}</span>
-            </div>
-          </div>
-
-          <div className="mb-5 flex items-center gap-3 px-1">
-            <input
-              type="checkbox"
-              id="print-receipt"
-              checked={printReceipt}
-              onChange={(e) => setPrintReceipt(e.target.checked)}
-              className="h-5 w-5 cursor-pointer rounded border-border text-primary transition focus:ring-primary/50"
-            />
-            <label htmlFor="print-receipt" className="cursor-pointer select-none text-sm font-bold text-foreground">Print Receipt</label>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading || cartItems.length === 0}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition hover:bg-primary/95 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? "Processing..." : "PAY NOW"}
-          </button>
-        </form>
-      </Modal>
-
-      {/* Hold Order Modal */}
-      <Modal open={holdOpen} onClose={() => setHoldOpen(false)} title="Hold Order">
-        <form onSubmit={handleHoldBill} className="mt-2 text-foreground">
-          <div className="mb-4">
-            <label className="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Customer Name (Optional)</label>
-            <input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/60"
-              placeholder="Enter customer name..."
-              autoFocus
-            />
-          </div>
-          <div className="mb-5">
-            <label className="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Note (Optional)</label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="h-24 w-full resize-none rounded-xl border border-border bg-background p-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/60"
-              placeholder="Add any notes for this held order..."
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={holdLoading || cartItems.length === 0}
-            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary px-4 text-sm font-extrabold uppercase tracking-wider text-primary-foreground transition hover:bg-primary/95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {holdLoading ? "Saving..." : "CONFIRM HOLD"}
-          </button>
-        </form>
-      </Modal>
 
       {/* Camera Scanner Modal */}
       <Modal open={isCameraOpen} onClose={() => setIsCameraOpen(false)} title="Camera Scanner" size="lg">
