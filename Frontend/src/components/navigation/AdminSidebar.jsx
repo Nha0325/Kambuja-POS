@@ -48,8 +48,8 @@ function AdminSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) {
     >
       <div className="shrink-0 flex items-center h-16 border-b border-[#e5e7eb] dark:border-[#27272a] px-4">
         <div className={`flex items-center gap-3 w-full ${!isExpanded && "justify-center"}`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#06b6d4] text-sm font-bold text-white shadow-sm dark:shadow-none">
-            KP
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white overflow-hidden border border-[#e5e7eb] dark:border-none shadow-sm dark:shadow-none">
+            <img src="/Logo.jpg" alt="Kambuja Logo" className="w-full h-full object-contain" />
           </div>
           <div className={`flex flex-col min-w-0 transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0 pointer-events-none hidden"}`}>
             <h1 className="truncate text-sm font-bold tracking-tight text-[#020617] dark:text-[#f8fafc]">Kambuja POS</h1>
