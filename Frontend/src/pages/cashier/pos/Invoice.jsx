@@ -1,14 +1,33 @@
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaPrint } from "react-icons/fa6";
 import useFetchOne from "../../../hooks/common/useFetchOne";
 import formatDate from "../../../utils/formatters/formatDate";
 
 function Invoice() {
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`;
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data } = useFetchOne("sales", id);
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 px-4 flex justify-center items-start">
+    <div className="min-h-screen bg-muted/30 py-8 px-4 flex justify-center items-start relative">
+      
+      {/* Floating Action Buttons (Hidden when printing) */}
+      <div className="fixed top-4 left-4 print:hidden flex flex-col sm:flex-row gap-3 z-50">
+        <button 
+          onClick={() => navigate('/cashier/pos')} 
+          className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-700 shadow-md transition-colors"
+        >
+          <FaArrowLeft /> Back to POS
+        </button>
+        <button 
+          onClick={() => window.print()} 
+          className="flex items-center gap-2 bg-cyan-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-cyan-700 shadow-md transition-colors"
+        >
+          <FaPrint /> Print Receipt
+        </button>
+      </div>
+
       <div className="w-[80mm] bg-white font-bold p-4 text-black shadow-lg rounded-sm print:shadow-none print:m-0 print:p-0">
       <h1 className="text-center text-2xl tracking-wide font-extrabold">MASTER POS</h1>
       <div className="text-center text-xs mt-1">Receipt</div>
