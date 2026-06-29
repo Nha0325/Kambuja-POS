@@ -28,7 +28,8 @@ async function showMenu() {
     console.log("3. List all users");
     console.log("4. Delete ALL Products");
     console.log("5. Delete ALL Categories");
-    console.log("6. Delete ALL test data (DANGEROUS)");
+    console.log("6. Delete ALL test data (users/products/sales)");
+    console.log("7. Delete ALL Sales/Cashier Data (Receipts, Shifts, Sales)");
     console.log("0. Exit");
     console.log("=====================================");
     
@@ -52,6 +53,9 @@ async function showMenu() {
             break;
         case '6':
             await deleteTestData();
+            break;
+        case '7':
+            await deleteSalesData();
             break;
         case '0':
             console.log("Exiting...");
@@ -180,6 +184,37 @@ async function deleteTestData() {
             console.log("Data wipe complete.");
         } catch (error) {
             console.error("Error wiping data:", error.message);
+        }
+    } else {
+        console.log("Aborted.");
+    }
+    
+    console.log("\n");
+    await showMenu();
+}
+
+async function deleteSalesData() {
+    console.log("\nWARNING: This will delete ALL sales, receipts, and cashier shifts (DailyClose) from the database!");
+    const confirm = await question("Type 'DELETE' to confirm wiping sales data: ");
+    
+    if (confirm === 'DELETE') {
+        try {
+            const Sale = require('./models/sales/Sale.model');
+            const DailyClose = require('./models/sales/DailyClose.model');
+            const Receipt = require('./models/sales/Receipt.model');
+            const Payment = require('./models/payment/Payment.model');
+            const StockMovement = require('./models/misc/StockMovement.model');
+            
+            let count = 0;
+            count += (await Sale.deleteMany({})).deletedCount;
+            count += (await DailyClose.deleteMany({})).deletedCount;
+            count += (await Receipt.deleteMany({})).deletedCount;
+            count += (await Payment.deleteMany({})).deletedCount;
+            count += (await StockMovement.deleteMany({ type: "SALE" })).deletedCount;
+            
+            console.log(`Deleted ${count} sales-related records successfully.`);
+        } catch (error) {
+            console.error("Error wiping sales data:", error.message);
         }
     } else {
         console.log("Aborted.");
