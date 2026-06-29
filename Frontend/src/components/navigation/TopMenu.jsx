@@ -202,7 +202,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
         {isAdminShell && (
           <button
             type="button"
-            onClick={() => navigate("/admin-manager/settings")}
+            onClick={() => navigate(isAdminManagerShell ? "/admin-manager/settings" : "/admin/settings")}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#64748b] dark:text-[#a1a1aa] hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             aria-label="Settings"
           >
