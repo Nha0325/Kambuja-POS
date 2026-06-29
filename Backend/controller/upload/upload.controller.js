@@ -1,9 +1,9 @@
 const multer = require("multer")
 const fs = require("fs")
 const path = require("path")
+const sharp = require("sharp")
 
 const uploadDir = path.resolve(__dirname, "../upload")
-// Allow any image type
 
 const getSafeUploadPath = (filename) => {
     if (!filename || filename !== path.basename(filename)) {
@@ -19,18 +19,7 @@ const getSafeUploadPath = (filename) => {
     return filePath
 }
 
-const diskStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        fs.mkdirSync(uploadDir, {recursive: true})
-        cb(null, uploadDir)
-    },
-    filename: (req, file, cb) => {
-        const extName = path.extname(file.originalname).toLowerCase()
-        const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extName}`
-        cb(null, filename)
-    }
-
-})
+const memoryStorage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
@@ -41,7 +30,7 @@ const fileFilter = (req, file, cb) => {
 }
 
 const upload = multer({
-    storage: diskStorage,
+    storage: memoryStorage,
     fileFilter: fileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024 // 10MB
@@ -49,34 +38,60 @@ const upload = multer({
 })
 
 exports.uploadFile = (req, res) => {
-    try {
-        
-        upload.single("imageUrl")(req, res, (err) => {
-            if(err){
-                return res.status(400).json({
-                    success:false,
-                    error: err.message
-                })
-            }
-            if(!req.file){
-                return res.status(400).json({
-                    success:false,
-                    error: "No file provided!"
-                })
-            }
-            return res.status(200).json({
-                    success:true,
-                    message: "Image upload successfully!",
-                    filename: req.file.filename
+    upload.single("imageUrl")(req, res, async (err) => {
+        if(err){
+            return res.status(400).json({
+                success:false,
+                error: err.message
             })
-        })
-
-    } catch (error) {
-        res.status(500).json({
-            success:false,
-            error:"Upload failed"
-        })
-    }
+        }
+        if(!req.file){
+            return res.status(400).json({
+                success:false,
+                error: "No file provided!"
+            })
+        }
+        
+        try {
+            fs.mkdirSync(uploadDir, {recursive: true});
+            const extName = path.extname(req.file.originalname).toLowerCase();
+            const isPng = extName === '.png' && req.file.mimetype === 'image/png';
+            
+            const uniquePrefix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+            let finalBuffer;
+            let finalFilename;
+            
+            // Resize all images to max 800x800
+            const imageProcessor = sharp(req.file.buffer)
+                .resize(800, 800, { fit: 'inside', withoutEnlargement: true });
+                
+            if (isPng) {
+                // For logo/icon: PNG keep original format
+                finalBuffer = await imageProcessor.png().toBuffer();
+                finalFilename = `${uniquePrefix}.png`;
+            } else {
+                // For product photo: WebP quality 80
+                finalBuffer = await imageProcessor.webp({ quality: 80 }).toBuffer();
+                finalFilename = `${uniquePrefix}.webp`;
+            }
+            
+            const outputPath = path.resolve(uploadDir, finalFilename);
+            fs.writeFileSync(outputPath, finalBuffer);
+            
+            return res.status(200).json({
+                success:true,
+                message: "Image upload successfully!",
+                filename: finalFilename
+            });
+            
+        } catch (error) {
+            console.error("Image processing error:", error);
+            return res.status(500).json({
+                success:false,
+                error:"Error processing image"
+            });
+        }
+    })
 }
 exports.removeFile = (req, res) => {
     try {

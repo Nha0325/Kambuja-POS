@@ -25,13 +25,14 @@ function EditProduct() {
   const [status, setStatus] = useState(true);
   const [reorderLevel, setReorderLevel] = useState(10);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const route = useParams();
   const navigate = useNavigate();
 
   const { data: categories } = useQuery("categories", "", 1, 100);
   const { uploadFile, removeFile } = useStorage();
-  const { update, isLoading } = useCollection("products");
+  const { update } = useCollection("products");
   const { data: product, isLoading: isFinding } = useFindById("products", route.id);
 
   const handleImageChange = (e) => {
@@ -62,19 +63,23 @@ function EditProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
       const cost = Number(costPrice);
       const sale = Number(salePrice);
       if (!Number.isFinite(sale) || sale <= 0) {
         toast.error("Sale price must be greater than zero.");
+        setIsSaving(false);
         return;
       }
       if (!Number.isFinite(cost) || cost < 0) {
         toast.error("Cost price must be greater than or equal zero.");
+        setIsSaving(false);
         return;
       }
       if (sale < cost) {
         toast.error("Sale price must be greater than or equal to cost price.");
+        setIsSaving(false);
         return;
       }
 
@@ -108,6 +113,8 @@ function EditProduct() {
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong!");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -454,10 +461,10 @@ function EditProduct() {
             </Link>
             <button 
               type="submit"
-              disabled={isLoading}
+              disabled={isSaving}
               className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-6 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-11 w-full sm:w-auto"
             >
-              {isLoading ? "Updating..." : "Update Product"}
+              {isSaving ? "Updating..." : "Update Product"}
             </button>
           </div>
         </form>

@@ -22,11 +22,12 @@ function CreateProduct() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: categories } = useFetchData("categories", 1, 100);
   const { data: suppliers } = useFetchData("suppliers", 1, 100);
   const { uploadFile } = useStorage();
-  const { create, isLoading } = useCollection("products");
+  const { create } = useCollection("products");
   const navigate = useNavigate();
 
   const handleImageChange = (e) => {
@@ -57,19 +58,23 @@ function CreateProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
 
     const cost = Number(costPrice);
     const sale = Number(salePrice);
     if (!Number.isFinite(sale) || sale <= 0) {
       toast.error("Sale price must be greater than zero.");
+      setIsSaving(false);
       return;
     }
     if (!Number.isFinite(cost) || cost < 0) {
       toast.error("Cost price must be greater than or equal zero.");
+      setIsSaving(false);
       return;
     }
     if (sale < cost) {
       toast.error("Sale price must be greater than or equal to cost price.");
+      setIsSaving(false);
       return;
     }
 
@@ -80,6 +85,7 @@ function CreateProduct() {
 
       if (!filename) {
         toast.error("Image upload failed");
+        setIsSaving(false);
         return;
       }
     }
@@ -108,6 +114,8 @@ function CreateProduct() {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to create product.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -374,10 +382,10 @@ function CreateProduct() {
             </Link>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSaving}
               className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center"
             >
-              {isLoading ? "Saving..." : "Save Product"}
+              {isSaving ? "Saving..." : "Save Product"}
             </button>
           </div>
         </form>
