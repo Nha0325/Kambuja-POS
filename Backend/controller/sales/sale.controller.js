@@ -407,3 +407,4 @@ exports.findToday = async (req, res, next) => {
         next(error)
     }
 }
+// LAST_CLOSE_LOGIC_ACTIVE
