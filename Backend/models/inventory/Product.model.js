@@ -95,8 +95,8 @@ schema.pre("validate", function syncStockFields() {
     this.lowStockThreshold = threshold
     this.reorderLevel = threshold
 
-    if (this.barcode === "") this.barcode = null;
-    if (this.sku === "") this.sku = null;
+    if (this.barcode === "") this.barcode = undefined;
+    if (this.sku === "") this.sku = undefined;
 })
 
 schema.index({ shopId: 1, barcode: 1 }, { unique: true, sparse: true });

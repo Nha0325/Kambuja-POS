@@ -96,8 +96,8 @@ const normalizeProductPayload = (body) => {
         }
     })
 
-    if (payload.barcode === "") payload.barcode = null
-    if (payload.sku === "") payload.sku = null
+    if (payload.barcode === "") payload.barcode = undefined
+    if (payload.sku === "") payload.sku = undefined
 
     return payload
 }
@@ -306,9 +306,19 @@ exports.update = async (req, res, next) => {
             })
         }
 
+        const updateQuery = { $set: payload }
+        if (payload.barcode === undefined && 'barcode' in req.body && req.body.barcode === "") {
+            updateQuery.$unset = updateQuery.$unset || {}
+            updateQuery.$unset.barcode = 1
+        }
+        if (payload.sku === undefined && 'sku' in req.body && req.body.sku === "") {
+            updateQuery.$unset = updateQuery.$unset || {}
+            updateQuery.$unset.sku = 1
+        }
+
         const doc =await Product.findOneAndUpdate(
             { _id: id, ...req.shopFilter },
-            payload,
+            updateQuery,
             { new: true, runValidators: true }
         )
         if(!doc){
