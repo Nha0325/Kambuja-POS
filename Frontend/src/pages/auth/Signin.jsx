@@ -56,11 +56,20 @@ const SignIn = () => {
         }
       `}</style>
 
-      <main className="bg-white p-4 w-full max-w-5xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row min-h-[600px]">
+      <main className="relative bg-white p-4 w-full max-w-5xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row min-h-[600px] overflow-hidden">
         
+        {/* Mobile Background Image */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center p-8 md:hidden opacity-50 pointer-events-none">
+          <img 
+            src="/Logo.jpg" 
+            alt="Kambuja POS Logo Background" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+
         {/* ── Left Panel: Form ── */}
-        <section className="w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-          <div className="max-w-sm w-full mx-auto">
+        <section className="relative z-10 w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="max-w-sm w-full mx-auto bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none p-6 md:p-0 rounded-2xl md:rounded-none">
             <h1 className="text-[32px] font-medium text-gray-900 mb-8 tracking-tight">
               Sign in to Kambuja
             </h1>
@@ -134,29 +143,13 @@ const SignIn = () => {
         </section>
 
         {/* ── Right Panel: Image ── */}
-        <section className="hidden md:block w-1/2 relative rounded-[1.5rem] overflow-hidden">
-          <img 
-            src="/Logo.jpg" 
-            alt="Kambuja POS Logo" 
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {/* Overlay Box */}
-          <div className="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
-            <h3 className="font-bold text-gray-900 text-lg mb-1">
-              Systematic control for your enterprise.
-            </h3>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Access real-time inventory tracking, sales analytics, and multi-store management tools in one secure location.
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium border border-green-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                System Online
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 text-gray-700 text-xs font-medium border border-gray-200">
-                v4.2
-              </span>
-            </div>
+        <section className="hidden md:flex w-1/2 flex-col relative rounded-[1.5rem] overflow-hidden bg-white border border-gray-100">
+          <div className="absolute inset-0 flex items-center justify-center p-8 pb-48">
+            <img 
+              src="/Logo.jpg" 
+              alt="Kambuja POS Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
         </section>
 
