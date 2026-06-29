@@ -3,11 +3,7 @@ const fs = require("fs")
 const path = require("path")
 
 const uploadDir = path.resolve(__dirname, "../upload")
-const allowedImageTypes = {
-    "image/jpeg": [".jpg", ".jpeg"],
-    "image/png": [".png"],
-    "image/webp": [".webp"],
-}
+// Allow any image type
 
 const getSafeUploadPath = (filename) => {
     if (!filename || filename !== path.basename(filename)) {
@@ -37,14 +33,10 @@ const diskStorage = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    const extName = path.extname(file.originalname).toLowerCase()
-    const allowedExtensions = allowedImageTypes[file.mimetype]
-
-    if(allowedExtensions?.includes(extName)){
+    if (file.mimetype.startsWith("image/")) {
         cb(null, true)
-    }
-    else{
-        cb( new Error("Only JPEG, PNG, and WebP images are allowed"), false)
+    } else {
+        cb(new Error("Only image files are allowed"), false)
     }
 }
 
@@ -52,7 +44,7 @@ const upload = multer({
     storage: diskStorage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 2 * 1024 * 1024
+        fileSize: 10 * 1024 * 1024 // 10MB
     }
 })
 
