@@ -1,10 +1,12 @@
+import { lazy } from "react"
+import { Suspense } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
-import Loading from "../components/ui/Loading"
+const Loading = lazy(() => import("../components/ui/Loading"))
 import useCurrent from "../hooks/auth/useCurrent"
-import NotFound from "../pages/NotFound"
-import Unauthorized from "../pages/Unauthorized"
-import { PrintLabelPage } from "../pages/admin/product"
-import Protected from "../components/auth/Protected"
+const NotFound = lazy(() => import("../pages/NotFound"))
+const Unauthorized = lazy(() => import("../pages/Unauthorized"))
+const PrintLabelPage = lazy(() => import("../pages/admin/product").then(module => ({ default: module.PrintLabelPage })))
+const Protected = lazy(() => import("../components/auth/Protected"))
 import { homeForRole, ROLES } from "../utils/helpers/role"
 import { authRoutes } from "./auth.routes"
 import { adminManagerRoutes } from "./admin-manager.routes"
@@ -19,23 +21,25 @@ function RoleHome() {
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<RoleHome />} />
-      {authRoutes}
-      {adminManagerRoutes}
-      {adminRoutes}
-      {cashierRoutes}
-      <Route
-        path="/product/print-label-page"
-        element={
-          <Protected allowedRoles={[ROLES.ADMIN]}>
-            <PrintLabelPage />
-          </Protected>
-        }
-      />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/" element={<RoleHome />} />
+        {authRoutes}
+        {adminManagerRoutes}
+        {adminRoutes}
+        {cashierRoutes}
+        <Route
+          path="/product/print-label-page"
+          element={
+            <Protected allowedRoles={[ROLES.ADMIN]}>
+              <PrintLabelPage />
+            </Protected>
+          }
+        />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   )
 }
 

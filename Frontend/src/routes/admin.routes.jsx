@@ -1,18 +1,35 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy } from "react"
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/auth/Protected"
+const Protected = lazy(() => import("../components/auth/Protected"))
 import AdminLayout from "../layouts/AdminLayout"
-import Home from "../pages/admin/dashboard"
-import { SupplierCreate, SupplierEdit, SupplierList } from "../pages/admin/supplier"
-import Profile from "../pages/profile/Profile"
-import { CategoryCreate, CategoryEdit, CategoryList } from "../pages/admin/category"
-import { PrintLabel, ProductCreate, ProductEdit, ProductList } from "../pages/admin/product"
-import { PurchaseCreate, PurchaseList } from "../pages/admin/purchase"
-import { CashierCreate, CashierEdit, CashierList } from "../pages/admin/user"
-import ListSale from "../pages/cashier/pos/ListSale"
-import { SaleReport, StockReport } from "../pages/admin/report"
-import { Inventory, StockAdjustment, StockIn, History } from "../pages/admin/inventory"
-import { NotificationChannels, NotificationLogs } from "../pages/admin/notification"
-import ShopSettings from "../pages/admin/settings"
+const Home = lazy(() => import("../pages/admin/dashboard"))
+const SupplierCreate = lazy(() => import("../pages/admin/supplier").then(module => ({ default: module.SupplierCreate })))
+const SupplierEdit = lazy(() => import("../pages/admin/supplier").then(module => ({ default: module.SupplierEdit })))
+const SupplierList = lazy(() => import("../pages/admin/supplier").then(module => ({ default: module.SupplierList })))
+const Profile = lazy(() => import("../pages/profile/Profile"))
+const CategoryCreate = lazy(() => import("../pages/admin/category").then(module => ({ default: module.CategoryCreate })))
+const CategoryEdit = lazy(() => import("../pages/admin/category").then(module => ({ default: module.CategoryEdit })))
+const CategoryList = lazy(() => import("../pages/admin/category").then(module => ({ default: module.CategoryList })))
+const PrintLabel = lazy(() => import("../pages/admin/product").then(module => ({ default: module.PrintLabel })))
+const ProductCreate = lazy(() => import("../pages/admin/product").then(module => ({ default: module.ProductCreate })))
+const ProductEdit = lazy(() => import("../pages/admin/product").then(module => ({ default: module.ProductEdit })))
+const ProductList = lazy(() => import("../pages/admin/product").then(module => ({ default: module.ProductList })))
+const PurchaseCreate = lazy(() => import("../pages/admin/purchase").then(module => ({ default: module.PurchaseCreate })))
+const PurchaseList = lazy(() => import("../pages/admin/purchase").then(module => ({ default: module.PurchaseList })))
+const CashierCreate = lazy(() => import("../pages/admin/user").then(module => ({ default: module.CashierCreate })))
+const CashierEdit = lazy(() => import("../pages/admin/user").then(module => ({ default: module.CashierEdit })))
+const CashierList = lazy(() => import("../pages/admin/user").then(module => ({ default: module.CashierList })))
+const ListSale = lazy(() => import("../pages/cashier/pos/ListSale"))
+const SaleReport = lazy(() => import("../pages/admin/report").then(module => ({ default: module.SaleReport })))
+const StockReport = lazy(() => import("../pages/admin/report").then(module => ({ default: module.StockReport })))
+const Inventory = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.Inventory })))
+const StockAdjustment = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.StockAdjustment })))
+const StockIn = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.StockIn })))
+const History = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.History })))
+const NotificationChannels = lazy(() => import("../pages/admin/notification").then(module => ({ default: module.NotificationChannels })))
+const NotificationLogs = lazy(() => import("../pages/admin/notification").then(module => ({ default: module.NotificationLogs })))
+const ShopSettings = lazy(() => import("../pages/admin/settings"))
 import { ROLES } from "../utils/helpers/role"
 
 const adminElement = (

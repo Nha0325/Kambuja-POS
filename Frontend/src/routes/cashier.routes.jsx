@@ -1,11 +1,13 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy } from "react"
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/auth/Protected"
+const Protected = lazy(() => import("../components/auth/Protected"))
 import CashierLayout from "../layouts/CashierLayout"
-import POS from "../pages/cashier/pos/POS"
-import Invoice from "../pages/cashier/pos/Invoice"
-import StockCheck from "../pages/cashier/StockCheck"
-import DailyClose from "../pages/cashier/DailyClose"
-import SalesHistory from "../pages/cashier/SalesHistory"
+const POS = lazy(() => import("../pages/cashier/pos/POS"))
+const Invoice = lazy(() => import("../pages/cashier/pos/Invoice"))
+const StockCheck = lazy(() => import("../pages/cashier/StockCheck"))
+const DailyClose = lazy(() => import("../pages/cashier/DailyClose"))
+const SalesHistory = lazy(() => import("../pages/cashier/SalesHistory"))
 import { ROLES } from "../utils/helpers/role"
 
 const cashierLayout = (

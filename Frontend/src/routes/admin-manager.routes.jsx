@@ -1,21 +1,28 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy } from "react"
 import { Navigate, Route } from "react-router-dom"
-import Protected from "../components/auth/Protected"
+const Protected = lazy(() => import("../components/auth/Protected"))
 import AdminManagerLayout from "../layouts/AdminManagerLayout"
-import Dashboard from "../pages/admin-manager/dashboard"
-import { CreateShop, EditShop, Shops } from "../pages/admin-manager/shops"
-import { Admins, CreateAdmin } from "../pages/admin-manager/admins"
-import Reports from "../pages/admin-manager/reports"
-import SystemLogs from "../pages/admin-manager/logs"
-import SystemHealth from "../pages/admin-manager/health"
-import Settings from "../pages/admin-manager/settings"
-import Stock from "../pages/admin-manager/stock"
-import Alerts from "../pages/admin-manager/alerts"
-import { CreateLocation, EditLocation, Locations } from "../pages/admin-manager/locations"
-import { Subscriptions } from "../pages/admin-manager/subscriptions"
-import PosAccess from "../pages/admin-manager/access"
+const Dashboard = lazy(() => import("../pages/admin-manager/dashboard"))
+const CreateShop = lazy(() => import("../pages/admin-manager/shops").then(module => ({ default: module.CreateShop })))
+const EditShop = lazy(() => import("../pages/admin-manager/shops").then(module => ({ default: module.EditShop })))
+const Shops = lazy(() => import("../pages/admin-manager/shops").then(module => ({ default: module.Shops })))
+const Admins = lazy(() => import("../pages/admin-manager/admins").then(module => ({ default: module.Admins })))
+const CreateAdmin = lazy(() => import("../pages/admin-manager/admins").then(module => ({ default: module.CreateAdmin })))
+const Reports = lazy(() => import("../pages/admin-manager/reports"))
+const SystemLogs = lazy(() => import("../pages/admin-manager/logs"))
+const SystemHealth = lazy(() => import("../pages/admin-manager/health"))
+const Settings = lazy(() => import("../pages/admin-manager/settings"))
+const Stock = lazy(() => import("../pages/admin-manager/stock"))
+const Alerts = lazy(() => import("../pages/admin-manager/alerts"))
+const CreateLocation = lazy(() => import("../pages/admin-manager/locations").then(module => ({ default: module.CreateLocation })))
+const EditLocation = lazy(() => import("../pages/admin-manager/locations").then(module => ({ default: module.EditLocation })))
+const Locations = lazy(() => import("../pages/admin-manager/locations").then(module => ({ default: module.Locations })))
+const Subscriptions = lazy(() => import("../pages/admin-manager/subscriptions").then(module => ({ default: module.Subscriptions })))
+const PosAccess = lazy(() => import("../pages/admin-manager/access"))
 
-import ProductList from "../pages/admin-manager/products/ProductList"
-import ProductDetail from "../pages/admin-manager/products/ProductDetail"
+const ProductList = lazy(() => import("../pages/admin-manager/products/ProductList"))
+const ProductDetail = lazy(() => import("../pages/admin-manager/products/ProductDetail"))
 import { ROLES } from "../utils/helpers/role"
 
 export const adminManagerRoutes = (

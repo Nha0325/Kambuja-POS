@@ -1,7 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
+import { lazy } from "react"
 import { Route } from "react-router-dom"
-import AuthRedirect from "../components/auth/AuthRedirect"
+const AuthRedirect = lazy(() => import("../components/auth/AuthRedirect"))
 import AuthLayout from "../layouts/AuthLayout"
-import Signin from "../pages/auth/Signin"
+const Signin = lazy(() => import("../pages/auth/Signin"))
 
 export const authRoutes = (
   <Route element={<AuthLayout />}>
