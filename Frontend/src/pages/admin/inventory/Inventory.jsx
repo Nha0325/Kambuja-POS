@@ -17,8 +17,10 @@ import {
 import dayjs from "dayjs"
 import { adminSurface } from "../adminPageUi"
 import { getImageUrl } from "../../../utils/helpers/getImageUrl"
+import { useTranslation } from "react-i18next";
 
 function Inventory() {
+  const { t } = useTranslation();
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
@@ -62,9 +64,9 @@ function Inventory() {
   const paginatedRows = filteredRows.slice((page - 1) * itemsPerPage, page * itemsPerPage)
 
   const getStatusBadge = (qty, min) => {
-    if (qty === 0) return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"><span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>Out of Stock</span>
-    if (qty <= min) return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-[#F59E0B]"><span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></span>Low Stock</span>
-    return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]"><span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span>In Stock</span>
+    if (qty === 0) return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"><span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>{t('out_of_stock')}</span>
+    if (qty <= min) return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-[#F59E0B]"><span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></span>{t('low_stock')}</span>
+    return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]"><span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span>{t('in_stock')}</span>
   }
 
   const formatStock = (stockQtyBase, unitsPerPurchaseUnit, purchaseUnitName, baseUnitName) => {
@@ -83,21 +85,21 @@ function Inventory() {
       {/* Header */}
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Inventory</p>
-          <h1 className={adminSurface.title}>Stock Overview</h1>
+          <p className={adminSurface.eyebrow}>{t('inventory')}</p>
+          <h1 className={adminSurface.title}>{t('stock_overview')}</h1>
           <p className={adminSurface.description}>
-            Manage your inventory, monitor stock levels, and track product availability.
+            {t('stock_overview_desc')}
           </p>
         </div>
         <div className="grid grid-cols-3 gap-3 sm:flex">
           <Link to="/admin/inventory/history" className={adminSurface.secondaryButton}>
-            <LuClock size={18} /> History
+            <LuClock size={18} /> {t('history')}
           </Link>
           <Link to="/admin/inventory/adjustment" className={adminSurface.secondaryButton}>
-            <LuSlidersHorizontal size={18} /> Adjust
+            <LuSlidersHorizontal size={18} /> {t('adjust')}
           </Link>
           <Link to="/admin/inventory/stock-in" className={adminSurface.primaryButton}>
-            <LuPackagePlus size={18} /> Stock In
+            <LuPackagePlus size={18} /> {t('stock_in')}
           </Link>
         </div>
       </div>
@@ -106,7 +108,7 @@ function Inventory() {
       <div className={adminSurface.statGrid}>
         <div className={adminSurface.statCard}>
           <div className="flex items-center justify-between">
-            <p className={adminSurface.statLabel}>Total Products</p>
+            <p className={adminSurface.statLabel}>{t('total_products')}</p>
             <div className={adminSurface.statIcon}>
               <LuPackage size={20} />
             </div>
@@ -116,7 +118,7 @@ function Inventory() {
 
         <div className={adminSurface.statCard}>
           <div className="flex items-center justify-between">
-            <p className={adminSurface.statLabel}>Total Stock Units</p>
+            <p className={adminSurface.statLabel}>{t('total_stock_units')}</p>
             <div className={`${adminSurface.statIcon} text-[#22C55E] bg-[#22C55E]/10`}>
               <LuBoxes size={20} />
             </div>
@@ -126,7 +128,7 @@ function Inventory() {
 
         <div className={adminSurface.statCard}>
           <div className="flex items-center justify-between">
-            <p className={adminSurface.statLabel}>Low Stock Products</p>
+            <p className={adminSurface.statLabel}>{t('low_stock_products')}</p>
             <div className={`${adminSurface.statIcon} text-[#F59E0B] bg-[#F59E0B]/10`}>
               <LuTriangleAlert size={20} />
             </div>
@@ -136,7 +138,7 @@ function Inventory() {
 
         <div className={adminSurface.statCard}>
           <div className="flex items-center justify-between">
-            <p className={adminSurface.statLabel}>Out of Stock</p>
+            <p className={adminSurface.statLabel}>{t('out_of_stock')}</p>
             <div className={`${adminSurface.statIcon} text-[#EF4444] bg-[#EF4444]/10`}>
               <LuCircleX size={20} />
             </div>
@@ -154,7 +156,7 @@ function Inventory() {
               <LuSearch className="h-5 w-5 text-[#6B7280]" />
             </div>
             <input
-              placeholder="Search product or SKU..."
+              placeholder={t('search_product_sku')}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className={`${adminSurface.input} pl-10 w-full`}
@@ -169,7 +171,7 @@ function Inventory() {
               onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
               className={`${adminSurface.select} pl-9 w-full`}
             >
-              <option value="">All Categories</option>
+              <option value="">{t('all_categories')}</option>
               {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
@@ -178,10 +180,10 @@ function Inventory() {
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className={`${adminSurface.select} w-full`}
           >
-            <option value="">All Statuses</option>
-            <option value="IN_STOCK">In Stock</option>
-            <option value="LOW_STOCK">Low Stock</option>
-            <option value="OUT_OF_STOCK">Out of Stock</option>
+            <option value="">{t('all_statuses')}</option>
+            <option value="IN_STOCK">{t('in_stock')}</option>
+            <option value="LOW_STOCK">{t('low_stock')}</option>
+            <option value="OUT_OF_STOCK">{t('out_of_stock')}</option>
           </select>
         </div>
 
@@ -190,15 +192,15 @@ function Inventory() {
           <table className={`${adminSurface.table} min-w-[1000px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={adminSurface.th}>Product</th>
-                <th className={adminSurface.th}>SKU / Barcode</th>
-                <th className={adminSurface.th}>Category</th>
-                <th className={adminSurface.th}>Supplier</th>
-                <th className={`${adminSurface.th} text-right`}>Current Stock</th>
-                <th className={`${adminSurface.th} text-right`}>Display Stock</th>
-                <th className={`${adminSurface.th} text-right`}>Min Stock</th>
-                <th className={`${adminSurface.th} text-center`}>Status</th>
-                <th className={`${adminSurface.th} text-right`}>Last Updated</th>
+                <th className={adminSurface.th}>{t('product')}</th>
+                <th className={adminSurface.th}>{t('sku_barcode')}</th>
+                <th className={adminSurface.th}>{t('category')}</th>
+                <th className={adminSurface.th}>{t('supplier')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('current_stock')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('display_stock')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('min_stock')}</th>
+                <th className={`${adminSurface.th} text-center`}>{t('status')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('last_updated')}</th>
               </tr>
             </thead>
             <tbody>
@@ -246,7 +248,7 @@ function Inventory() {
                   <td colSpan="9" className="px-5 py-12 text-center text-[#6B7280]">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <LuSearch size={32} className="text-[#6B7280] opacity-50" />
-                      <p>No inventory matching your filters.</p>
+                      <p>{t('no_inventory_filters')}</p>
                     </div>
                   </td>
                 </tr>

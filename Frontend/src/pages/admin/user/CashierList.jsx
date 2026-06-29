@@ -8,8 +8,10 @@ import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
 import { useConfirm } from "../../../hooks/ui/useConfirm";
+import { useTranslation } from "react-i18next";
 
 function User() {
+  const { t } = useTranslation();
   const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -23,10 +25,10 @@ function User() {
 
   const handleDelete = async (id) => {
     const isConfirmed = await confirm({
-      title: "Delete Cashier",
-      message: "Are you sure you want to delete this user? This action cannot be undone.",
-      confirmText: "Yes, delete",
-      cancelText: "Cancel",
+      title: t('delete_cashier'),
+      message: t('delete_cashier_msg'),
+      confirmText: t('yes_delete'),
+      cancelText: t('cancel'),
       variant: "danger"
     });
 
@@ -35,10 +37,10 @@ function User() {
         const res = await remove(id);
         if (res) {
           setRefetch(!refetch);
-          toast.success("User deleted successfully!");
+          toast.success(t('user_deleted_success'));
         }
       } catch (error) {
-        toast.error(error?.response?.data?.message || "Failed to delete user.");
+        toast.error(error?.response?.data?.message || t('failed_to_delete_user'));
       }
       closeConfirm();
     }
@@ -48,21 +50,21 @@ function User() {
     <div className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Staff</p>
-          <h1 className={adminSurface.title}>Cashiers</h1>
+          <p className={adminSurface.eyebrow}>{t('staff')}</p>
+          <h1 className={adminSurface.title}>{t('cashiers')}</h1>
           <p className={adminSurface.description}>
-            Manage cashier accounts, user roles, and shop access for the POS team.
+            {t('cashiers_desc')}
           </p>
         </div>
         <Link to="/admin/cashiers/create" className={adminSurface.primaryButton}>
-          + Add Cashier
+          + {t('add_cashier')}
         </Link>
       </div>
 
       <div className={adminSurface.statGrid}>
         {[
-          ["Total Cashiers", userCount],
-          ["Active Cashiers", activeCount],
+          [t('total_cashiers'), userCount],
+          [t('active_cashiers'), activeCount],
         ].map(([label, value]) => (
           <div key={label} className={adminSurface.statCard}>
             <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
@@ -94,7 +96,7 @@ function User() {
             <input
               type="text"
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users..."
+              placeholder={t('search_users')}
               className={`${adminSurface.input} w-full`}
             />
           </fieldset>
@@ -105,25 +107,25 @@ function User() {
           <table className={`${adminSurface.table} min-w-[760px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={`${adminSurface.th} w-12 text-center`}>N.o</th>
-                <th className={adminSurface.th}>Username</th>
-                <th className={adminSurface.th}>Email</th>
-                <th className={adminSurface.th}>Role</th>
-                <th className={adminSurface.th}>Status</th>
-                <th className={`${adminSurface.th} w-24 text-center`}>Action</th>
+                <th className={`${adminSurface.th} w-12 text-center`}>{t('no')}</th>
+                <th className={adminSurface.th}>{t('username')}</th>
+                <th className={adminSurface.th}>{t('email')}</th>
+                <th className={adminSurface.th}>{t('role')}</th>
+                <th className={adminSurface.th}>{t('status')}</th>
+                <th className={`${adminSurface.th} w-24 text-center`}>{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="p-8 text-center text-slate-500 dark:text-[#A9A6BB]">
-                    Loading users...
+                    {t('loading_users')}
                   </td>
                 </tr>
               ) : data?.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="p-8 text-center text-slate-500 dark:text-[#A9A6BB]">
-                    No users found.
+                    {t('no_users_found')}
                   </td>
                 </tr>
               ) : (

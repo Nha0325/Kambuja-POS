@@ -10,8 +10,10 @@ import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
 import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
 import { useConfirm } from "../../../hooks/ui/useConfirm";
+import { useTranslation } from "react-i18next";
 
 function Product() {
+  const { t } = useTranslation();
   const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -27,10 +29,10 @@ function Product() {
 
   const handleDelete = async (id) => {
     const isConfirmed = await confirm({
-      title: "Delete Product",
-      message: "Are you sure you want to delete this product? This action cannot be undone.",
-      confirmText: "Yes, delete",
-      cancelText: "Cancel",
+      title: t('delete_product'),
+      message: t('delete_product_msg'),
+      confirmText: t('yes_delete'),
+      cancelText: t('cancel'),
       variant: "danger"
     });
 
@@ -38,7 +40,7 @@ function Product() {
       const res = await remove(id);
       if (res && isDeleting === false) {
         setRefetch(!refetch);
-        toast.success("Deleted successfully!");
+        toast.success(t('deleted_success'));
       }
       closeConfirm();
     }
@@ -48,18 +50,18 @@ function Product() {
     <div className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Admin / Products</p>
-          <h1 className={adminSurface.title}>Products</h1>
+          <p className={adminSurface.eyebrow}>{t('admin_products')}</p>
+          <h1 className={adminSurface.title}>{t('products')}</h1>
           <p className={adminSurface.description}>
-            Maintain product codes, pricing, category assignment, stock count, and labels.
+            {t('products_desc')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link to="/admin/categories" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-[#2A2E36] bg-[#111318] px-5 text-sm font-semibold text-[#F8FAFC] shadow-sm transition-colors hover:border-[#3A3F49] hover:bg-[#1A1D24]">
-            <LuTags className="text-[#A9A6BB]" /> Manage Categories
+            <LuTags className="text-[#A9A6BB]" /> {t('manage_categories')}
           </Link>
           <Link to="/admin/products/create" className={adminSurface.primaryButton}>
-            <LuPlus /> New Product
+            <LuPlus /> {t('new_product')}
           </Link>
         </div>
       </div>
@@ -93,7 +95,7 @@ function Product() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Search products..."
+                placeholder={t('search_products')}
               />
             </label>
           </div>
@@ -103,15 +105,15 @@ function Product() {
           <table className={`${adminSurface.table} min-w-[1180px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={`${adminSurface.th} w-16 text-center`}>N.o</th>
-                <th className={adminSurface.th}>Code</th>
-                <th className={adminSurface.th}>Product</th>
-                <th className={adminSurface.th}>Category</th>
-                <th className={`${adminSurface.th} text-right`}>Cost Price</th>
-                <th className={`${adminSurface.th} text-right`}>Sale Price</th>
-                <th className={`${adminSurface.th} text-center`}>Current Stock</th>
-                <th className={adminSurface.th}>Note</th>
-                <th className={`${adminSurface.th} w-28 text-center`}>Actions</th>
+                <th className={`${adminSurface.th} w-16 text-center`}>{t('no')}</th>
+                <th className={adminSurface.th}>{t('code')}</th>
+                <th className={adminSurface.th}>{t('product')}</th>
+                <th className={adminSurface.th}>{t('category')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('cost_price')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('sale_price')}</th>
+                <th className={`${adminSurface.th} text-center`}>{t('current_stock')}</th>
+                <th className={adminSurface.th}>{t('note')}</th>
+                <th className={`${adminSurface.th} w-28 text-center`}>{t('actions')}</th>
               </tr>
             </thead>
 
@@ -129,7 +131,7 @@ function Product() {
               {!isLoading && products?.length === 0 && (
                 <tr>
                   <td colSpan={9} className="p-8 text-center text-sm text-[#6B7280]">
-                    No products found.
+                    {t('no_products')}
                   </td>
                 </tr>
               )}
@@ -160,7 +162,7 @@ function Product() {
                             </div>
                           ) : (
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#2A2E36] bg-[#111318] text-[10px] text-slate-500 dark:text-zinc-400">
-                              No Img
+                              {t('no_image')}
                             </div>
                           )}
                           <span className="font-semibold text-slate-900 dark:text-white">{item?.name || "-"}</span>

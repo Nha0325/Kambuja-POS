@@ -2,8 +2,10 @@ import { useEffect, useState, useMemo } from "react"
 import { Link } from "react-router-dom"
 import { api } from "../../utils/config/api"
 import formatDate from "../../utils/formatters/formatDate"
+import { useTranslation } from "react-i18next";
 
 function SalesHistory() {
+  const { t } = useTranslation();
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`
   const [sales, setSales] = useState([])
   const [search, setSearch] = useState("")
@@ -41,13 +43,13 @@ function SalesHistory() {
     <div className="min-h-[calc(100vh-64px)] bg-background p-4 sm:p-6 text-foreground">
       <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Sales History</h1>
-          <p className="text-sm text-muted-foreground">Review past sales and invoices</p>
+          <h1 className="text-2xl font-bold">{t('sales_history')}</h1>
+          <p className="text-sm text-muted-foreground">{t('sales_history_desc')}</p>
         </div>
         <div className="w-full sm:w-72">
           <input
             type="text"
-            placeholder="Search by invoice, cashier, status..."
+            placeholder={t('search_history')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full h-10 px-4 py-2 border border-border bg-background rounded-lg shadow-sm text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground transition"
@@ -67,21 +69,21 @@ function SalesHistory() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">Invoice</th>
-                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">Date</th>
-                <th className="hidden md:table-cell px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">Cashier</th>
-                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">Total Cost</th>
-                <th className="px-2 sm:px-4 py-3 font-bold text-center text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">Action</th>
+                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">{t('invoice_id')}</th>
+                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">{t('date')}</th>
+                <th className="hidden md:table-cell px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">{t('cashier')}</th>
+                <th className="px-2 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">{t('total_cost')}</th>
+                <th className="px-2 sm:px-4 py-3 font-bold text-center text-muted-foreground uppercase tracking-wider text-[10px] sm:text-[11px]">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-8 text-center text-muted-foreground">Loading sales history...</td>
+                  <td colSpan="5" className="px-4 py-8 text-center text-muted-foreground">{t('loading_sales_history')}</td>
                 </tr>
               ) : filteredSales.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-8 text-center text-muted-foreground">No sales found</td>
+                  <td colSpan="5" className="px-4 py-8 text-center text-muted-foreground">{t('no_sales_found')}</td>
                 </tr>
               ) : (
                 filteredSales.map((sale) => (
@@ -100,7 +102,7 @@ function SalesHistory() {
                         to={`/cashier/invoice/${sale._id}`} 
                         className="inline-flex items-center justify-center px-1.5 py-1 sm:px-3 sm:py-1.5 bg-primary text-primary-foreground rounded-md font-bold text-[10px] sm:text-xs hover:bg-primary/90 transition active:scale-95"
                       >
-                        Receipt
+                        {t('receipt')}
                       </Link>
                     </td>
                   </tr>

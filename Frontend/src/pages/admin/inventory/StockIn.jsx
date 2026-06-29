@@ -6,8 +6,10 @@ import { productService } from "../../../services/inventory/product.service"
 import { supplierService } from "../../../services/purchase/supplier.service"
 import { LuPackagePlus, LuInfo, LuPackage, LuFileText, LuDollarSign } from "react-icons/lu"
 import { adminSurface } from "../adminPageUi"
+import { useTranslation } from "react-i18next";
 
 function StockIn() {
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [suppliers, setSuppliers] = useState([])
@@ -82,19 +84,19 @@ function StockIn() {
     event.preventDefault()
 
     if (!form.productId) {
-      toast.error("Product is required")
+      toast.error(t('product_is_required'))
       return
     }
 
     const quantity = Number(form.quantityPurchaseUnit)
     if (!Number.isFinite(quantity) || quantity <= 0) {
-      toast.error("Quantity must be greater than 0")
+      toast.error(t('qty_greater_than_0'))
       return
     }
 
     const costPerPurchaseUnit = form.costPerPurchaseUnit === "" ? undefined : Number(form.costPerPurchaseUnit)
     if (costPerPurchaseUnit !== undefined && (!Number.isFinite(costPerPurchaseUnit) || costPerPurchaseUnit < 0)) {
-      toast.error("Cost per purchase unit must be greater than or equal to 0")
+      toast.error(t('cost_greater_than_0'))
       return
     }
 
@@ -119,10 +121,10 @@ function StockIn() {
       if (!payload.supplierId) delete payload.supplierId;
 
       await adminService.receiveStock(payload)
-      toast.success("Stock received successfully")
+      toast.success(t('stock_received_success'))
       navigate("/admin/inventory")
     } catch (error) {
-      toast.error(error.response?.data?.message || error.response?.data?.error || "Unable to receive stock")
+      toast.error(error.response?.data?.message || error.response?.data?.error || t('unable_to_receive_stock'))
     } finally {
       setIsLoading(false)
     }
@@ -138,15 +140,15 @@ function StockIn() {
             </div>
             <div>
               <p className={adminSurface.eyebrow}>
-                Inventory Management
+                {t('inventory_management')}
               </p>
               <h1 className={adminSurface.title}>
-                Receive Stock
+                {t('receive_stock')}
               </h1>
             </div>
           </div>
           <p className={adminSurface.description}>
-            Use for receiving new inventory from supplier or purchase. This increases stock as a normal business stock-in movement.
+            {t('receive_stock_desc')}
           </p>
         </div>
       </div>
@@ -155,21 +157,21 @@ function StockIn() {
         <form onSubmit={submit} className="space-y-8">
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuPackage className="text-cyan-600 dark:text-[#06b6d4]" /> Product Details
+              <LuPackage className="text-cyan-600 dark:text-[#06b6d4]" /> {t('product_details')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5 md:col-span-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Select Product*</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('select_product')}</label>
                 <select
                   required
                   className={`${adminSurface.select} w-full`}
                   value={form.productId}
                   onChange={(e) => setForm({ ...form, productId: e.target.value })}
                 >
-                  <option value="" disabled>Search or select product</option>
+                  <option value="" disabled>{t('search_select_product')}</option>
                   {products.map((product) => (
                     <option key={product._id} value={product._id}>
-                      {product.name} (Code: {product.code || "N/A"})
+                      {product.name} ({t('code')}: {product.code || "N/A"})
                     </option>
                   ))}
                 </select>
@@ -177,21 +179,21 @@ function StockIn() {
 
               {selectedProduct && selectedProduct.unitConfig && (
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Input Unit*</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('input_unit')}</label>
                   <select
                     className={`${adminSurface.select} w-full`}
                     value={form.inputUnit}
                     onChange={(e) => setForm({ ...form, inputUnit: e.target.value })}
                   >
-                    <option value="">Default ({selectedProduct.unitConfig.purchaseUnit?.nameKh || 'Unit'})</option>
+                    <option value="">{t('default_unit')} ({selectedProduct.unitConfig.purchaseUnit?.nameKh || 'Unit'})</option>
                     {selectedProduct.unitConfig.purchaseUnit && (
                       <option value={selectedProduct.unitConfig.purchaseUnit.code}>
-                        {selectedProduct.unitConfig.purchaseUnit.nameKh} ({selectedProduct.unitConfig.unitsPerPurchaseUnit} Base Units)
+                        {selectedProduct.unitConfig.purchaseUnit.nameKh} ({selectedProduct.unitConfig.unitsPerPurchaseUnit} {t('base_units')})
                       </option>
                     )}
                     {selectedProduct.unitConfig.baseUnit && (
                       <option value={selectedProduct.unitConfig.baseUnit.code}>
-                        {selectedProduct.unitConfig.baseUnit.nameKh} (Base Unit)
+                        {selectedProduct.unitConfig.baseUnit.nameKh} ({t('base_unit')})
                       </option>
                     )}
                   </select>
@@ -199,7 +201,7 @@ function StockIn() {
               )}
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Quantity Purchase Unit*</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('quantity_purchase_unit')}</label>
                 <input
                   required
                   type="number"
@@ -207,12 +209,12 @@ function StockIn() {
                   className={`${adminSurface.input} w-full`}
                   value={form.quantityPurchaseUnit}
                   onChange={(e) => setForm({ ...form, quantityPurchaseUnit: e.target.value })}
-                  placeholder="Enter purchase quantity"
+                  placeholder={t('enter_purchase_qty')}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Units Per Purchase Unit*</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('units_per_purchase_unit')}</label>
                 <input
                   required
                   type="number"
@@ -226,7 +228,7 @@ function StockIn() {
               </div>
 
               <div className="space-y-1.5 flex flex-col justify-end">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB] invisible">Quick Add</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB] invisible">{t('quick_add')}</label>
                 <div className="flex items-center gap-2 h-11">
                   {[1, 5, 10, 20].map((num) => (
                     <button
@@ -245,15 +247,15 @@ function StockIn() {
             {selectedProduct && form.quantityPurchaseUnit !== "" && (
               <div className="mt-6 rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-slate-50 dark:bg-[#111318] p-4 flex items-center justify-between text-sm shadow-sm">
                 <div className="text-center flex-1">
-                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">Current Stock</p>
+                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">{t('current_stock')}</p>
                   <p className="text-xl font-bold text-slate-900 dark:text-[#F8FAFC]">{currentStock} {selectedProduct.unitConfig?.baseUnit?.nameKh || ""}</p>
                 </div>
                 <div className="text-center flex-1 border-x border-slate-200 dark:border-[#2A2E36]">
-                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">Receiving (Base)</p>
+                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">{t('receiving_base')}</p>
                   <p className="text-xl font-bold text-emerald-500">+{convertedQty} {selectedProduct.unitConfig?.baseUnit?.nameKh || ""}</p>
                 </div>
                 <div className="text-center flex-1">
-                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">New Stock (Base)</p>
+                  <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">{t('new_stock_base')}</p>
                   <p className="text-xl font-bold text-slate-900 dark:text-[#F8FAFC]">{newStock} {selectedProduct.unitConfig?.baseUnit?.nameKh || ""}</p>
                 </div>
               </div>
@@ -262,17 +264,17 @@ function StockIn() {
 
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuFileText className="text-cyan-600 dark:text-[#06b6d4]" /> Advanced Details
+              <LuFileText className="text-cyan-600 dark:text-[#06b6d4]" /> {t('advanced_details')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Supplier</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('supplier')}</label>
                 <select
                   className={`${adminSurface.select} w-full`}
                   value={form.supplierId}
                   onChange={(e) => setForm({ ...form, supplierId: e.target.value })}
                 >
-                  <option value="">No supplier (Direct stock in)</option>
+                  <option value="">{t('no_supplier_direct')}</option>
                   {suppliers.map((supplier) => (
                     <option key={supplier._id} value={supplier._id}>
                       {supplier.businessName || supplier.name}
@@ -282,7 +284,7 @@ function StockIn() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Cost Per Purchase Unit (Optional)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('cost_per_purchase_unit_optional')}</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -295,12 +297,12 @@ function StockIn() {
                   <LuDollarSign className="absolute bottom-[13px] left-3 text-[#6B7280]" size={16} />
                 </div>
                 <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">
-                  Total cost: ${totalCost.toFixed(2)}
+                  {t('total_cost_label')} ${totalCost.toFixed(2)}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Invoice / Ref No.</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('invoice_ref_no')}</label>
                 <input
                   type="text"
                   className={`${adminSurface.input} w-full`}
@@ -311,7 +313,7 @@ function StockIn() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">Received Date</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#A9A6BB]">{t('received_date')}</label>
                 <input
                   type="date"
                   className={`${adminSurface.input} w-full`}
@@ -324,11 +326,11 @@ function StockIn() {
 
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuInfo className="text-cyan-600 dark:text-[#06b6d4]" /> Additional Notes
+              <LuInfo className="text-cyan-600 dark:text-[#06b6d4]" /> {t('additional_notes')}
             </h2>
             <textarea
               className={`${adminSurface.input} w-full py-3 h-auto min-h-[100px] resize-y`}
-              placeholder="Add any extra details regarding this inventory movement..."
+              placeholder={t('add_extra_details_inventory')}
               value={form.note}
               onChange={(e) => setForm({ ...form, note: e.target.value })}
             ></textarea>
@@ -336,14 +338,14 @@ function StockIn() {
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-slate-200 dark:border-[#2A2E36]">
             <Link to="/admin/inventory" className={adminSurface.secondaryButton}>
-              Cancel
+              {t('cancel')}
             </Link>
             <button
               type="submit"
               disabled={isLoading || !form.productId || !form.quantityPurchaseUnit}
               className={adminSurface.primaryButton}
             >
-              {isLoading ? "Processing..." : "Confirm Receive Stock"}
+              {isLoading ? t('processing') : t('confirm_receive_stock')}
             </button>
           </div>
         </form>

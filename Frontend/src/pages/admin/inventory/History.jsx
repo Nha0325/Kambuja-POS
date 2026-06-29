@@ -12,8 +12,10 @@ import {
 import dayjs from "dayjs"
 import { adminSurface } from "../adminPageUi"
 import { getImageUrl } from "../../../utils/helpers/getImageUrl"
+import { useTranslation } from "react-i18next";
 
 function History() {
+  const { t } = useTranslation();
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState("")
@@ -48,16 +50,16 @@ function History() {
     switch (type) {
       case "RECEIVE_STOCK":
       case "STOCK_IN":
-        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]"><LuArrowDownToLine size={12}/> Receive Stock</span>
+        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]"><LuArrowDownToLine size={12}/> {t('receive_stock')}</span>
       case "SALE":
-        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"><LuArrowDownToLine size={12}/> Sale</span>
+        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"><LuArrowDownToLine size={12}/> {t('sale')}</span>
       case "STOCK_ADJUSTMENT":
       case "ADJUSTMENT":
-        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-[#F59E0B]"><LuSlidersHorizontal size={12}/> Stock Adjustment</span>
+        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-xs font-semibold text-[#F59E0B]"><LuSlidersHorizontal size={12}/> {t('stock_adjustment')}</span>
       case "RETURN":
-        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#3B82F6]/20 bg-[#3B82F6]/10 px-2.5 py-1 text-xs font-semibold text-[#3B82F6]"><LuArrowUpFromLine size={12}/> Return</span>
+        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#3B82F6]/20 bg-[#3B82F6]/10 px-2.5 py-1 text-xs font-semibold text-[#3B82F6]"><LuArrowUpFromLine size={12}/> {t('return')}</span>
       case "CANCEL_SALE":
-        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6B7280]/20 bg-[#6B7280]/10 px-2.5 py-1 text-xs font-semibold text-[#6B7280]">Cancel Sale</span>
+        return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6B7280]/20 bg-[#6B7280]/10 px-2.5 py-1 text-xs font-semibold text-[#6B7280]">{t('cancel_sale')}</span>
       default:
         return <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6B7280]/20 bg-[#6B7280]/10 px-2.5 py-1 text-xs font-semibold text-[#6B7280]">{type}</span>
     }
@@ -68,15 +70,15 @@ function History() {
       {/* Header */}
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Inventory</p>
-          <h1 className={adminSurface.title}>Movement History</h1>
+          <p className={adminSurface.eyebrow}>{t('inventory')}</p>
+          <h1 className={adminSurface.title}>{t('movement_history')}</h1>
           <p className={adminSurface.description}>
-            Track all stock in and adjustment records for your products.
+            {t('movement_history_desc')}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:flex">
           <Link to="/admin/inventory" className={adminSurface.secondaryButton}>
-             Overview
+             {t('overview')}
           </Link>
         </div>
       </div>
@@ -90,7 +92,7 @@ function History() {
               <LuSearch className="h-5 w-5 text-[#6B7280]" />
             </div>
             <input
-              placeholder="Search product, code, reason..."
+              placeholder={t('search_product_code_reason')}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className={`${adminSurface.input} pl-10 w-full`}
@@ -102,12 +104,12 @@ function History() {
               onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
               className={`${adminSurface.select} w-full`}
             >
-              <option value="">All Types</option>
-              <option value="RECEIVE_STOCK">Receive Stock</option>
-              <option value="SALE">Sale</option>
-              <option value="STOCK_ADJUSTMENT">Stock Adjustment</option>
-              <option value="RETURN">Return</option>
-              <option value="CANCEL_SALE">Cancel Sale</option>
+              <option value="">{t('all_types')}</option>
+              <option value="RECEIVE_STOCK">{t('receive_stock')}</option>
+              <option value="SALE">{t('sale')}</option>
+              <option value="STOCK_ADJUSTMENT">{t('stock_adjustment')}</option>
+              <option value="RETURN">{t('return')}</option>
+              <option value="CANCEL_SALE">{t('cancel_sale')}</option>
             </select>
           </div>
         </div>
@@ -117,15 +119,15 @@ function History() {
           <table className={`${adminSurface.table} min-w-[1000px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={adminSurface.th}>Date</th>
-                <th className={adminSurface.th}>Product</th>
-                <th className={adminSurface.th}>Type</th>
-                <th className={`${adminSurface.th} text-right`}>Before</th>
-                <th className={`${adminSurface.th} text-right`}>Change</th>
-                <th className={`${adminSurface.th} text-right`}>After</th>
-                <th className={adminSurface.th}>Reason / Note</th>
-                <th className={adminSurface.th}>Reference</th>
-                <th className={adminSurface.th}>By</th>
+                <th className={adminSurface.th}>{t('date')}</th>
+                <th className={adminSurface.th}>{t('product')}</th>
+                <th className={adminSurface.th}>{t('type')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('before')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('change')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('after')}</th>
+                <th className={adminSurface.th}>{t('reason_note')}</th>
+                <th className={adminSurface.th}>{t('reference')}</th>
+                <th className={adminSurface.th}>{t('by')}</th>
               </tr>
             </thead>
             <tbody>
@@ -184,7 +186,7 @@ function History() {
                   <td colSpan="9" className="px-5 py-12 text-center text-[#6B7280]">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <LuSearch size={32} className="text-[#6B7280] opacity-50" />
-                      <p>No movement history found.</p>
+                      <p>{t('no_movement_history')}</p>
                     </div>
                   </td>
                 </tr>

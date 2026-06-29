@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react"
 import toast from "react-hot-toast"
 import { adminService } from "../../../services/users/admin.service"
 import { cambodiaAddress } from "../../../utils/data/cambodiaAddress"
+import { useTranslation } from "react-i18next";
 
 const sectionTitleClass = "mb-6 flex items-center gap-2 text-base font-semibold text-[#020617] dark:text-[#f8fafc]"
 const labelClass = "block text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]"
@@ -15,6 +16,7 @@ const SectionTitle = ({ children }) => (
 )
 
 const Combobox = ({ valueObj, onChange, options, placeholder, disabled, required }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const wrapperRef = useRef(null)
@@ -83,7 +85,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled, required
               </div>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">No results found</div>
+            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">{t('no_results_found')}</div>
           )}
         </div>
       )}
@@ -92,6 +94,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled, required
 }
 
 function ShopSettings() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ 
     name: "", 
     billingPhone: "", 
@@ -139,9 +142,9 @@ function ShopSettings() {
 
       const response = await adminService.updateShop(payload)
       setForm((current) => ({ ...current, ...response.data.result }))
-      toast.success("Shop settings updated")
+      toast.success(t('shop_settings_updated'))
     } catch (error) {
-      toast.error(error.response?.data?.error || "Unable to update shop")
+      toast.error(error.response?.data?.error || t('unable_to_update_shop'))
     } finally {
       setIsLoading(false)
     }
@@ -159,34 +162,34 @@ function ShopSettings() {
     <section className="mx-auto w-full max-w-4xl min-w-0 pb-10">
       <div className="w-full">
         <div className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#06b6d4]">Configuration</p>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">Shop Settings</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#06b6d4]">{t('configuration')}</p>
+          <h1 className="mt-1 text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{t('shop_settings')}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-            Update the shop profile used across admin, reporting, and receipt workflows.
+            {t('shop_settings_desc')}
           </p>
         </div>
 
         <form onSubmit={submit} className="space-y-10 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-5 shadow-none sm:p-6 md:p-8">
           <section>
-            <SectionTitle>Shop Profile</SectionTitle>
+            <SectionTitle>{t('shop_profile')}</SectionTitle>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <label className="space-y-2">
-                <span className={labelClass}>Shop Name *</span>
-                <input required className={inputClass} placeholder="Enter shop name" value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <span className={labelClass}>{t('shop_name_req')}</span>
+                <input required className={inputClass} placeholder={t('enter_shop_name')} value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Phone</span>
-                <input className={inputClass} placeholder="Enter phone number" value={form.billingPhone || ""} onChange={(e) => setForm({ ...form, billingPhone: e.target.value })} />
+                <span className={labelClass}>{t('phone')}</span>
+                <input className={inputClass} placeholder={t('enter_phone_number')} value={form.billingPhone || ""} onChange={(e) => setForm({ ...form, billingPhone: e.target.value })} />
               </label>
             </div>
           </section>
 
           <section>
-            <SectionTitle>Shop Address</SectionTitle>
+            <SectionTitle>{t('shop_address')}</SectionTitle>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <label className="space-y-2">
-                <span className={labelClass}>Province / Capital *</span>
+                <span className={labelClass}>{t('province_req')}</span>
                 <Combobox
                   valueObj={selectedProv}
                   onChange={(opt) => setForm({ 
@@ -197,13 +200,13 @@ function ShopSettings() {
                     village: "" 
                   })}
                   options={cambodiaAddress}
-                  placeholder="Select Province / Capital"
+                  placeholder={t('select_province')}
                   required
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>District / Khan *</span>
+                <span className={labelClass}>{t('district_req')}</span>
                 <Combobox
                   valueObj={selectedDist}
                   onChange={(opt) => setForm({ 
@@ -213,14 +216,14 @@ function ShopSettings() {
                     village: "" 
                   })}
                   options={availableDistricts}
-                  placeholder="Select District / Khan"
+                  placeholder={t('select_district')}
                   disabled={!form.provinceKh}
                   required
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Commune / Sangkat</span>
+                <span className={labelClass}>{t('commune')}</span>
                 <Combobox
                   valueObj={selectedComm}
                   onChange={(opt) => setForm({ 
@@ -229,19 +232,19 @@ function ShopSettings() {
                     village: "" 
                   })}
                   options={availableCommunes}
-                  placeholder="Select Commune / Sangkat"
+                  placeholder={t('select_commune')}
                   disabled={!form.districtKh}
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Village</span>
-                <input className={inputClass} placeholder="Village name (Optional)" value={form.village || ""} onChange={(e) => setForm({ ...form, village: e.target.value })} />
+                <span className={labelClass}>{t('village')}</span>
+                <input className={inputClass} placeholder={t('village_name_optional')} value={form.village || ""} onChange={(e) => setForm({ ...form, village: e.target.value })} />
               </label>
 
               <label className="space-y-2 md:col-span-2">
-                <span className={labelClass}>Detailed Address</span>
-                <input className={inputClass} placeholder="House number, street, market name, nearby landmark..." value={form.addressDetail || ""} onChange={(e) => setForm({ ...form, addressDetail: e.target.value })} />
+                <span className={labelClass}>{t('detailed_address')}</span>
+                <input className={inputClass} placeholder={t('detailed_address_placeholder')} value={form.addressDetail || ""} onChange={(e) => setForm({ ...form, addressDetail: e.target.value })} />
               </label>
             </div>
           </section>
@@ -252,7 +255,7 @@ function ShopSettings() {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? "Saving..." : "Save Settings"}
+              {isLoading ? t('saving') : t('save_settings')}
             </button>
           </div>
         </form>

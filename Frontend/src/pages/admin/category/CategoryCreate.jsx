@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useCollection from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 function CreateCategory() {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
 
@@ -19,7 +21,7 @@ function CreateCategory() {
     });
 
     if (res) {
-      toast.success("Created successfully!!");
+      toast.success(t('created_successfully'));
       clearForm();
       navigate("/admin/categories");
     }
@@ -39,13 +41,13 @@ function CreateCategory() {
             to="/admin/categories"
             className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
-            Categories
+            {t('categories')}
           </Link>
 
           <span className="text-[#64748b] dark:text-[#a1a1aa]">›</span>
 
           <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">
-            Create New Category
+            {t('create_new_category')}
           </span>
         </nav>
 
@@ -55,10 +57,10 @@ function CreateCategory() {
             {/* Card Header */}
             <div className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6">
               <h1 className="text-xl font-semibold text-[#020617] dark:text-[#f8fafc]">
-                Add Category
+                {t('add_category')}
               </h1>
               <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-                Define a new product grouping for your inventory management.
+                {t('define_category_desc')}
               </p>
             </div>
 
@@ -70,7 +72,7 @@ function CreateCategory() {
                     htmlFor="category-name"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Category Name <span className="text-red-500">*</span>
+                    {t('category_name')} <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -81,11 +83,11 @@ function CreateCategory() {
                     onChange={(e) => setName(e.target.value)}
                     type="text"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="e.g. Beverages, Electronics, Summer Collection"
+                    placeholder={t('category_name_placeholder')}
                   />
 
                   <p className="text-xs text-[#64748b] dark:text-[#a1a1aa]">
-                    Keep names short and descriptive for easy identification.
+                    {t('keep_names_short')}
                   </p>
                 </div>
 
@@ -95,7 +97,7 @@ function CreateCategory() {
                     htmlFor="category-note"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Note
+                    {t('note')}
                   </label>
 
                   <textarea
@@ -105,7 +107,7 @@ function CreateCategory() {
                     onChange={(e) => setNote(e.target.value)}
                     rows={4}
                     className="min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="Additional details about this category..."
+                    placeholder={t('category_note_placeholder')}
                   />
                 </div>
               </div>
@@ -116,7 +118,7 @@ function CreateCategory() {
                   to="/admin/categories"
                   className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center w-full sm:w-auto"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Link>
 
                 <button
@@ -124,7 +126,7 @@ function CreateCategory() {
                   disabled={isLoading}
                   className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center w-full sm:w-auto"
                 >
-                  {isLoading ? "Saving..." : "Save Category"}
+                  {isLoading ? t('saving') : t('save_category')}
                 </button>
               </div>
             </form>

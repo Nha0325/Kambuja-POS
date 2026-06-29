@@ -3,8 +3,10 @@ import { useSaleReport } from "../../../hooks/reports/useSaleReport";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";
+import { useTranslation } from "react-i18next";
 
 function SaleReport() {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState(() => dayjs().format("YYYY-MM-DD"));
   const [endDate, setEndDate] = useState(() => dayjs().format("YYYY-MM-DD"));
   const [data, setData] = useState([]); 
@@ -55,22 +57,22 @@ function SaleReport() {
 
   return (
     <div className={adminSurface.page}>
-        <div className={adminSurface.header}>
-          <div>
-            <p className={adminSurface.eyebrow}>Reports</p>
-            <h1 className={adminSurface.title}>Sale Report</h1>
-            <p className={adminSurface.description}>
-              Filter sales by date range and review invoice totals, payment status, and cashier activity.
-            </p>
-          </div>
+      <div className={adminSurface.header}>
+        <div>
+          <p className={adminSurface.eyebrow}>{t('reports')}</p>
+          <h1 className={adminSurface.title}>{t('sale_report')}</h1>
+          <p className={adminSurface.description}>
+            {t('sale_report_desc')}
+          </p>
         </div>
+      </div>
 
         <div className="flex flex-col lg:flex-row justify-between items-start gap-6 w-full">
           {/* Date Filters - Top Left */}
           <form onSubmit={handleFilter} className="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3 w-full lg:w-auto">
           <div className="min-w-0 w-full sm:w-auto">
             <label htmlFor="sale-report-startDate" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#6B7280]">
-              Start Date
+              {t('start_date')}
             </label>
             <input
               id="sale-report-startDate"
@@ -84,7 +86,7 @@ function SaleReport() {
           </div>
           <div className="min-w-0 w-full sm:w-auto">
             <label htmlFor="sale-report-endDate" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#6B7280]">
-              End Date
+              {t('end_date')}
             </label>
             <input
               id="sale-report-endDate"
@@ -98,7 +100,7 @@ function SaleReport() {
           </div>
           <div className="flex gap-2 w-full col-span-2 sm:col-span-1 sm:w-auto mt-2 sm:mt-0">
             <button disabled={isLoading} className={`${adminSurface.primaryButton} flex-1 sm:flex-none`}>
-              {isLoading ? "..." : "Filter"}
+              {isLoading ? "..." : t('filter')}
             </button>
             <button
               type="button"
@@ -111,16 +113,16 @@ function SaleReport() {
               }}
               className={`${adminSurface.secondaryButton} flex-1 sm:flex-none text-red-600 hover:text-red-700 dark:text-red-500`}
             >
-              Clear
+              {t('clear')}
             </button>
           </div>
           </form>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full lg:w-auto">
             {[
-              ["Sales", data.length, "", "🧾"],
-              ["Total Amount", `$${Number(totalAmount || 0).toFixed(2)}`, "", "💰"],
-              ["Shift Diff", `${totalDifference > 0 ? '+' : ''}$${totalDifference.toFixed(2)}`, totalDifference < 0 ? "text-red-500" : totalDifference > 0 ? "text-green-500" : "", "⚖️"],
+              [t('sales'), data.length, "", "🧾"],
+              [t('total_amount'), `$${Number(totalAmount || 0).toFixed(2)}`, "", "💰"],
+              [t('shift_diff'), `${totalDifference > 0 ? '+' : ''}$${totalDifference.toFixed(2)}`, totalDifference < 0 ? "text-red-500" : totalDifference > 0 ? "text-green-500" : "", "⚖️"],
             ].map(([label, value, colorClass, icon]) => (
               <div key={label} className={`${adminSurface.statCard} w-full sm:w-48 lg:w-56 p-4 sm:p-6`}>
                 <div className={adminSurface.statIcon}>{icon}</div>
@@ -135,18 +137,18 @@ function SaleReport() {
 
         <div className={adminSurface.tableShell}>
           <div className={adminSurface.toolbar}>
-            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Sale results</p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-[#A9A6BB]">{data.length} row(s) displayed</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">{t('sale_results')}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-[#A9A6BB]">{data.length} {t('rows_displayed')}</p>
           </div>
           <div className={adminSurface.tableWrap}>
             <table className={`${adminSurface.table} min-w-[1080px]`}>
               <thead className={adminSurface.tableHead}>
                 <tr>
-                  <th className={adminSurface.th}>N.o</th>
-                  <th className={adminSurface.th}>Invoice</th>
-                  <th className={adminSurface.th}>Sale By</th>
-                  <th className={adminSurface.th}>Total Cost</th>
-                  <th className={adminSurface.th}>Created Date</th>
+                  <th className={adminSurface.th}>{t('no')}</th>
+                  <th className={adminSurface.th}>{t('invoice')}</th>
+                  <th className={adminSurface.th}>{t('sale_by')}</th>
+                  <th className={adminSurface.th}>{t('total_cost')}</th>
+                  <th className={adminSurface.th}>{t('created_date')}</th>
                 </tr>
               </thead>
 
@@ -170,7 +172,7 @@ function SaleReport() {
                 <tbody>
                   <tr>
                     <td colSpan={5} className="p-8 text-center text-sm text-slate-500 dark:text-[#A9A6BB]">
-                      No Data!
+                      {t('no_data')}
                     </td>
                   </tr>
                 </tbody>
@@ -179,7 +181,7 @@ function SaleReport() {
           </div>
           <div className={`${adminSurface.footer} justify-end sm:justify-end`}>
             <h1 className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC] text-right w-full">
-              Total Amount:{" "}
+              {t('total_amount')}:{" "}
               <span className="text-red-500 font-semibold">${Number(totalAmount || 0).toFixed(2)}
               </span>
             </h1>
@@ -189,28 +191,28 @@ function SaleReport() {
         {/* SHIFT CLOSURES TABLE */}
         <div className={`${adminSurface.tableShell} mt-8`}>
           <div className={adminSurface.toolbar}>
-            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Shift Closures</p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-[#A9A6BB]">Cashier shift balances and differences</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">{t('shift_closures')}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-[#A9A6BB]">{t('shift_closures_desc')}</p>
           </div>
           <div className={adminSurface.tableWrap}>
             <table className={`${adminSurface.table} min-w-[900px]`}>
               <thead className={adminSurface.tableHead}>
                 <tr>
-                  <th className={adminSurface.th}>Cashier</th>
-                  <th className={adminSurface.th}>Status</th>
-                  <th className={adminSurface.th}>Sales</th>
-                  <th className={adminSurface.th}>Expected Cash</th>
-                  <th className={adminSurface.th}>Counted Cash</th>
-                  <th className={adminSurface.th}>Difference</th>
-                  <th className={adminSurface.th}>Note</th>
-                  <th className={adminSurface.th}>Closed At</th>
+                  <th className={adminSurface.th}>{t('cashier')}</th>
+                  <th className={adminSurface.th}>{t('status')}</th>
+                  <th className={adminSurface.th}>{t('sales')}</th>
+                  <th className={adminSurface.th}>{t('expected_cash')}</th>
+                  <th className={adminSurface.th}>{t('counted_cash')}</th>
+                  <th className={adminSurface.th}>{t('difference')}</th>
+                  <th className={adminSurface.th}>{t('note')}</th>
+                  <th className={adminSurface.th}>{t('closed_at')}</th>
                 </tr>
               </thead>
               <tbody>
                 {shifts?.length === 0 ? (
                   <tr>
                     <td colSpan="8" className="p-8 text-center text-slate-500 dark:text-[#A9A6BB]">
-                      No shift closures found for this date range.
+                      {t('no_shift_closures')}
                     </td>
                   </tr>
                 ) : (
@@ -233,8 +235,8 @@ function SaleReport() {
                       <td className={adminSurface.td}>${Number(shift.cashCounted || 0).toFixed(2)}</td>
                       <td className={adminSurface.td}>
                         <span className={`inline-flex items-center gap-1 font-bold text-sm ${isShortage ? 'text-red-600 dark:text-red-400' : isSurplus ? 'text-green-600 dark:text-green-400' : 'text-slate-600 dark:text-slate-400'}`}>
-                          {isShortage && <span className="text-[10px] font-bold bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">⚠ SHORTAGE</span>}
-                          {isSurplus && <span className="text-[10px] font-bold bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded">SURPLUS</span>}
+                          {isShortage && <span className="text-[10px] font-bold bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">⚠ {t('shortage')}</span>}
+                          {isSurplus && <span className="text-[10px] font-bold bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded">{t('surplus')}</span>}
                           {diff > 0 ? '+' : ''}${Math.abs(diff).toFixed(2)}
                         </span>
                       </td>
@@ -248,7 +250,7 @@ function SaleReport() {
               {shifts?.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                    <td colSpan="3" className={`${adminSurface.td} font-bold text-slate-700 dark:text-slate-300`}>Total</td>
+                    <td colSpan="3" className={`${adminSurface.td} font-bold text-slate-700 dark:text-slate-300`}>{t('total')}</td>
                     <td className={`${adminSurface.td} font-bold text-slate-900 dark:text-[#F8FAFC]`}>${totalExpected.toFixed(2)}</td>
                     <td className={`${adminSurface.td} font-bold text-slate-900 dark:text-[#F8FAFC]`}>${totalCounted.toFixed(2)}</td>
                     <td className={adminSurface.td}>

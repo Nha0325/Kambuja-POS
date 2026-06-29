@@ -11,9 +11,11 @@ import { LuScanBarcode } from "react-icons/lu";
 import { MdCameraAlt } from "react-icons/md";
 import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import { api } from "../../../utils/config/api";
+import { useTranslation } from "react-i18next";
 
 
 function POS() {
+  const { t } = useTranslation();
   const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`;
   const [scanCode, setScanCode] = useState("");
   const [cartItems, setCartItems] = useState([]);
@@ -81,7 +83,7 @@ function POS() {
       if (existing) {
         const stockAvailable = Number(product.stock ?? product.stockQtyBase ?? product.currentStock ?? 0);
         if (existing.qty + 1 > stockAvailable) {
-          toast.error("Not enough stock");
+          toast.error(t('not_enough_stock'));
           return prev;
         }
 
@@ -98,7 +100,7 @@ function POS() {
 
       const stockAvailable = Number(product.stock ?? product.stockQtyBase ?? product.currentStock ?? 0);
       if (stockAvailable <= 0) {
-        toast.error("Product is out of stock");
+        toast.error(t('product_out_of_stock'));
         return prev;
       }
 
@@ -155,9 +157,9 @@ function POS() {
       }
     } catch (err) {
       if (err.response?.status === 404) {
-        toast.error("Product code scanned but product not found. Save product first or check code.");
+        toast.error(t('product_not_found_msg'));
       } else {
-        const msg = err.response?.data?.message || "Scan failed";
+        const msg = err.response?.data?.message || t('scan_failed');
         toast.error(msg);
       }
     }
@@ -168,7 +170,7 @@ function POS() {
     if (item && item.qty + 1 <= item.stock) {
       setCartItems(prev => prev.map(el => el.productId === id ? { ...el, qty: el.qty + 1, lineTotal: (el.qty + 1) * el.price } : el));
     } else if (item) {
-      toast.error("Not enough stock");
+      toast.error(t('not_enough_stock'));
     }
   };
 
@@ -186,9 +188,9 @@ function POS() {
         }
     } catch (err) {
         if (err.response?.status === 404) {
-          toast.error("Product code scanned but product not found. Save product first or check code.");
+          toast.error(t('product_not_found_msg'));
         } else {
-          toast.error(err.response?.data?.message || "Product not found or out of stock");
+          toast.error(err.response?.data?.message || t('product_not_found_or_out_of_stock'));
         }
     }
     
@@ -200,7 +202,7 @@ function POS() {
   };
 
   const handlePayment = async () => {
-    if (cartItems.length <= 0) return toast.error("Please add product to cart!");
+    if (cartItems.length <= 0) return toast.error(t('please_add_product'));
 
     const currentTotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
 
@@ -225,7 +227,7 @@ function POS() {
           } catch (e) { console.error("Failed to complete held bill", e); }
         }
 
-        toast.success("Sale completed successfully!");
+        toast.success(t('sale_completed_success'));
         setTotalCost(0);
         setCartItems([]);
         setLastScannedProduct(null);
@@ -259,7 +261,7 @@ function POS() {
       const availableStock = Number(item.productData?.stock ?? item.productData?.stockQtyBase ?? item.productData?.currentStock ?? 0);
       const neededStock = toBaseQty(item, item.qty, newUnit);
       if (availableStock < neededStock) {
-        toast.error("Insufficient stock for selected unit");
+        toast.error(t('insufficient_stock_unit'));
         return;
       }
     }
@@ -303,7 +305,7 @@ function POS() {
                   onChange={(e) => setScanCode(e.target.value)}
                   value={scanCode}
                   onKeyDown={handleScanKeyDown}
-                  placeholder="Scan barcode or enter SKU"
+                  placeholder={t('scan_placeholder')}
                 />
               </div>
               <button
@@ -313,7 +315,7 @@ function POS() {
                 aria-label="Camera Scanner"
               >
                 <MdCameraAlt size={18} />
-                <span className="hidden sm:inline">Camera</span>
+                <span className="hidden sm:inline">{t('camera_scanner')}</span>
               </button>
             </div>,
             topActionEl
@@ -322,7 +324,7 @@ function POS() {
           <div className="flex-1 overflow-y-auto p-4 bg-muted/10 space-y-6">
               {/* Last Scanned Product */}
               <div>
-                <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">Last Scanned</h2>
+                <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('last_scanned')}</h2>
                 {lastScannedProduct ? (
                   <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:flex-row items-center">
                     <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted/30 p-2 flex items-center justify-center">
@@ -333,20 +335,20 @@ function POS() {
                           className="h-full w-full object-contain"
                         />
                       ) : (
-                        <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest">No Image</span>
+                        <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest">{t('no_image')}</span>
                       )}
                     </div>
                     <div className="flex-1 text-center sm:text-left">
                         <h3 className="text-lg font-extrabold text-foreground">{lastScannedProduct.name}</h3>
                         <div className="mt-1 flex flex-wrap justify-center sm:justify-start gap-2 text-xs font-semibold text-muted-foreground">
-                            {lastScannedProduct.barcode && <span className="rounded-md bg-muted px-2 py-1">Barcode: {lastScannedProduct.barcode}</span>}
-                            {lastScannedProduct.sku && <span className="rounded-md bg-muted px-2 py-1">SKU: {lastScannedProduct.sku}</span>}
-                            <span className="rounded-md bg-muted px-2 py-1">Stock: {lastScannedProduct.stock ?? lastScannedProduct.currentStock ?? 0}</span>
+                            {lastScannedProduct.barcode && <span className="rounded-md bg-muted px-2 py-1">{t('barcode')} {lastScannedProduct.barcode}</span>}
+                            {lastScannedProduct.sku && <span className="rounded-md bg-muted px-2 py-1">{t('sku')} {lastScannedProduct.sku}</span>}
+                            <span className="rounded-md bg-muted px-2 py-1">{t('stock')} {lastScannedProduct.stock ?? lastScannedProduct.currentStock ?? 0}</span>
                         </div>
                         <div className="mt-3 flex items-center justify-center sm:justify-between gap-4">
                             <span className="text-xl font-black text-primary">{formatUsd(lastScannedProduct.salePrice)}</span>
                             <span className="rounded-xl bg-primary/10 px-3 py-1 text-xs font-extrabold text-primary">
-                                Qty in cart: {cartItems.find(c => c.productId === lastScannedProduct._id)?.qty || 0}
+                                {t('qty_in_cart')} {cartItems.find(c => c.productId === lastScannedProduct._id)?.qty || 0}
                             </span>
                         </div>
                     </div>
@@ -354,7 +356,7 @@ function POS() {
                 ) : (
                   <div className="rounded-2xl border border-dashed border-border bg-card/50 p-8 text-center text-muted-foreground">
                      <LuScanBarcode className="mx-auto mb-2 opacity-50" size={32} />
-                     <p className="text-sm font-semibold tracking-wide">Waiting for scan...</p>
+                     <p className="text-sm font-semibold tracking-wide">{t('waiting_for_scan')}</p>
                   </div>
                 )}
               </div>
@@ -362,7 +364,7 @@ function POS() {
               {/* Recent Scans */}
               {recentScans.length > 1 && (
                 <div>
-                    <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">Recent Scans</h2>
+                    <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('recent_scans')}</h2>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                       {recentScans.filter(p => p._id !== lastScannedProduct?._id).map((item) => (
                         <div key={item._id} className="flex flex-col rounded-xl border border-border bg-card p-3 shadow-xs">
@@ -374,7 +376,7 @@ function POS() {
                                   className="h-full w-full object-contain"
                                 />
                               ) : (
-                                <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest">No Img</span>
+                                <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest">{t('no_image')}</span>
                               )}
                             </div>
                             <h4 className="truncate text-center text-xs font-bold text-foreground/90">{item.name}</h4>
@@ -398,9 +400,9 @@ function POS() {
         <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs lg:sticky lg:top-4 lg:h-[calc(100vh-80px)] transition-colors duration-200">
           {/* Cart Header */}
           <div className="flex items-center justify-between border-b border-border p-4 shrink-0 bg-muted/30">
-            <h4 className="font-bold text-lg tracking-tight">Cart</h4>
+            <h4 className="font-bold text-lg tracking-tight">{t('cart')}</h4>
             <button onClick={() => { setCartItems([]); setLastScannedProduct(null); setRecentScans([]); }} className="text-[11px] font-bold uppercase tracking-wider text-destructive hover:text-destructive/80 transition">
-              CLEAR
+              {t('clear')}
             </button>
           </div>
 
@@ -409,7 +411,7 @@ function POS() {
             {cartItems.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center p-8 text-muted-foreground opacity-60">
                 <span className="text-5xl mb-3 grayscale">🛒</span>
-                <p className="text-sm font-semibold tracking-wide">Your cart is currently empty</p>
+                <p className="text-sm font-semibold tracking-wide">{t('cart_empty')}</p>
               </div>
             ) : (
               cartItems.map((item, idx) => (
@@ -455,15 +457,15 @@ function POS() {
           {/* Summary Area */}
           <div className="border-t border-border bg-card p-4 shrink-0 shadow-[0_-4px_15px_-10px_rgba(0,0,0,0.1)]">
             <div className="mb-2 flex justify-between text-sm font-semibold text-muted-foreground">
-              <span>Subtotal</span>
+              <span>{t('subtotal')}</span>
               <span>{formatUsd(totalCost)}</span>
             </div>
             <div className="mb-4 flex justify-between text-sm font-semibold text-muted-foreground">
-              <span>Tax (0%)</span>
+              <span>{t('tax')} (0%)</span>
               <span>{formatUsd(0)}</span>
             </div>
             <div className="flex items-center justify-between border-t border-border/60 pt-3">
-              <span className="text-[13px] font-black uppercase tracking-widest text-foreground">TOTAL</span>
+              <span className="text-[13px] font-black uppercase tracking-widest text-foreground">{t('total')}</span>
               <span className="text-3xl font-black text-foreground tracking-tight">{formatUsd(totalCost)}</span>
             </div>
             <div className="mt-4 flex gap-2">
@@ -472,7 +474,7 @@ function POS() {
                 disabled={cartItems.length === 0 || isLoading}
                 className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-xs font-extrabold uppercase tracking-widest text-primary-foreground transition hover:bg-primary/95 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
               >
-                {isLoading ? "PROCESSING..." : "COMPLETE SALE & PRINT"}
+                {isLoading ? t('processing') : t('complete_sale')}
               </button>
             </div>
           </div>
@@ -480,7 +482,7 @@ function POS() {
       </div>
 
       {/* Camera Scanner Modal */}
-      <Modal open={isCameraOpen} onClose={() => setIsCameraOpen(false)} title="Camera Scanner" size="lg">
+      <Modal open={isCameraOpen} onClose={() => setIsCameraOpen(false)} title={t('camera_scanner')} size="lg">
         <div className="mt-3">
           {isCameraOpen && (
             <ProductScanner

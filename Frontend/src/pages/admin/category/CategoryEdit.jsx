@@ -6,8 +6,10 @@ import useFetchOne from "../../../hooks/common/useFetchOne";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { LuArrowLeft, LuPackageSearch } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 
 function EditCategory() {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState("ACTIVE");
@@ -31,7 +33,7 @@ function EditCategory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
-      setNameError("Category name is required");
+      setNameError(t('category_name_required'));
       return;
     }
     setNameError("");
@@ -42,7 +44,7 @@ function EditCategory() {
       status
     });
     if (res) {
-      toast.success("Category updated successfully");
+      toast.success(t('category_updated_successfully'));
       navigate('/admin/categories');
     }
   };
@@ -76,13 +78,13 @@ function EditCategory() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">Category not found</h2>
-          <p className="mb-6 text-sm text-slate-500 dark:text-zinc-400">The category you're trying to edit does not exist or has been removed.</p>
+          <h2 className="mb-2 text-xl font-bold text-slate-900 dark:text-white">{t('category_not_found')}</h2>
+          <p className="mb-6 text-sm text-slate-500 dark:text-zinc-400">{t('category_not_found_desc')}</p>
           <Link
             to="/admin/categories"
             className="inline-flex h-10 items-center justify-center rounded-lg bg-[#06b6d4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0891b2]"
           >
-            Back to Categories
+            {t('back_to_categories')}
           </Link>
         </div>
       </section>
@@ -100,11 +102,11 @@ function EditCategory() {
             to="/admin/categories"
             className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
-            Categories
+            {t('categories')}
           </Link>
           <span>›</span>
           <span className="font-semibold text-slate-900 dark:text-white">
-            Edit Category
+            {t('edit_category')}
           </span>
         </nav>
 
@@ -115,26 +117,26 @@ function EditCategory() {
             <div className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-                  Edit Category
+                  {t('edit_category')}
                 </h1>
                 <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
-                  Update category details used for product grouping, reporting, and stock control.
+                  {t('edit_category_desc')}
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Link
                   to="/admin/categories"
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-white dark:hover:bg-white/5"
-                  title="Back to Categories"
+                  title={t('back_to_categories')}
                 >
-                  <LuArrowLeft className="h-4 w-4 text-slate-500 dark:text-zinc-400" /> Back
+                  <LuArrowLeft className="h-4 w-4 text-slate-500 dark:text-zinc-400" /> {t('back')}
                 </Link>
                 <Link
                   to="/admin/products"
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-white dark:hover:bg-white/5"
-                  title="View Products"
+                  title={t('view_products')}
                 >
-                  <LuPackageSearch className="h-4 w-4 text-[#06b6d4]" /> View Products
+                  <LuPackageSearch className="h-4 w-4 text-[#06b6d4]" /> {t('view_products')}
                 </Link>
               </div>
             </div>
@@ -148,7 +150,7 @@ function EditCategory() {
                       htmlFor="category-name"
                       className="block text-sm font-semibold text-slate-900 dark:text-white"
                     >
-                      Category Name <span className="text-red-500">*</span>
+                      {t('category_name')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="category-name"
@@ -160,7 +162,7 @@ function EditCategory() {
                       }}
                       type="text"
                       className={`h-10 w-full rounded-lg border ${nameError ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : "border-[#e5e7eb] focus:border-[#06b6d4] focus:ring-[#06b6d4]/20 dark:border-[#27272a]"} bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500`}
-                      placeholder="Enter category name"
+                      placeholder={t('enter_category_name')}
                     />
                     {nameError && (
                       <p className="text-xs text-red-500">{nameError}</p>
@@ -173,7 +175,7 @@ function EditCategory() {
                       htmlFor="category-note"
                       className="block text-sm font-semibold text-slate-900 dark:text-white"
                     >
-                      Note
+                      {t('note')}
                     </label>
                     <textarea
                       id="category-note"
@@ -182,14 +184,14 @@ function EditCategory() {
                       onChange={(e) => setNote(e.target.value)}
                       rows={4}
                       className="min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500"
-                      placeholder="Short description for this category"
+                      placeholder={t('short_desc_category')}
                     />
                   </div>
 
                   {/* Status */}
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-slate-900 dark:text-white">
-                      Status
+                      {t('status')}
                     </label>
                     <div className="flex items-center gap-2 rounded-lg border border-[#e5e7eb] bg-[#f8fafc] p-1 dark:border-[#27272a] dark:bg-[#09090b] w-fit">
                       <button
@@ -201,7 +203,7 @@ function EditCategory() {
                             : "text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white"
                         }`}
                       >
-                        Active
+                        {t('active')}
                       </button>
                       <button
                         type="button"
@@ -212,7 +214,7 @@ function EditCategory() {
                             : "text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white"
                         }`}
                       >
-                        Inactive
+                        {t('inactive')}
                       </button>
                     </div>
                   </div>
@@ -220,18 +222,18 @@ function EditCategory() {
 
                 {/* Metadata Sidebar */}
                 <div className="lg:border-l border-[#e5e7eb] dark:border-[#27272a] lg:pl-8 space-y-6">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Category Info</h3>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">{t('category_info')}</h3>
                   
                   <div className="space-y-4">
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400 mb-1">Created At</p>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400 mb-1">{t('created_at')}</p>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {data.createdAt ? dayjs(data.createdAt).format("MMM DD, YYYY h:mm A") : "-"}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400 mb-1">Last Updated</p>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400 mb-1">{t('last_updated')}</p>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {data.updatedAt ? dayjs(data.updatedAt).format("MMM DD, YYYY h:mm A") : "-"}
                       </p>
@@ -246,7 +248,7 @@ function EditCategory() {
                   to="/admin/categories"
                   className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-white dark:hover:bg-white/5"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Link>
 
                 <button
@@ -260,9 +262,9 @@ function EditCategory() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      Saving...
+                      {t('saving')}
                     </span>
-                  ) : "Save Changes"}
+                  ) : t('save_changes')}
                 </button>
               </div>
             </form>

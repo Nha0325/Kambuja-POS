@@ -14,27 +14,29 @@ import {
   FaBell,
   FaGear,
 } from "react-icons/fa6"
+import { useTranslation } from "react-i18next";
 
 const primaryItems = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: FaGaugeHigh },
-  { to: "/admin/products", label: "Products", icon: FaBoxOpen },
-  { to: "/admin/categories", label: "Categories", icon: FaTags },
-  { to: "/admin/inventory", label: "Inventory", icon: FaBoxesStacked },
-  { to: "/admin/inventory/stock-in", label: "Receive Stock", icon: FaArrowRightToBracket },
-  { to: "/admin/inventory/adjustment", label: "Stock Adjustment", icon: FaSliders },
-  { to: "/admin/suppliers", label: "Suppliers", icon: FaTruck },
-  { to: "/admin/purchases", label: "Purchases", icon: FaReceipt },
-  { to: "/admin/reports/sales", label: "Sales Report", icon: FaChartLine },
-  { to: "/admin/reports/stock", label: "Stock Report", icon: FaChartPie },
-  { to: "/admin/cashiers", label: "Cashiers", icon: FaUserTie },
-  { to: "/admin/logs", label: "Notifications", icon: FaBell },
+  { to: "/admin/dashboard", labelKey: "dashboard", icon: FaGaugeHigh },
+  { to: "/admin/products", labelKey: "products", icon: FaBoxOpen },
+  { to: "/admin/categories", labelKey: "categories", icon: FaTags },
+  { to: "/admin/inventory", labelKey: "inventory", icon: FaBoxesStacked },
+  { to: "/admin/inventory/stock-in", labelKey: "receive_stock", icon: FaArrowRightToBracket },
+  { to: "/admin/inventory/adjustment", labelKey: "stock_adjustment", icon: FaSliders },
+  { to: "/admin/suppliers", labelKey: "suppliers", icon: FaTruck },
+  { to: "/admin/purchases", labelKey: "purchases", icon: FaReceipt },
+  { to: "/admin/reports/sales", labelKey: "sales_report", icon: FaChartLine },
+  { to: "/admin/reports/stock", labelKey: "stock_report", icon: FaChartPie },
+  { to: "/admin/cashiers", labelKey: "cashiers", icon: FaUserTie },
+  { to: "/admin/logs", labelKey: "notifications", icon: FaBell },
 ]
 
 const footerItems = [
-  { to: "/admin/settings", label: "Shop Settings", icon: FaGear },
+  { to: "/admin/settings", labelKey: "shop_settings", icon: FaGear },
 ]
 
 function AdminSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) {
+  const { t } = useTranslation();
 
   const navLinkClass = ({ isActive }) => (
     `${isActive ? "bg-[#06b6d4]/10 text-[#06b6d4] dark:bg-[#06b6d4]/20 dark:text-[#06b6d4] font-semibold" : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#020617] dark:text-[#a1a1aa] dark:hover:bg-[#111113] dark:hover:text-[#f8fafc] font-medium"} group relative flex h-10 w-full items-center rounded-lg transition-colors px-3 ${!isExpanded && "justify-center"}`
@@ -53,21 +55,21 @@ function AdminSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) {
           </div>
           <div className={`flex flex-col min-w-0 transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0 pointer-events-none hidden"}`}>
             <h1 className="truncate text-sm font-bold tracking-tight text-[#020617] dark:text-[#f8fafc]">Kambuja POS</h1>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa]">Shop Admin</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa]">{t('shop_admin')}</p>
           </div>
         </div>
       </div>
 
       <nav className="sidebar-scroll flex-1 space-y-1.5 overflow-y-auto overflow-x-hidden px-3 py-6 flex flex-col">
-        {primaryItems.map(({ to, label, icon: Icon }) => (
+        {primaryItems.map(({ to, labelKey, icon: Icon }) => (
           <NavLink key={to} to={to} className={navLinkClass} onClick={onNavigate}>
             <Icon className="h-4 w-4 shrink-0" />
             <span className={`ml-3 text-sm whitespace-nowrap transition-opacity duration-200 ${isExpanded ? "opacity-100" : "opacity-0 hidden"}`}>
-              {label}
+              {t(labelKey)}
             </span>
             {!isExpanded && (
               <div className="absolute left-14 hidden whitespace-nowrap rounded-md bg-[#020617] px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-sm transition-opacity group-hover:block group-hover:opacity-100 z-50 dark:bg-white dark:text-[#020617]">
-                {label}
+                {t(labelKey)}
               </div>
             )}
           </NavLink>
@@ -75,15 +77,15 @@ function AdminSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) {
       </nav>
 
       <div className="shrink-0 space-y-1.5 border-t border-[#e5e7eb] dark:border-[#27272a] px-3 py-4 flex flex-col">
-        {footerItems.map(({ to, label, icon: Icon }) => (
+        {footerItems.map(({ to, labelKey, icon: Icon }) => (
           <NavLink key={to} to={to} className={navLinkClass} onClick={onNavigate}>
             <Icon className="h-4 w-4 shrink-0" />
             <span className={`ml-3 text-sm whitespace-nowrap transition-opacity duration-200 ${isExpanded ? "opacity-100" : "opacity-0 hidden"}`}>
-              {label}
+              {t(labelKey)}
             </span>
             {!isExpanded && (
               <div className="absolute left-14 hidden whitespace-nowrap rounded-md bg-[#020617] px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-sm transition-opacity group-hover:block group-hover:opacity-100 z-50 dark:bg-white dark:text-[#020617]">
-                {label}
+                {t(labelKey)}
               </div>
             )}
           </NavLink>

@@ -5,6 +5,7 @@ import { FaMoneyBillWave, FaReceipt, FaCheckCircle } from "react-icons/fa";
 import { cashierService } from "../../services/users/cashier.service";
 import useSignout from "../../hooks/auth/useSignout";
 import { useConfirm } from "../../hooks/ui/useConfirm";
+import { useTranslation } from "react-i18next";
 
 const formatUsd = (value) => {
   const num = Number(value || 0);
@@ -12,6 +13,7 @@ const formatUsd = (value) => {
 };
 
 function DailyClose() {
+  const { t } = useTranslation();
   const { signout } = useSignout();
   const { confirm, closeConfirm } = useConfirm();
   const [sales, setSales] = useState([]);
@@ -50,10 +52,10 @@ function DailyClose() {
 
   const handleClose = async () => {
     const isConfirmed = await confirm({
-      title: "Close Shift",
-      message: "Are you sure you want to close this shift? This action cannot be undone.",
-      confirmText: "Yes, Close Shift",
-      cancelText: "Cancel",
+      title: t('close_shift_title'),
+      message: t('close_shift_msg'),
+      confirmText: t('yes_close_shift'),
+      cancelText: t('cancel'),
       variant: "primary"
     });
     
@@ -120,23 +122,23 @@ function DailyClose() {
       <div className="hidden print:block font-mono text-[12px] text-black bg-white w-[300px] mx-auto p-4">
         <div className="text-center mb-3">
           <p className="text-[15px] font-bold tracking-wide">Kambuja POS</p>
-          <p className="text-[11px] text-gray-500 uppercase tracking-widest">Shift Close Report</p>
+          <p className="text-[11px] text-gray-500 uppercase tracking-widest">{t('shift_close_report')}</p>
           <p className="text-[11px] mt-1">
             {isClosed && closedData ? new Date(closedData.closedAt).toLocaleString() : new Date().toLocaleString()}
           </p>
         </div>
         <div className="border-t border-dashed border-gray-400 my-2" />
-        <div className="flex justify-between py-0.5"><span>Sales Count</span><span className="font-bold">{printStats.salesCount}</span></div>
-        <div className="flex justify-between py-0.5"><span>Total Sales</span><span className="font-bold">{formatUsd(printStats.totalSales)}</span></div>
+        <div className="flex justify-between py-0.5"><span>{t('sales_count')}</span><span className="font-bold">{printStats.salesCount}</span></div>
+        <div className="flex justify-between py-0.5"><span>{t('total_sales')}</span><span className="font-bold">{formatUsd(printStats.totalSales)}</span></div>
         <div className="border-t border-dashed border-gray-400 my-2" />
-        <div className="flex justify-between py-0.5"><span>Expected Cash</span><span className="font-bold">{formatUsd(printStats.expectedCash)}</span></div>
-        <div className="flex justify-between py-0.5"><span>Counted Cash</span><span className="font-bold">{formatUsd(printStats.cashCounted)}</span></div>
+        <div className="flex justify-between py-0.5"><span>{t('expected_cash')}</span><span className="font-bold">{formatUsd(printStats.expectedCash)}</span></div>
+        <div className="flex justify-between py-0.5"><span>{t('counted_cash')}</span><span className="font-bold">{formatUsd(printStats.cashCounted)}</span></div>
         <div className="border-t border-gray-400 my-1" />
         <div className="flex justify-between py-1 font-bold">
-          <span>Difference</span>
+          <span>{t('difference')}</span>
           <span>
             {printStats.difference > 0 ? '+' : ''}{formatUsd(printStats.difference)}
-            {printStats.difference < 0 ? ' ⚠ SHORTAGE' : printStats.difference > 0 ? ' SURPLUS' : ' ✓ OK'}
+            {printStats.difference < 0 ? ` ⚠ ${t('shortage')}` : printStats.difference > 0 ? ` ${t('surplus')}` : ' ✓ OK'}
           </span>
         </div>
         {printStats.note && (
@@ -146,7 +148,7 @@ function DailyClose() {
           </>
         )}
         <div className="border-t border-dashed border-gray-400 my-2" />
-        <p className="text-center text-[10px] text-gray-400">— Shift Closed —</p>
+        <p className="text-center text-[10px] text-gray-400">— {t('shift_closed')} —</p>
       </div>
       {/* ===== END PRINT ONLY ===== */}
 
@@ -154,13 +156,13 @@ function DailyClose() {
       <div className="print:hidden">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">My Shift</h1>
-          <p className="text-sm text-muted-foreground mt-1">Review your shift sales and balance your cash drawer.</p>
+          <h1 className="text-2xl font-bold">{t('my_shift')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('my_shift_desc')}</p>
         </div>
         {isClosed && (
           <div className="flex items-center gap-2 rounded-full bg-green-100 dark:bg-emerald-500/10 px-4 py-2 text-sm font-bold text-green-700 dark:text-emerald-400">
             <FaCheckCircle />
-            <span>Shift Closed</span>
+            <span>{t('shift_closed')}</span>
           </div>
         )}
       </div>
@@ -173,7 +175,7 @@ function DailyClose() {
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="mb-2 flex items-center gap-2 text-muted-foreground">
                 <FaReceipt />
-                <span className="text-sm font-semibold uppercase tracking-wider">Sales Count</span>
+                <span className="text-sm font-semibold uppercase tracking-wider">{t('sales_count')}</span>
               </div>
               <p className="text-2xl font-bold text-foreground">{displayStats.salesCount}</p>
             </div>
@@ -181,7 +183,7 @@ function DailyClose() {
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="mb-2 flex items-center gap-2 text-muted-foreground">
                 <FaMoneyBillWave />
-                <span className="text-sm font-semibold uppercase tracking-wider">Total Sales</span>
+                <span className="text-sm font-semibold uppercase tracking-wider">{t('total_sales')}</span>
               </div>
               <p className="text-2xl font-bold text-primary">{formatUsd(displayStats.totalSales)}</p>
             </div>
@@ -190,19 +192,19 @@ function DailyClose() {
 
         {/* Right: Close Form */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-bold mb-4 border-b border-border pb-3">Drawer Balance</h2>
+          <h2 className="text-lg font-bold mb-4 border-b border-border pb-3">{t('drawer_balance')}</h2>
 
           <div className="mb-6 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="font-semibold text-muted-foreground">Expected Cash</span>
+              <span className="font-semibold text-muted-foreground">{t('expected_cash')}</span>
               <span className="font-bold">{formatUsd(displayStats.expectedCash)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="font-semibold text-muted-foreground">Counted Cash</span>
+              <span className="font-semibold text-muted-foreground">{t('counted_cash')}</span>
               <span className="font-bold">{formatUsd(displayStats.cashCounted)}</span>
             </div>
             <div className={`flex justify-between border-t border-border pt-3 text-base font-bold ${displayStats.difference < 0 ? 'text-destructive' : displayStats.difference > 0 ? 'text-primary' : 'text-emerald-600 dark:text-emerald-500'}`}>
-              <span>Difference</span>
+              <span>{t('difference')}</span>
               <span>{displayStats.difference > 0 ? '+' : ''}{formatUsd(displayStats.difference)}</span>
             </div>
           </div>
@@ -210,7 +212,7 @@ function DailyClose() {
           {!isClosed ? (
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-bold text-foreground">Actual Counted Cash ($)</label>
+                <label className="mb-1 block text-sm font-bold text-foreground">{t('actual_counted_cash')}</label>
                 <input
                   type="number"
                   value={countedCash}
@@ -220,12 +222,12 @@ function DailyClose() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-bold text-foreground">Note (Optional)</label>
+                <label className="mb-1 block text-sm font-bold text-foreground">{t('note_optional')}</label>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   className="h-20 w-full resize-none rounded-lg border border-border bg-background p-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground"
-                  placeholder="Explain any differences..."
+                  placeholder={t('explain_differences')}
                 />
               </div>
 
@@ -238,21 +240,21 @@ function DailyClose() {
                   disabled={isLoading}
                   className="h-12 flex-1 rounded-xl border border-[#c6c6cd] dark:border-[#27272a] bg-white dark:bg-[#111113] text-sm font-bold uppercase tracking-wider text-[#45464d] dark:text-[#a1a1aa] transition hover:bg-[#f8f9ff] dark:hover:bg-[#18181b] disabled:opacity-50"
                 >
-                  {isLoading ? "..." : "Refresh"}
+                  {isLoading ? "..." : t('refresh')}
                 </button>
                 <button
                   onClick={handleClose}
                   disabled={isSubmitting || countedCash === "" || salesCount === 0}
                   className="h-12 flex-[2] rounded-xl bg-[#131b2e] dark:bg-[#06b6d4] text-sm font-bold uppercase tracking-wider text-white transition hover:bg-[#213145] dark:hover:bg-[#8B5CF6] disabled:opacity-50"
                 >
-                  Close Day
+                  {t('close_day')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="mt-4 rounded-lg bg-[#f8f9ff] dark:bg-[#09090b] p-4 text-center border border-[#e5e7ef] dark:border-[#27272a]">
               <p className="text-sm font-medium text-[#45464d] dark:text-[#a1a1aa]">
-                Closed at {new Date(closedData.closedAt).toLocaleString()}
+                {t('closed_at')} {new Date(closedData.closedAt).toLocaleString()}
               </p>
               {closedData.note && (
                 <p className="mt-2 text-xs italic text-[#76777d] dark:text-[#71717a]">"{closedData.note}"</p>

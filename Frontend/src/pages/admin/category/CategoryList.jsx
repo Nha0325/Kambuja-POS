@@ -8,8 +8,10 @@ import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
 import formatDate from "../../../utils/formatters/formatDate";
 import { useConfirm } from "../../../hooks/ui/useConfirm";
+import { useTranslation } from "react-i18next";
 
 function Category() {
+  const { t } = useTranslation();
   const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -29,10 +31,10 @@ function Category() {
 
   const handleDelete = async (id) => {
     const isConfirmed = await confirm({
-      title: "Delete Category",
-      message: "Are you sure you want to delete this category? This action cannot be undone.",
-      confirmText: "Yes, delete",
-      cancelText: "Cancel",
+      title: t('delete_category'),
+      message: t('delete_category_msg'),
+      confirmText: t('yes_delete'),
+      cancelText: t('cancel'),
       variant: "danger"
     });
 
@@ -40,7 +42,7 @@ function Category() {
       const res = await remove(id);
       if (res && isDeleting === false) {
         setRefetch(!refetch);
-        toast.success("Deleted successfully!");
+        toast.success(t('deleted_success'));
       }
       closeConfirm();
     }
@@ -50,22 +52,22 @@ function Category() {
     <div className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Admin / Categories</p>
-          <h1 className={adminSurface.title}>Categories</h1>
+          <p className={adminSurface.eyebrow}>{t('admin_categories')}</p>
+          <h1 className={adminSurface.title}>{t('categories')}</h1>
           <p className={adminSurface.description}>
-            Organize products into clean groups for browsing, reporting, and stock control.
+            {t('categories_desc')}
           </p>
         </div>
         <Link to="/admin/categories/create" className={adminSurface.primaryButton}>
-          <LuPlus /> Add Category
+          <LuPlus /> {t('add_category')}
         </Link>
       </div>
 
       <div className={adminSurface.statGrid}>
         {[
-          ["Total Categories", totalCategories],
-          ["Active Categories", activeCategories],
-          ["Products Linked", productsLinked],
+          [t('total_categories'), totalCategories],
+          [t('active_categories'), activeCategories],
+          [t('products_linked'), productsLinked],
         ].map(([label, value]) => (
           <div key={label} className={adminSurface.statCard}>
             <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
@@ -109,9 +111,9 @@ function Category() {
                   title="Filter status"
                   className={adminSurface.pageSizeSelect}
                 >
-                  <option value="All">All Status</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
+                  <option value="All">{t('all_status')}</option>
+                  <option value="ACTIVE">{t('active')}</option>
+                  <option value="INACTIVE">{t('inactive')}</option>
                 </select>
               </fieldset>
             </div>
@@ -125,7 +127,7 @@ function Category() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Search categories..."
+                placeholder={t('search_categories')}
               />
             </label>
           </div>
@@ -135,12 +137,12 @@ function Category() {
           <table className={`${adminSurface.table} min-w-[800px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={`${adminSurface.th} w-16 text-center`}>N.o</th>
-                <th className={adminSurface.th}>Category</th>
-                <th className={`${adminSurface.th} w-32`}>Products</th>
-                <th className={`${adminSurface.th} w-32`}>Status</th>
-                <th className={`${adminSurface.th} w-40`}>Updated</th>
-                <th className={`${adminSurface.th} w-28 text-center`}>Actions</th>
+                <th className={`${adminSurface.th} w-16 text-center`}>{t('no')}</th>
+                <th className={adminSurface.th}>{t('category')}</th>
+                <th className={`${adminSurface.th} w-32`}>{t('products')}</th>
+                <th className={`${adminSurface.th} w-32`}>{t('status')}</th>
+                <th className={`${adminSurface.th} w-40`}>{t('updated')}</th>
+                <th className={`${adminSurface.th} w-28 text-center`}>{t('actions')}</th>
               </tr>
             </thead>
 
@@ -160,8 +162,8 @@ function Category() {
                   <td colSpan={6} className="p-12 text-center">
                     <div className="flex flex-col items-center justify-center text-[#6B7280]">
                       <LuPackage className="h-12 w-12 text-[#3F3F46] mb-3" />
-                      <p className="text-base font-medium text-[#F8FAFC]">No categories found</p>
-                      <p className="text-sm mt-1">Add your first category to get started.</p>
+                      <p className="text-base font-medium text-[#F8FAFC]">{t('no_categories')}</p>
+                      <p className="text-sm mt-1">{t('no_categories_desc')}</p>
                     </div>
                   </td>
                 </tr>

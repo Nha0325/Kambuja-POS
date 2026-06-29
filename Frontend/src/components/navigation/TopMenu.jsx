@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { productService } from "../../services/inventory/product.service";
 import { saleService } from "../../services/sales/sale.service";
+import { useTranslation } from "react-i18next";
 dayjs.extend(relativeTime);
 
 function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
@@ -39,11 +40,17 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
   const isAdminShell = !pathname.startsWith('/cashier')
   const isAdminManagerShell = pathname.startsWith('/admin-manager')
 
+  const { t, i18n } = useTranslation();
+
   useEffect(() => {
-    const handleLanguageChange = () => setLanguage(localStorage.getItem('language') || 'en')
+    const handleLanguageChange = () => {
+      const newLang = localStorage.getItem('language') || 'en';
+      setLanguage(newLang);
+      i18n.changeLanguage(newLang);
+    }
     window.addEventListener('languagechange', handleLanguageChange)
     return () => window.removeEventListener('languagechange', handleLanguageChange)
-  }, [])
+  }, [i18n])
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -442,7 +449,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                   className={`flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-red-600 dark:text-red-400 transition ${isAdminShell ? 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]' : 'dark:text-red-500 hover:bg-slate-50 dark:hover:bg-[#2A2E36]'}`}
                 >
                   <span className="shrink-0"><TbLogout2 /></span>
-                  <span>Log out</span>
+                  <span>{t('logout')}</span>
                 </button>
               </li>
               )}

@@ -4,24 +4,26 @@ import TopMenu from "../components/navigation/TopMenu"
 import CashierSidebar from "../components/navigation/CashierSidebar"
 import CashierBottomNav from "../components/navigation/CashierBottomNav"
 import ConfirmProvider from "../components/ui/ConfirmProvider"
+import { useTranslation } from "react-i18next";
 
 const pageTitles = [
-  ["/cashier/pos", "Cashier's Page"],
-  ["/cashier/checkout", "Checkout"],
-  ["/cashier/sales-history", "Sales History"],
-  ["/cashier/sales-today", "Sales History"],
-  ["/cashier/hold-orders", "Hold Orders"],
-  ["/cashier/hold-bills", "Hold Orders"],
-  ["/cashier/stock-check", "Stock Check"],
-  ["/cashier/my-shift", "My Shift"],
-  ["/cashier/daily-close", "My Shift"],
+  ["/cashier/pos", "pos_page"],
+  ["/cashier/checkout", "checkout"],
+  ["/cashier/sales-history", "sales_history"],
+  ["/cashier/sales-today", "sales_history"],
+  ["/cashier/hold-orders", "hold_orders"],
+  ["/cashier/hold-bills", "hold_orders"],
+  ["/cashier/stock-check", "stock_check"],
+  ["/cashier/my-shift", "my_shift"],
+  ["/cashier/daily-close", "my_shift"],
 ]
 
-const getPageTitle = (pathname) => (
-  pageTitles.find(([path]) => pathname.startsWith(path))?.[1] || "Dashboard"
+const getPageTitleKey = (pathname) => (
+  pageTitles.find(([path]) => pathname.startsWith(path))?.[1] || "dashboard"
 )
 
 function CashierLayout() {
+  const { t } = useTranslation();
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -82,8 +84,8 @@ function CashierLayout() {
       
       <div className={`${sidebarPadding} min-w-0 max-w-full transition-all duration-300 pb-16 lg:pb-0 print:pb-0 print:pl-0`}>
         <TopMenu
-          title={getPageTitle(location.pathname)}
-          eyebrow="Shop Cashier"
+          title={t(getPageTitleKey(location.pathname))}
+          eyebrow={t('shop_cashier')}
           onShowSidebar={() => {
             if (window.innerWidth < 1024) {
               setIsMobileOpen(!isMobileOpen)
