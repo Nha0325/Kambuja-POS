@@ -32,7 +32,7 @@ export const adminSurface = {
     "h-11 min-h-0 rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#111318] px-4 py-2 text-sm text-slate-900 dark:text-[#F8FAFC] outline-none transition focus:border-cyan-500 dark:focus:border-[#06b6d4] focus:ring-2 focus:ring-cyan-500/20 dark:focus:ring-[#06b6d4]/20 shadow-sm",
   footer: "flex flex-col gap-3 border-t border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
   pageSizeSelect:
-    "h-11 min-h-0 w-20 rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#111318] px-3 py-2 text-sm font-semibold text-slate-700 dark:text-[#F8FAFC] outline-none transition focus:border-cyan-500 dark:focus:border-[#06b6d4] focus:ring-2 focus:ring-cyan-500/20 dark:focus:ring-[#06b6d4]/20 shadow-sm",
+    "h-11 min-h-0 w-auto min-w-[5rem] rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#111318] px-3 py-2 text-sm font-semibold text-slate-700 dark:text-[#F8FAFC] outline-none transition focus:border-cyan-500 dark:focus:border-[#06b6d4] focus:ring-2 focus:ring-cyan-500/20 dark:focus:ring-[#06b6d4]/20 shadow-sm",
   paginationMeta:
     "inline-flex min-h-11 items-center rounded-xl border border-slate-200 dark:border-[#2A2E36] bg-slate-50 dark:bg-[#111318] px-4 text-sm font-semibold text-slate-500 dark:text-[#A9A6BB]",
   paginationButton:
