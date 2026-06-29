@@ -2,22 +2,13 @@ const multer = require("multer")
 const fs = require("fs")
 const path = require("path")
 const sharp = require("sharp")
+const cloudinary = require("cloudinary").v2
 
-const uploadDir = path.resolve(__dirname, "../../upload")
-
-const getSafeUploadPath = (filename) => {
-    if (!filename || filename !== path.basename(filename)) {
-        throw new Error("Invalid file path")
-    }
-
-    const filePath = path.resolve(uploadDir, filename)
-    const relativePath = path.relative(uploadDir, filePath)
-    if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
-        throw new Error("Invalid file path")
-    }
-
-    return filePath
-}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 const memoryStorage = multer.memoryStorage();
 
@@ -53,13 +44,12 @@ exports.uploadFile = (req, res) => {
         }
         
         try {
-            fs.mkdirSync(uploadDir, {recursive: true});
             const extName = path.extname(req.file.originalname).toLowerCase();
             const isPng = extName === '.png' && req.file.mimetype === 'image/png';
             
             const uniquePrefix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
             let finalBuffer;
-            let finalFilename;
+            let format;
             
             // Resize all images to max 800x800
             const imageProcessor = sharp(req.file.buffer)
@@ -68,20 +58,33 @@ exports.uploadFile = (req, res) => {
             if (isPng) {
                 // For logo/icon: PNG keep original format
                 finalBuffer = await imageProcessor.png().toBuffer();
-                finalFilename = `${uniquePrefix}.png`;
+                format = 'png';
             } else {
                 // For product photo: WebP quality 80
                 finalBuffer = await imageProcessor.webp({ quality: 80 }).toBuffer();
-                finalFilename = `${uniquePrefix}.webp`;
+                format = 'webp';
             }
             
-            const outputPath = path.resolve(uploadDir, finalFilename);
-            fs.writeFileSync(outputPath, finalBuffer);
+            // Upload to Cloudinary using upload_stream
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "kambuja-pos/products",
+                        public_id: uniquePrefix,
+                        format: format
+                    },
+                    (error, result) => {
+                        if (error) return reject(error);
+                        resolve(result);
+                    }
+                );
+                stream.end(finalBuffer);
+            });
             
             return res.status(200).json({
                 success:true,
                 message: "Image upload successfully!",
-                filename: finalFilename
+                filename: result.secure_url
             });
             
         } catch (error) {
@@ -93,7 +96,8 @@ exports.uploadFile = (req, res) => {
         }
     })
 }
-exports.removeFile = (req, res) => {
+
+exports.removeFile = async (req, res) => {
     try {
         if(!req.params.imageUrl){
             return res.status(400).json({
@@ -101,28 +105,32 @@ exports.removeFile = (req, res) => {
                 error: "Image is required!"
             })
         }
-        const imagePath = getSafeUploadPath(req.params.imageUrl)
-
-        if(fs.existsSync(imagePath)){
-            fs.unlinkSync(imagePath)
-            res.status(200).json({
-                success: true,
-                message: "Image deleted successfully!"
-            })
+        
+        const imageUrl = req.params.imageUrl;
+        
+        // If it's a cloudinary URL, try to extract the public ID to delete it
+        if (imageUrl.includes('cloudinary.com')) {
+            // e.g. https://res.cloudinary.com/drdyvvajp/image/upload/v1234567/kambuja-pos/products/123123.webp
+            // We need to extract: kambuja-pos/products/123123
+            const parts = imageUrl.split('/');
+            const filename = parts.pop().split('.')[0]; // 123123
+            const folder2 = parts.pop(); // products
+            const folder1 = parts.pop(); // kambuja-pos
+            const publicId = `${folder1}/${folder2}/${filename}`;
+            
+            try {
+                await cloudinary.uploader.destroy(publicId);
+            } catch (err) {
+                console.error("Cloudinary delete error:", err);
+            }
         }
-        else{
-            res.status(200).json({
-                success: true,
-                message: "Image already deleted or not found!"
-            })     
-        }
+        
+        res.status(200).json({
+            success: true,
+            message: "Image deleted successfully!"
+        })
     } catch (error) {
-        if (error.message === "Invalid file path") {
-            return res.status(400).json({
-                success: false,
-                error: "Invalid file path"
-            })
-        }
+        console.error(error);
         res.status(500).json({
             success: false,
             error: "Error while deleting image!"
