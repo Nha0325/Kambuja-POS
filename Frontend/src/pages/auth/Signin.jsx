@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSignin from "../../hooks/auth/useSignin";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
@@ -11,6 +11,10 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const { signin, isLoading } = useSignin();
+
+  useEffect(() => {
+    document.title = "Sign In - Kambuja POS";
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,9 +141,12 @@ const SignIn = () => {
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Overlay Box */}
-          <div className="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-2xl shadow-lg">
+          <div className="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
+            <h3 className="font-bold text-gray-900 text-lg mb-1">
+              Systematic control for your enterprise.
+            </h3>
             <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Kambuja POS – Systematic control for your enterprise. Access real-time inventory tracking, sales analytics, and multi-store management tools in one secure location.
+              Access real-time inventory tracking, sales analytics, and multi-store management tools in one secure location.
             </p>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium border border-green-100">

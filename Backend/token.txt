@@ -1,2 +1,0 @@
-◇ injected env (13) from .env // tip: ⌘ override existing { override: true }
-TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBmOGUxNTM4OTU5ZWQ1NTdjZDVhYyIsInJvbGUiOiJDQVNISUVSIiwic2hvcElkIjoiNmE0MGY4NDUwZjBjZGFlM2U2MWFhN2MyIiwiaWF0IjoxNzgyNzQ0OTUxLCJleHAiOjE3ODI3NDg1NTF9.zin96lbMSlFj_k68Kxp2J7hvhFQQQk8U-8DJwaKVptc
