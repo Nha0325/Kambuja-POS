@@ -3,7 +3,7 @@ const fs = require("fs")
 const path = require("path")
 const sharp = require("sharp")
 
-const uploadDir = path.resolve(__dirname, "../upload")
+const uploadDir = path.resolve(__dirname, "../../upload")
 
 const getSafeUploadPath = (filename) => {
     if (!filename || filename !== path.basename(filename)) {
