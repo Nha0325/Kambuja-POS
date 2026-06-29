@@ -35,8 +35,6 @@ function StockLookup() {
     return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-700">In Stock</span>
   }
 
-
-
   return (
     <section className="w-full max-w-full p-4 sm:p-6 bg-[#f8f9ff] min-h-screen">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">

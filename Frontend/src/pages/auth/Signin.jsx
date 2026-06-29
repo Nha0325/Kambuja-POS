@@ -57,20 +57,20 @@ const SignIn = () => {
       `}</style>
 
       <main className="relative bg-white p-4 w-full max-w-5xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row min-h-[600px] overflow-hidden">
-        
-        {/* Mobile Background Image */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center p-8 md:hidden opacity-100 pointer-events-none">
-          <img 
-            src="/Logo.jpg" 
-            alt="Kambuja POS Logo Background" 
-            className="w-full h-full object-contain"
-          />
-        </div>
 
         {/* ── Left Panel: Form ── */}
         <section className="relative z-10 w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
           <div className="max-w-sm w-full mx-auto">
-            <h1 className="text-[32px] font-medium text-gray-900 mb-8 tracking-tight">
+            {/* Mobile Logo (Top) */}
+            <div className="md:hidden flex justify-center mb-6">
+              <img 
+                src="/Logo.jpg" 
+                alt="Kambuja POS Logo" 
+                className="h-20 object-contain"
+              />
+            </div>
+            
+            <h1 className="text-[32px] font-medium text-gray-900 mb-8 tracking-tight text-center md:text-left">
               Sign in to Kambuja
             </h1>
 
