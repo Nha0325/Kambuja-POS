@@ -96,6 +96,9 @@ const normalizeProductPayload = (body) => {
         }
     })
 
+    if (payload.barcode === "") payload.barcode = null
+    if (payload.sku === "") payload.sku = null
+
     return payload
 }
 

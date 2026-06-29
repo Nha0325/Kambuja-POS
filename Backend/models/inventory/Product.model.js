@@ -28,11 +28,9 @@ const schema = new mongoose.Schema({
     },
     barcode: {
         type: String,
-        default: ""
     },
     sku: {
         type: String,
-        default: ""
     },
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
@@ -96,6 +94,9 @@ schema.pre("validate", function syncStockFields() {
     const threshold = Number(this.lowStockThreshold ?? this.reorderLevel ?? 5)
     this.lowStockThreshold = threshold
     this.reorderLevel = threshold
+
+    if (this.barcode === "") this.barcode = null;
+    if (this.sku === "") this.sku = null;
 })
 
 schema.index({ shopId: 1, barcode: 1 }, { unique: true, sparse: true });
