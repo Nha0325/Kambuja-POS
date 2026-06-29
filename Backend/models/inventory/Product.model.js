@@ -99,9 +99,9 @@ schema.pre("validate", function syncStockFields() {
     if (this.sku === "") this.sku = undefined;
 })
 
-schema.index({ shopId: 1, barcode: 1 }, { unique: true, sparse: true });
-schema.index({ shopId: 1, sku: 1 }, { unique: true, sparse: true });
-schema.index({ shopId: 1, code: 1 }, { unique: true, sparse: true });
+schema.index({ shopId: 1, barcode: 1 }, { unique: true, partialFilterExpression: { barcode: { $type: "string" } } });
+schema.index({ shopId: 1, sku: 1 }, { unique: true, partialFilterExpression: { sku: { $type: "string" } } });
+schema.index({ shopId: 1, code: 1 }, { unique: true });
 
 const Product = mongoose.model("Product", schema)
 module.exports = Product
