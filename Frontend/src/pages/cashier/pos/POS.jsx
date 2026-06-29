@@ -74,6 +74,7 @@ function POS() {
 
 
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   function addToCart(product) {
     if (!product) return;
     
@@ -163,7 +164,7 @@ function POS() {
         toast.error(msg);
       }
     }
-  }, []);
+  }, [addToCart, t]);
 
   const handleCartIncrement = (id) => {
     const item = cartItems.find((el) => el.productId === id);
@@ -500,5 +501,4 @@ function POS() {
     </section>
   );
 }
-
 export default POS;

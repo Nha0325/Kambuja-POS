@@ -27,6 +27,7 @@ function Subscriptions() {
 
   const [isProcessing, setIsProcessing] = useState(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchSubscriptions = async () => {
     try {
       setLoading(true)
@@ -44,7 +45,7 @@ function Subscriptions() {
 
   useEffect(() => {
     fetchSubscriptions()
-  }, [])
+  }, [fetchSubscriptions])
 
   const handleUpdate = async (id, payload, successMessage) => {
     try {

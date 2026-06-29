@@ -31,7 +31,7 @@ function PosAccess() {
         }
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadShops()

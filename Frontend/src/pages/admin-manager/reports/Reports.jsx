@@ -103,7 +103,7 @@ function Reports() {
       .then(res => setShops(res.data?.result || []))
       .catch(err => setError(formatApiError(err) || t('failed_to_load_shops')))
       .finally(() => setIsLoadingShops(false))
-  }, [])
+  }, [t])
 
   useEffect(() => {
     if (!selectedShop) {
@@ -132,7 +132,7 @@ function Reports() {
         }
       })
       .finally(() => setIsLoadingReports(false))
-  }, [selectedShop, period, dateRange.startDate, dateRange.endDate])
+  }, [selectedShop, period, dateRange.startDate, dateRange.endDate, t])
 
   const exportReports = () => {
     if (!reportData) return;

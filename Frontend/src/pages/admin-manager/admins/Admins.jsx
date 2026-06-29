@@ -38,7 +38,7 @@ function Admins() {
         }
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()

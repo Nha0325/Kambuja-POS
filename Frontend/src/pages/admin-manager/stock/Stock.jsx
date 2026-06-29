@@ -67,7 +67,7 @@ function Stock() {
         }
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadStock()

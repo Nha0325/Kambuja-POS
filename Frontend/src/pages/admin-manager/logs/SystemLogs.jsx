@@ -63,7 +63,7 @@ function SystemLogs() {
     } finally {
       setIsLoading(false)
     }
-  }, [search, actionFilter])
+  }, [search, actionFilter, t])
 
   useEffect(() => {
     const timer = setTimeout(() => {

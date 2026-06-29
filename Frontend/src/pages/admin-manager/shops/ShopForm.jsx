@@ -188,7 +188,7 @@ function ShopForm() {
     return () => {
       isMounted = false
     }
-  }, [id])
+  }, [id, t])
 
   const submit = async (event) => {
     event.preventDefault()

@@ -44,7 +44,7 @@ function Locations() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadData()

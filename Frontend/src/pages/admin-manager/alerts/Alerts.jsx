@@ -76,7 +76,7 @@ function Alerts() {
         setError(t('alert_not_found_or_already_removed'))
       }
     }
-  }, [highlightedAlertId, alerts])
+  }, [highlightedAlertId, alerts, t])
 
   const loadAlerts = useCallback((quiet = false) => {
     if (!quiet) setIsLoading(true)
@@ -95,7 +95,7 @@ function Alerts() {
       .finally(() => {
         if (!quiet) setIsLoading(false)
       })
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadAlerts()
@@ -130,7 +130,7 @@ function Alerts() {
         || alert.userId?.username?.toLowerCase().includes(term)
         || alertTypeLabel[alert.type]?.toLowerCase().includes(term))
     })
-  }, [alerts, search, typeFilter])
+  }, [alerts, search, typeFilter, alertTypeLabel])
 
   const exportAlerts = () => {
     downloadCsv(
