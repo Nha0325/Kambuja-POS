@@ -11,6 +11,8 @@ import { ROLES, normalizeRole } from "../../utils/helpers/role";
 import { adminManagerService } from "../../services/users/adminManager.service";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { productService } from "../../services/inventory/product.service";
+import { saleService } from "../../services/sales/sale.service";
 dayjs.extend(relativeTime);
 
 function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
@@ -22,6 +24,12 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({ products: [], sales: [] });
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchRef = useRef(null);
+  
   const isCashier = normalizeRole(user?.role) === ROLES.CASHIER
 
   const username = user?.username || "User"
@@ -29,12 +37,43 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
 
   // Distinguish between the Admin layout and Cashier layout
   const isAdminShell = !pathname.startsWith('/cashier')
+  const isAdminManagerShell = pathname.startsWith('/admin-manager')
 
   useEffect(() => {
     const handleLanguageChange = () => setLanguage(localStorage.getItem('language') || 'en')
     window.addEventListener('languagechange', handleLanguageChange)
     return () => window.removeEventListener('languagechange', handleLanguageChange)
   }, [])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults({ products: [], sales: [] });
+      setShowSearchDropdown(false);
+      return;
+    }
+    
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const [prodRes, saleRes] = await Promise.all([
+          productService.list({ search: searchQuery, limit: 4 }),
+          isAdminManagerShell ? Promise.resolve({ data: { result: [] } }) : saleService.list({ search: searchQuery, limit: 4 })
+        ]);
+        
+        setSearchResults({
+          products: prodRes.data?.result || prodRes.data?.data || [],
+          sales: saleRes.data?.result || saleRes.data?.data || []
+        });
+        setShowSearchDropdown(true);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, isAdminManagerShell]);
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -61,8 +100,6 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
     }
   };
 
-  const isAdminManagerShell = pathname.startsWith('/admin-manager')
-
   useEffect(() => {
     if (!isAdminManagerShell) return;
     fetchNotifications();
@@ -79,6 +116,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
     const handleClickOutside = (event) => {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) setIsAccountOpen(false);
       if (notifMenuRef.current && !notifMenuRef.current.contains(event.target)) setIsNotifOpen(false);
+      if (searchRef.current && !searchRef.current.contains(event.target)) setShowSearchDropdown(false);
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
@@ -142,14 +180,77 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
       </div>
 
       {isAdminShell ? (
-        <div className="hidden md:flex flex-1 justify-center relative">
+        <div className="hidden md:flex flex-1 justify-center relative" ref={searchRef}>
           <div className="relative w-full max-w-md">
             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#a1a1aa] h-4 w-4" />
             <input
               type="text"
-              placeholder="Search everywhere..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSearchDropdown(true);
+              }}
+              onFocus={() => { if(searchQuery) setShowSearchDropdown(true); }}
+              placeholder="Search products or invoices..."
               className="h-10 w-full max-w-md rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-4 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
             />
+            {showSearchDropdown && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-lg">
+                {isSearching ? (
+                  <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">Searching...</div>
+                ) : (
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {searchResults.products.length > 0 && (
+                      <div className="border-b border-[#e5e7eb] dark:border-[#27272a]">
+                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">PRODUCTS</div>
+                        {searchResults.products.map(p => (
+                          <div 
+                            key={p._id}
+                            onClick={() => {
+                              navigate(isAdminManagerShell ? `/admin-manager/products/${p._id}` : `/admin/products/${p._id}/edit`);
+                              setShowSearchDropdown(false);
+                            }}
+                            className="px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#1A1D22] cursor-pointer"
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">{p.name}</span>
+                              <span className="text-xs text-[#06b6d4] font-medium">${p.salePrice}</span>
+                            </div>
+                            <div className="text-xs text-slate-500">{p.sku || p.code}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {searchResults.sales.length > 0 && (
+                      <div>
+                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">INVOICES</div>
+                        {searchResults.sales.map(s => (
+                          <div 
+                            key={s._id}
+                            onClick={() => {
+                              navigate(`/admin/sales`);
+                              setShowSearchDropdown(false);
+                            }}
+                            className="px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#1A1D22] cursor-pointer"
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">#{s.invoiceNumber}</span>
+                              <span className="text-xs text-[#06b6d4] font-medium">${s.totalCost}</span>
+                            </div>
+                            <div className="text-xs text-slate-500">Items: {s.items?.length || 0}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {searchResults.products.length === 0 && searchResults.sales.length === 0 && (
+                      <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">No results found</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       ) : (

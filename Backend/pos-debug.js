@@ -26,7 +26,9 @@ async function showMenu() {
     console.log("1. Change user password (Admin/Cashier)");
     console.log("2. Delete user (Admin/Cashier)");
     console.log("3. List all users");
-    console.log("4. Delete ALL test data (DANGEROUS)");
+    console.log("4. Delete ALL Products");
+    console.log("5. Delete ALL Categories");
+    console.log("6. Delete ALL test data (DANGEROUS)");
     console.log("0. Exit");
     console.log("=====================================");
     
@@ -43,6 +45,12 @@ async function showMenu() {
             await listUsers();
             break;
         case '4':
+            await deleteSpecific('products');
+            break;
+        case '5':
+            await deleteSpecific('categories');
+            break;
+        case '6':
             await deleteTestData();
             break;
         case '0':
@@ -102,6 +110,32 @@ async function deleteUser() {
 async function listUsers() {
     const users = await User.find({}).select('username role email -_id');
     console.table(users.map(u => ({ Username: u.username, Role: u.role, Email: u.email })));
+    console.log("\n");
+    await showMenu();
+}
+
+async function deleteSpecific(type) {
+    console.log(`\nWARNING: This will delete ALL ${type} from your database!`);
+    const confirm = await question(`Type 'DELETE' to confirm wiping ${type}: `);
+    
+    if (confirm === 'DELETE') {
+        try {
+            if (type === 'products') {
+                const Product = require('./models/inventory/Product.model');
+                const res = await Product.deleteMany({});
+                console.log(`Deleted ${res.deletedCount} products.`);
+            } else if (type === 'categories') {
+                const Category = require('./models/inventory/Category.model');
+                const res = await Category.deleteMany({});
+                console.log(`Deleted ${res.deletedCount} categories.`);
+            }
+        } catch (error) {
+            console.error(`Error deleting ${type}:`, error.message);
+        }
+    } else {
+        console.log("Aborted.");
+    }
+    
     console.log("\n");
     await showMenu();
 }
