@@ -185,7 +185,7 @@ function Admins() {
                     <td className={`${tableCellClass} text-right`}>
                       <div className={`flex items-center justify-end gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity ${admin.status === 'INACTIVE' ? 'opacity-60 hover:opacity-100' : ''}`}>
                         <Link
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 dark:hover:bg-[#7033ff]/20 transition-colors"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors"
                           title="Edit Admin"
                           to={`/admin-manager/admin-owners/${admin._id}/edit`}
                         >
@@ -214,7 +214,7 @@ function Admins() {
             <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
-            <button className="w-8 h-8 rounded-md bg-[#7033ff] text-white flex items-center justify-center text-sm font-bold">1</button>
+            <button className="w-8 h-8 rounded-md bg-[#06b6d4] text-white flex items-center justify-center text-sm font-bold">1</button>
             <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors text-sm font-bold disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>

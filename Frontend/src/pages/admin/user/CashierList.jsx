@@ -7,8 +7,10 @@ import useCollection from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
+import { useConfirm } from "../../../hooks/ui/useConfirm";
 
 function User() {
+  const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -17,10 +19,18 @@ function User() {
   const { data, totalPage, isLoading } = useFetchData("users", page, limit, search, refetch);
   const { remove, isLoading: isDeleting } = useCollection("users");
   const userCount = data?.length || 0;
-  const cashierCount = data?.filter((user) => user?.role === "cashier")?.length || 0;
+  const activeCount = data?.filter((user) => user?.status !== "INACTIVE")?.length || 0;
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this user?")) {
+    const isConfirmed = await confirm({
+      title: "Delete Cashier",
+      message: "Are you sure you want to delete this user? This action cannot be undone.",
+      confirmText: "Yes, delete",
+      cancelText: "Cancel",
+      variant: "danger"
+    });
+
+    if (isConfirmed) {
       try {
         const res = await remove(id);
         if (res) {
@@ -30,6 +40,7 @@ function User() {
       } catch (error) {
         toast.error(error?.response?.data?.message || "Failed to delete user.");
       }
+      closeConfirm();
     }
   };
 
@@ -50,8 +61,8 @@ function User() {
 
       <div className={adminSurface.statGrid}>
         {[
-          ["Users", userCount],
-          ["Cashiers", cashierCount],
+          ["Total Cashiers", userCount],
+          ["Active Cashiers", activeCount],
         ].map(([label, value]) => (
           <div key={label} className={adminSurface.statCard}>
             <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
@@ -98,31 +109,37 @@ function User() {
                 <th className={adminSurface.th}>Username</th>
                 <th className={adminSurface.th}>Email</th>
                 <th className={adminSurface.th}>Role</th>
+                <th className={adminSurface.th}>Status</th>
                 <th className={`${adminSurface.th} w-24 text-center`}>Action</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-[#45464d]">
+                  <td colSpan="6" className="p-8 text-center text-slate-500 dark:text-[#A9A6BB]">
                     Loading users...
                   </td>
                 </tr>
               ) : data?.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-[#5b6472]">
+                  <td colSpan="6" className="p-8 text-center text-slate-500 dark:text-[#A9A6BB]">
                     No users found.
                   </td>
                 </tr>
               ) : (
                 data?.map((user, index) => (
                   <tr key={user?._id} className={adminSurface.row}>
-                    <td className={`${adminSurface.td} text-center font-medium text-[#5b6472]`}>
+                    <td className={`${adminSurface.td} text-center font-medium text-slate-500 dark:text-[#A9A6BB]`}>
                       {(page - 1) * limit + index + 1}
                     </td>
-                    <td className={`${adminSurface.td} font-semibold text-[#0b1c30]`}>{user?.username || "-"}</td>
-                    <td className={`${adminSurface.td} text-[#45464d]`}>{user?.email || "-"}</td>
-                    <td className={`${adminSurface.td} capitalize text-[#45464d]`}>{user?.role || "-"}</td>
+                    <td className={`${adminSurface.td} font-semibold text-slate-900 dark:text-[#F8FAFC]`}>{user?.username || "-"}</td>
+                    <td className={`${adminSurface.td} text-slate-700 dark:text-[#A9A6BB]`}>{user?.email || "-"}</td>
+                    <td className={`${adminSurface.td} capitalize text-slate-700 dark:text-[#A9A6BB]`}>{user?.role || "-"}</td>
+                    <td className={adminSurface.td}>
+                      <span className={`inline-flex rounded px-2 py-1 text-xs font-bold tracking-wider ${user?.status === 'INACTIVE' ? 'bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-400'}`}>
+                        {user?.status || "ACTIVE"}
+                      </span>
+                    </td>
                     <td className={`${adminSurface.td} text-center`}>
                       <div className="flex items-center justify-center space-x-1.5">
                         <Link

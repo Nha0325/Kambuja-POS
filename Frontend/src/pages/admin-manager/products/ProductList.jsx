@@ -83,7 +83,7 @@ function ProductList() {
         <div className="flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa] mb-2">
           <span>Admin Manager</span>
           <span>/</span>
-          <span className="font-medium text-[#7033ff]">Products Monitor</span>
+          <span className="font-medium text-[#06b6d4]">Products Monitor</span>
         </div>
         <h1 className="text-2xl font-semibold text-[#0f172a] dark:text-[#f8fafc] md:text-3xl">Global Products Monitor</h1>
         <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">View products across all shops. Read-only access.</p>
@@ -92,7 +92,7 @@ function ProductList() {
       {/* Summary Cards */}
       <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7033ff]/10 text-[#7033ff]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#06b6d4]/10 text-[#06b6d4]">
             <FaBoxesStacked className="h-5 w-5" />
           </div>
           <div>
@@ -138,13 +138,13 @@ function ProductList() {
             placeholder="Search by name, barcode, SKU..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] pl-10 pr-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff]"
+            className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] pl-10 pr-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]"
           />
         </div>
         <select
           value={shopId}
           onChange={(e) => setShopId(e.target.value)}
-          className="h-10 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff]"
+          className="h-10 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]"
         >
           <option value="">All Shops</option>
           {shops.map(s => (
@@ -154,7 +154,7 @@ function ProductList() {
         <select
           value={stockStatus}
           onChange={(e) => setStockStatus(e.target.value)}
-          className="h-10 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff]"
+          className="h-10 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#0f172a] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]"
         >
           <option value="">All Stock Status</option>
           <option value="IN_STOCK">In Stock</option>

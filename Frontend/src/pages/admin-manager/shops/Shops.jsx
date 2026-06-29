@@ -194,7 +194,7 @@ function Shops() {
                   const ownerName = shop.ownerAdminId?.username || "Unknown"
                   return (
                     <tr key={shop._id} className={`group transition-colors ${shop.status === 'LOCKED' ? 'bg-[#f8fafc] dark:bg-[#09090b]' : 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}>
-                      <td className={`${tableCellClass} font-mono text-[#7033ff]`}>{shop.code}</td>
+                      <td className={`${tableCellClass} font-mono text-[#06b6d4]`}>{shop.code}</td>
                       <td className={tableCellClass}>
                         <div className={`font-bold ${shop.status === 'LOCKED' ? 'opacity-60' : ''}`}>{shop.name}</div>
                       </td>
@@ -258,7 +258,7 @@ function Shops() {
                             </button>
                           ) : (
                             <>
-                              <Link to={`/admin-manager/shops/${shop._id}/edit`} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 dark:hover:bg-[#7033ff]/20 transition-colors" title="Edit Shop">
+                              <Link to={`/admin-manager/shops/${shop._id}/edit`} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors" title="Edit Shop">
                                 <span className="material-symbols-outlined text-[18px]">edit</span>
                               </Link>
                               <button
@@ -293,7 +293,7 @@ function Shops() {
             <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
-            <button className="w-8 h-8 rounded-md bg-[#7033ff] text-white flex items-center justify-center text-sm font-bold">1</button>
+            <button className="w-8 h-8 rounded-md bg-[#06b6d4] text-white flex items-center justify-center text-sm font-bold">1</button>
             <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors text-sm font-bold disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
@@ -307,7 +307,7 @@ function Shops() {
           <div className="bg-[#ffffff] dark:bg-[#111113] rounded-xl w-full max-w-lg overflow-hidden border border-[#e5e7eb] dark:border-[#27272a] shadow-xl">
             <div className="flex justify-between items-center p-6 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#7033ff]">storefront</span>
+                <span className="material-symbols-outlined text-[#06b6d4]">storefront</span>
                 Shop Details
               </h3>
               <button 
@@ -325,7 +325,7 @@ function Shops() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop Code</p>
-                  <p className="text-sm font-bold text-[#7033ff] font-mono">{selectedShop.code}</p>
+                  <p className="text-sm font-bold text-[#06b6d4] font-mono">{selectedShop.code}</p>
                 </div>
                 <div>
                   <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Status</p>
@@ -355,7 +355,7 @@ function Shops() {
               
               <div className="mt-6 pt-6 border-t border-[#e5e7eb] dark:border-[#27272a]">
                 <h4 className="text-sm font-bold text-[#020617] dark:text-[#f8fafc] mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#7033ff] text-[20px]">location_on</span>
+                  <span className="material-symbols-outlined text-[#06b6d4] text-[20px]">location_on</span>
                   Location / Address
                 </h4>
                 {!(selectedShop.provinceKh || selectedShop.districtKh || selectedShop.communeKh || selectedShop.village || selectedShop.addressDetail || selectedShop.fullAddressKh) ? (

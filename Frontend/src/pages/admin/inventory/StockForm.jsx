@@ -96,7 +96,7 @@ function StockForm({ mode }) {
       <div className={adminSurface.header}>
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-[#3350BF]/20 text-violet-600 dark:text-[#22D3EE] border border-violet-200 dark:border-[#3350BF]/50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 dark:bg-[#06b6d4]/20 text-cyan-600 dark:text-[#06b6d4] border border-cyan-200 dark:border-[#06b6d4]/50">
               {isStockIn ? <LuPackagePlus size={20} /> : <LuSlidersHorizontal size={20} />}
             </div>
             <div>
@@ -122,7 +122,7 @@ function StockForm({ mode }) {
           {/* Section 1: Product Selection */}
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuPackage className="text-violet-600 dark:text-[#22D3EE]" /> Product Details
+              <LuPackage className="text-cyan-600 dark:text-[#06b6d4]" /> Product Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
@@ -196,7 +196,7 @@ function StockForm({ mode }) {
           {isStockIn && (
             <div className="space-y-5">
               <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-                <LuFileText className="text-violet-600 dark:text-[#22D3EE]" /> Receiving Details
+                <LuFileText className="text-cyan-600 dark:text-[#06b6d4]" /> Receiving Details
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-1.5">
@@ -247,7 +247,7 @@ function StockForm({ mode }) {
           {/* Section 3: Notes */}
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuInfo className="text-violet-600 dark:text-[#22D3EE]" /> Additional Notes
+              <LuInfo className="text-cyan-600 dark:text-[#06b6d4]" /> Additional Notes
             </h2>
             <textarea
               className={`${adminSurface.input} w-full py-3 h-auto min-h-[100px] resize-y`}

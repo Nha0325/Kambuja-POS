@@ -151,7 +151,7 @@ function SystemHealth() {
           <button 
             onClick={handleBackupNow} 
             disabled={isBackingUp}
-            className="h-10 px-4 bg-[#7033ff] text-white text-sm font-semibold rounded-lg hover:bg-[#7033ff]/90 transition-colors shadow-sm shadow-[#7033ff]/20 inline-flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="h-10 px-4 bg-[#06b6d4] text-white text-sm font-semibold rounded-lg hover:bg-[#06b6d4]/90 transition-colors shadow-sm shadow-[#06b6d4]/20 inline-flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             <FaCloudArrowUp /> {isBackingUp ? 'Processing...' : 'Backup Now'}
           </button>

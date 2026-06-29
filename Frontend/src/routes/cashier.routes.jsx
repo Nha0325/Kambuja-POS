@@ -3,7 +3,6 @@ import Protected from "../components/auth/Protected"
 import CashierLayout from "../layouts/CashierLayout"
 import POS from "../pages/cashier/pos/POS"
 import Invoice from "../pages/cashier/pos/Invoice"
-import HoldBills from "../pages/cashier/HoldBills"
 import StockCheck from "../pages/cashier/StockCheck"
 import DailyClose from "../pages/cashier/DailyClose"
 import SalesHistory from "../pages/cashier/SalesHistory"
@@ -28,11 +27,9 @@ export const cashierRoutes = (
     </Route>
     <Route path="/cashier" element={cashierLayout}>
       <Route path="checkout" element={<Navigate to="/cashier/pos" replace />} />
-      <Route path="hold-orders" element={<HoldBills />} />
       <Route path="sales-history" element={<SalesHistory />} />
       <Route path="stock-check" element={<StockCheck />} />
       <Route path="my-shift" element={<DailyClose />} />
-      <Route path="hold-bills" element={<Navigate to="/cashier/hold-orders" replace />} />
       <Route path="sales-today" element={<Navigate to="/cashier/sales-history" replace />} />
       <Route path="daily-close" element={<Navigate to="/cashier/my-shift" replace />} />
     </Route>

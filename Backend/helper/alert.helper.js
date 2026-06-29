@@ -7,7 +7,7 @@ exports.createAlert = async (payload) => {
         
         // Optional Telegram notification
         if (telegramService && telegramService.sendMessage) {
-            const urgentTypes = ['FAILED_LOGIN', 'CRITICAL_STOCK', 'OUT_OF_STOCK', 'SUBSCRIPTION_EXPIRY', 'SUSPICIOUS_ACTIVITY'];
+            const urgentTypes = ['FAILED_LOGIN', 'CRITICAL_STOCK', 'OUT_OF_STOCK', 'SUBSCRIPTION_EXPIRY', 'SUSPICIOUS_ACTIVITY', 'LOGIN'];
             if (urgentTypes.includes(payload.type)) {
                 telegramService.sendMessage(`<b>[${payload.type}]</b> ${payload.title}\n${payload.message}`).catch(() => {});
             }

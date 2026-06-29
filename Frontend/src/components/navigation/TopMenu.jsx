@@ -1,5 +1,4 @@
 import { FaBars } from "react-icons/fa6";
-import { GiTwoCoins } from "react-icons/gi";
 import { FaGear } from "react-icons/fa6";
 import { TbLogout2 } from "react-icons/tb";
 import { MdEmail } from "react-icons/md";
@@ -116,8 +115,8 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
   // Variables moved up
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full min-w-0 items-center justify-between gap-3 border-b border-[#e5e7eb] bg-white/95 px-4 sm:px-6 backdrop-blur transition-colors dark:border-[#27272a] dark:bg-[#09090b]/95">
-      <div className="flex min-w-0 items-center gap-3 w-1/3">
+    <header className="sticky top-0 z-40 flex h-16 w-full min-w-0 items-center justify-between gap-2 sm:gap-3 border-b border-[#e5e7eb] bg-white/95 px-2 sm:px-6 backdrop-blur transition-colors dark:border-[#27272a] dark:bg-[#09090b]/95 print:hidden">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3 w-auto sm:w-1/3">
         {onShowSidebar && (
           <button
             onClick={onShowSidebar || undefined}
@@ -137,25 +136,27 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
               <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{title}</span>
             </>
           ) : (
-            <span className="text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">{title}</span>
+            <span className="hidden lg:inline text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">{title}</span>
           )}
         </div>
       </div>
 
-      {isAdminShell && (
+      {isAdminShell ? (
         <div className="hidden md:flex flex-1 justify-center relative">
           <div className="relative w-full max-w-md">
             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#a1a1aa] h-4 w-4" />
             <input
               type="text"
               placeholder="Search everywhere..."
-              className="h-10 w-full max-w-md rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-4 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+              className="h-10 w-full max-w-md rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-4 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
             />
           </div>
         </div>
+      ) : (
+        <div id="cashier-top-action" className="flex flex-1 justify-center relative sm:px-4"></div>
       )}
 
-      <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3 w-1/3">
+      <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-3 w-auto sm:w-1/3">
         
         {/* Language Switcher */}
         {isAdminShell && (
@@ -236,7 +237,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                 <div className="flex items-center justify-between border-b border-[#e5e7eb] dark:border-[#27272a] p-4">
                   <h3 className="font-bold text-[#020617] dark:text-[#f8fafc]">Notifications</h3>
                   {unreadCount > 0 && (
-                    <button onClick={handleMarkAllRead} className="text-xs font-semibold text-[#7033ff] hover:underline">
+                    <button onClick={handleMarkAllRead} className="text-xs font-semibold text-[#06b6d4] hover:underline">
                       Mark all as read
                     </button>
                   )}
@@ -248,7 +249,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                     <div className="p-8 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">No new notifications</div>
                   ) : (
                     notifications.map((n) => {
-                      let sevClass = "bg-violet-50 text-violet-700";
+                      let sevClass = "bg-cyan-50 text-cyan-700";
                       if (n.severity === 'CRITICAL') sevClass = "bg-red-50 text-red-700";
                       if (n.severity === 'WARNING') sevClass = "bg-orange-50 text-orange-700";
                       if (n.severity === 'SUCCESS') sevClass = "bg-emerald-50 text-emerald-700";
@@ -280,27 +281,13 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
             )}
           </div>
         )}
-
-        {isCashier && !isAdminShell && (
-          <button
-            type="button"
-            onClick={() => navigate("/cashier/pos")}
-            className="btn btn-outline btn-sm hidden h-9 min-h-0 rounded-lg border-[#c6c6cd] px-3 text-xs text-[#0b1c30] hover:border-[#0058be] hover:bg-[#eff4ff] hover:text-[#0058be] sm:inline-flex"
-          >
-            <span>
-              <GiTwoCoins />
-            </span>
-            <span>POS</span>
-          </button>
-        )}
-
         <div ref={accountMenuRef} className="relative ml-1">
           <button
             type="button"
             onClick={() => setIsAccountOpen((prev) => !prev)}
             className={isAdminShell
-              ? "flex h-9 w-9 items-center justify-center rounded-xl bg-[#7033ff]/10 dark:bg-[#7033ff]/20 text-[#7033ff] hover:bg-[#7033ff]/20 transition-colors"
-              : "btn btn-sm h-9 min-h-0 max-w-32 rounded-lg border-0 bg-violet-600 dark:bg-[#3350BF] px-2 text-xs text-white hover:bg-violet-700 dark:hover:bg-[#8B5CF6] sm:max-w-40 sm:px-3"
+              ? "flex h-9 w-9 items-center justify-center rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors"
+              : "btn btn-sm h-9 min-h-0 max-w-32 rounded-lg border-0 bg-cyan-600 dark:bg-[#3350BF] px-2 text-xs text-white hover:bg-cyan-700 dark:hover:bg-[#8B5CF6] sm:max-w-40 sm:px-3"
             }
           >
             {isAdminShell ? (
@@ -319,6 +306,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                 </div>
                 <p className={`mt-1 truncate text-sm font-bold capitalize ${isAdminShell ? 'text-[#020617] dark:text-[#f8fafc]' : 'text-slate-900 dark:text-[#F8FAFC]'}`}>{username}</p>
               </li>
+              {!isCashier && (
               <li>
                 <button
                   onClick={handleSignOut}
@@ -329,6 +317,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                   <span>Log out</span>
                 </button>
               </li>
+              )}
             </ul>
           )}
         </div>

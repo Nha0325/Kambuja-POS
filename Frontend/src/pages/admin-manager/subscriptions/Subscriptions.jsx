@@ -165,7 +165,7 @@ function Subscriptions() {
                   <tr key={shop._id} className="hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors group">
                     <td className={tableCellClass}>
                       <div className="font-bold text-[#020617] dark:text-[#f8fafc]">{shop.name}</div>
-                      <div className="text-xs text-[#7033ff] font-mono">{shop.code}</div>
+                      <div className="text-xs text-[#06b6d4] font-mono">{shop.code}</div>
                     </td>
                     <td className={tableCellClass}>
                       {shop.ownerAdminId?.username || "Unknown"}
@@ -196,8 +196,8 @@ function Subscriptions() {
                       </span>
                     </td>
                     <td className={`${tableCellClass} text-center`}>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${shop.posAccess ? 'bg-[#7033ff]/10 dark:bg-[#7033ff]/20 text-[#7033ff] border border-[#7033ff]/20' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${shop.posAccess ? 'bg-[#7033ff]' : 'bg-[#64748b] dark:bg-[#a1a1aa]'}`}></span>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${shop.posAccess ? 'bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] border border-[#06b6d4]/20' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${shop.posAccess ? 'bg-[#06b6d4]' : 'bg-[#64748b] dark:bg-[#a1a1aa]'}`}></span>
                         {shop.posAccess ? 'Enabled' : 'Disabled'}
                       </span>
                     </td>
@@ -205,7 +205,7 @@ function Subscriptions() {
                       <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity">
                         <button
                           onClick={() => { setSelectedShop(shop); setModalType("view"); }}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 dark:hover:bg-[#7033ff]/20"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20"
                           title="View Subscription"
                         >
                           <span className="material-symbols-outlined text-[18px]">visibility</span>
@@ -249,7 +249,7 @@ function Subscriptions() {
           <div className="bg-[#ffffff] dark:bg-[#111113] rounded-2xl w-full max-w-md overflow-hidden shadow-xl border border-[#e5e7eb] dark:border-[#27272a]">
             <div className="flex justify-between items-center p-6 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#7033ff]">payments</span>
+                <span className="material-symbols-outlined text-[#06b6d4]">payments</span>
                 Manual Renew / Payment
               </h3>
               <button 
@@ -324,7 +324,7 @@ function Subscriptions() {
               <button
                 type="button"
                 onClick={confirmRenew}
-                className="h-10 px-6 bg-[#7033ff] text-white font-bold rounded-lg hover:bg-[#7033ff]/90 transition-colors"
+                className="h-10 px-6 bg-[#06b6d4] text-white font-bold rounded-lg hover:bg-[#06b6d4]/90 transition-colors"
                 disabled={isProcessing}
               >
                 {isProcessing ? "Processing..." : "Confirm Renew"}
@@ -338,7 +338,7 @@ function Subscriptions() {
           <div className="bg-[#ffffff] dark:bg-[#111113] rounded-2xl w-full max-w-md overflow-hidden shadow-xl border border-[#e5e7eb] dark:border-[#27272a]">
             <div className="flex justify-between items-center p-6 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#7033ff]">info</span>
+                <span className="material-symbols-outlined text-[#06b6d4]">info</span>
                 Subscription Details
               </h3>
               <button 
@@ -355,7 +355,7 @@ function Subscriptions() {
               </div>
               <div className="flex justify-between items-center border-b border-[#e5e7eb] dark:border-[#27272a] pb-3">
                 <span className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Shop Code</span>
-                <span className="text-sm font-mono font-bold text-[#7033ff]">{selectedShop.code}</span>
+                <span className="text-sm font-mono font-bold text-[#06b6d4]">{selectedShop.code}</span>
               </div>
               <div className="flex justify-between items-center border-b border-[#e5e7eb] dark:border-[#27272a] pb-3">
                 <span className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Plan</span>

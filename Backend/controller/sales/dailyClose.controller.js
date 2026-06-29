@@ -17,12 +17,16 @@ exports.getCurrent = async (req, res, next) => {
             query.cashier = req.user._id;
         }
 
-        let doc = await DailyClose.findOne(query).sort({ createdAt: -1 });
+        // Find last closed shift today for this cashier
+        let lastClose = await DailyClose.findOne(query).sort({ closedAt: -1 });
+
+        // Sales start AFTER last close, or from start of day if no previous close
+        const salesStart = lastClose ? new Date(lastClose.closedAt) : start;
 
         const salesQuery = {
             shopId: req.shopId,
             user: req.user._id,
-            createdAt: { $gte: start, $lte: end }
+            createdAt: { $gt: salesStart, $lte: end }
         };
 
         const sales = await Sale.find(salesQuery);
@@ -35,7 +39,7 @@ exports.getCurrent = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            result: doc, // Will be the closed session if already closed today
+            result: lastClose,
             preview: {
                 salesCount,
                 totalSales,
@@ -79,10 +83,20 @@ exports.close = async (req, res, next) => {
         const end = new Date();
         end.setHours(23, 59, 59, 999);
 
+        // Find last close today to get sales only SINCE last close
+        const lastClose = await DailyClose.findOne({
+            shopId: req.shopId,
+            cashier: req.user._id,
+            status: "CLOSED",
+            createdAt: { $gte: start, $lte: end }
+        }).sort({ closedAt: -1 });
+
+        const salesStart = lastClose ? new Date(lastClose.closedAt) : start;
+
         const salesQuery = {
             shopId: req.shopId,
             user: req.user._id,
-            createdAt: { $gte: start, $lte: end }
+            createdAt: { $gt: salesStart, $lte: end }
         };
 
         const sales = await Sale.find(salesQuery);
@@ -117,12 +131,24 @@ exports.close = async (req, res, next) => {
 
 exports.history = async (req, res, next) => {
     try {
+        const { startDate, endDate } = req.query;
         const query = { shopId: req.shopId };
+        
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            query.createdAt = { $gte: start, $lte: end };
+        }
+
         if (req.user && req.user.role === "CASHIER") {
             query.cashier = req.user._id;
         }
 
-        const docs = await DailyClose.find(query).sort({ closedAt: -1, createdAt: -1 });
+        const docs = await DailyClose.find(query)
+            .populate('cashier', 'username email')
+            .sort({ closedAt: -1, createdAt: -1 });
 
         res.status(200).json({ success: true, result: docs });
     } catch (error) {

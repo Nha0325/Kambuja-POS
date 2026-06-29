@@ -923,11 +923,54 @@ exports.alerts = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: {
+            result: {
                 alerts: allAlerts.slice(0, 100),
                 summary
             }
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.markAlertAsRead = async (req, res, next) => {
+    try {
+        const Notification = require('../../models/engagement/Notification.model');
+        const doc = await Notification.findByIdAndUpdate(
+            req.params.id,
+            { isRead: true, read: true },
+            { new: true }
+        );
+        if (!doc) return res.status(404).json({ success: false, error: "Alert not found" });
+        return res.status(200).json({ success: true, result: doc });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.markAllAlertsAsRead = async (req, res, next) => {
+    try {
+        const Notification = require('../../models/engagement/Notification.model');
+        await Notification.updateMany(
+            { roleTarget: "ADMIN_MANAGER", isRead: { $ne: true } },
+            { isRead: true, read: true }
+        );
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.resolveAlert = async (req, res, next) => {
+    try {
+        const Notification = require('../../models/engagement/Notification.model');
+        const doc = await Notification.findByIdAndUpdate(
+            req.params.id,
+            { status: "resolved", isRead: true, read: true },
+            { new: true }
+        );
+        if (!doc) return res.status(404).json({ success: false, error: "Alert not found" });
+        return res.status(200).json({ success: true, result: doc });
     } catch (error) {
         next(error);
     }

@@ -115,7 +115,7 @@ function StockAdjustment() {
       <div className={adminSurface.header}>
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-[#3350BF]/20 text-violet-600 dark:text-[#22D3EE] border border-violet-200 dark:border-[#3350BF]/50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 dark:bg-[#06b6d4]/20 text-cyan-600 dark:text-[#06b6d4] border border-cyan-200 dark:border-[#06b6d4]/50">
               <LuSlidersHorizontal size={20} />
             </div>
             <div>
@@ -137,7 +137,7 @@ function StockAdjustment() {
         <form onSubmit={submit} className="space-y-8">
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuPackage className="text-violet-600 dark:text-[#22D3EE]" /> Product Details
+              <LuPackage className="text-cyan-600 dark:text-[#06b6d4]" /> Product Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
@@ -246,7 +246,7 @@ function StockAdjustment() {
                 </div>
                 <div className="text-center flex-1 border-x border-slate-200 dark:border-[#2A2E36]">
                   <p className="text-slate-500 dark:text-[#A9A6BB] mb-1 font-medium">Change (Base)</p>
-                  <p className={`text-xl font-bold ${form.adjustmentType === 'DECREASE' ? 'text-red-500' : form.adjustmentType === 'INCREASE' ? 'text-emerald-500' : 'text-violet-500'}`}>
+                  <p className={`text-xl font-bold ${form.adjustmentType === 'DECREASE' ? 'text-red-500' : form.adjustmentType === 'INCREASE' ? 'text-emerald-500' : 'text-cyan-500'}`}>
                     {form.adjustmentType === "DECREASE" ? "-" : form.adjustmentType === "INCREASE" ? "+" : ""}
                     {form.adjustmentType === "SET_EXACT" ? (newStock - currentStock > 0 ? `+${newStock - currentStock}` : newStock - currentStock) : convertedQty}
                     {" "}{selectedProduct.unitConfig?.baseUnit?.nameKh || ""}
@@ -262,7 +262,7 @@ function StockAdjustment() {
 
           <div className="space-y-5">
             <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-[#F8FAFC] border-b border-slate-200 dark:border-[#2A2E36] pb-3">
-              <LuInfo className="text-violet-600 dark:text-[#22D3EE]" /> Additional Notes
+              <LuInfo className="text-cyan-600 dark:text-[#06b6d4]" /> Additional Notes
             </h2>
             <textarea
               className={`${adminSurface.input} w-full py-3 h-auto min-h-[100px] resize-y`}

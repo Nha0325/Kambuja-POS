@@ -47,13 +47,13 @@ const footerItems = [
 
 const navLinkClass = ({ isActive }) =>
   `${isActive
-    ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-[#3350BF] dark:to-[#AF68E0] text-white shadow-md shadow-violet-200 dark:shadow-[#3350BF]/20"
+    ? "bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-[#3350BF] dark:to-[#AF68E0] text-white shadow-md shadow-cyan-200 dark:shadow-[#3350BF]/20"
     : "text-slate-600 dark:text-[#A9A6BB] hover:bg-slate-50 dark:hover:bg-[#22262D] hover:text-slate-900 dark:hover:text-white"
   } flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all`
 
 const subNavLinkClass = ({ isActive }) =>
   `${isActive
-    ? "text-violet-700 dark:text-white font-medium"
+    ? "text-cyan-700 dark:text-white font-medium"
     : "text-slate-600 dark:text-[#A9A6BB] hover:text-slate-900 dark:hover:text-white"
   } flex min-h-10 w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all relative`
 
@@ -90,8 +90,8 @@ function CollapsibleGroup({ id, label, icon: Icon, items, isActive, isOpen, onTo
               <NavLink to={to} end={end} className={subNavLinkClass} onClick={onNavigate}>
                 {({ isActive }) => (
                   <>
-                    <span className={`absolute left-[-23px] top-1/2 h-[1px] w-3 -translate-y-1/2 ${isActive ? 'bg-violet-500 dark:bg-[#3350BF]' : 'bg-slate-200 dark:bg-[#22262D]'}`}></span>
-                    <ItemIcon className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-violet-600 dark:text-[#AF68E0]' : ''}`} />
+                    <span className={`absolute left-[-23px] top-1/2 h-[1px] w-3 -translate-y-1/2 ${isActive ? 'bg-cyan-500 dark:bg-[#3350BF]' : 'bg-slate-200 dark:bg-[#22262D]'}`}></span>
+                    <ItemIcon className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-cyan-600 dark:text-[#AF68E0]' : ''}`} />
                     <span className="min-w-0 truncate">{itemLabel}</span>
                   </>
                 )}

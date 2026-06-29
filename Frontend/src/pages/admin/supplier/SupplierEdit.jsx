@@ -51,7 +51,7 @@ function EditSupplier() {
     }
   }, [supplier, isFinding]);
 
-  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
+  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
   const labelClass = "block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2";
 
   return (
@@ -59,7 +59,7 @@ function EditSupplier() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between px-4 pt-4">
         <div>
           <div className="flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-            <Link to="/admin/suppliers" className="font-medium text-[#7033ff] hover:underline">
+            <Link to="/admin/suppliers" className="font-medium text-[#06b6d4] hover:underline">
               Suppliers
             </Link>
             <span>/</span>
@@ -154,7 +154,7 @@ function EditSupplier() {
               <Link to="/admin/suppliers" className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center h-10 w-full sm:w-auto">
                 Cancel
               </Link>
-              <button type="submit" disabled={isLoading} className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto">
+              <button type="submit" disabled={isLoading} className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto">
                 {isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>

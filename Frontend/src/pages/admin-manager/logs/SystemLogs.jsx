@@ -130,10 +130,10 @@ function SystemLogs() {
         {summaryCards.map(({ label, value, icon: Icon, dark }) => (
           <article
             key={label}
-            className={dark ? "rounded-2xl border border-[#7033ff] bg-[#7033ff] p-5 text-white shadow-sm" : `${cardClass} p-5`}
+            className={dark ? "rounded-2xl border border-[#06b6d4] bg-[#06b6d4] p-5 text-white shadow-sm" : `${cardClass} p-5`}
           >
             <div className="mb-4 flex items-center justify-between gap-3">
-              <span className={dark ? "rounded-xl bg-white/15 p-2 text-white" : "rounded-xl bg-[#7033ff]/10 dark:bg-[#7033ff]/20 p-2 text-[#7033ff]"}>
+              <span className={dark ? "rounded-xl bg-white/15 p-2 text-white" : "rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 p-2 text-[#06b6d4]"}>
                 <Icon />
               </span>
               <span className={dark ? "text-xs font-bold uppercase tracking-[0.05em] text-white/80" : "text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]"}>
@@ -188,7 +188,7 @@ function SystemLogs() {
               {latestLog ? `Latest event: ${latestLog.action || "Unknown"} at ${formatDate(latestLog.createdAt, dateTimeFormat)}` : "Waiting for audit events."}
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#7033ff]/20 bg-[#7033ff]/10 dark:bg-[#7033ff]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#7033ff]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#06b6d4]">
             <FaTerminal />
             {logs.length.toLocaleString()} rows
           </span>
@@ -214,13 +214,13 @@ function SystemLogs() {
                 <tr key={log._id} className="transition-colors hover:bg-[#f8fafc] dark:hover:bg-[#09090b]">
                   <td className={tableCellClass}>
                     <span className="inline-flex items-center gap-2">
-                      <FaCalendarDays className="text-[#7033ff]" />
+                      <FaCalendarDays className="text-[#06b6d4]" />
                       {formatDate(log.createdAt, dateFormat)}
                     </span>
                   </td>
                   <td className={tableCellClass}>
                     <span className="inline-flex items-center gap-2 font-semibold text-[#020617] dark:text-[#f8fafc]">
-                      <FaClock className="text-[#7033ff]" />
+                      <FaClock className="text-[#06b6d4]" />
                       {formatDate(log.createdAt, timeFormat)}
                     </span>
                   </td>
@@ -232,7 +232,7 @@ function SystemLogs() {
                   </td>
                   <td className={tableCellClass}>{log.shopName || "Platform"}</td>
                   <td className={tableCellClass}>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#7033ff]/20 bg-[#7033ff]/10 dark:bg-[#7033ff]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#7033ff]">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#06b6d4]">
                       <FaListCheck />
                       {log.action}
                     </span>

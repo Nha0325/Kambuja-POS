@@ -111,16 +111,16 @@ function CreateProduct() {
     }
   };
 
-  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
-  const selectClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]";
-  const textareaClass = "min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
+  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
+  const selectClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]";
+  const textareaClass = "min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
   const labelClass = "mb-2 block text-xs font-bold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa]";
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
       <div className="mx-auto max-w-6xl">
         <nav className="mb-2 flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-          <Link to="/admin/products" className="hover:text-[#7033ff]">Products</Link>
+          <Link to="/admin/products" className="hover:text-[#06b6d4]">Products</Link>
           <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
           <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">Create New</span>
         </nav>
@@ -156,7 +156,7 @@ function CreateProduct() {
                         <option>No categories available</option>
                       </select>
                       <span className="text-xs text-amber-600 dark:text-amber-400">
-                        Create a category before adding products. <Link to="/admin/categories" className="underline font-bold text-[#7033ff]">Manage Categories</Link>
+                        Create a category before adding products. <Link to="/admin/categories" className="underline font-bold text-[#06b6d4]">Manage Categories</Link>
                       </span>
                     </div>
                   ) : (
@@ -290,9 +290,9 @@ function CreateProduct() {
                   <label
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    className="flex h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] transition-colors hover:border-[#7033ff] hover:bg-[#7033ff]/5"
+                    className="flex h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] transition-colors hover:border-[#06b6d4] hover:bg-[#06b6d4]/5"
                   >
-                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#7033ff]/10 text-[#7033ff]">
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#06b6d4]/10 text-[#06b6d4]">
                       <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     </div>
                     <span className="text-sm font-semibold text-[#020617] dark:text-[#f8fafc]">Click to upload</span>
@@ -346,7 +346,7 @@ function CreateProduct() {
                   </div>
                   <label className="relative inline-flex cursor-pointer items-center">
                     <input type="checkbox" className="peer sr-only" checked={status} onChange={(e) => setStatus(e.target.checked)} />
-                    <div className="peer h-6 w-11 rounded-full bg-[#e5e7eb] dark:bg-[#27272a] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[#e5e7eb] dark:after:border-[#27272a] after:bg-white dark:after:bg-[#f8fafc] after:transition-all after:content-[''] peer-checked:bg-[#7033ff] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+                    <div className="peer h-6 w-11 rounded-full bg-[#e5e7eb] dark:bg-[#27272a] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[#e5e7eb] dark:after:border-[#27272a] after:bg-white dark:after:bg-[#f8fafc] after:transition-all after:content-[''] peer-checked:bg-[#06b6d4] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
                   </label>
                 </div>
 
@@ -375,7 +375,7 @@ function CreateProduct() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center"
+              className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center"
             >
               {isLoading ? "Saving..." : "Save Product"}
             </button>

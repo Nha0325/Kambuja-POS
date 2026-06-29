@@ -8,6 +8,7 @@ function EditUser() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [status, setStatus] = useState("ACTIVE");
   const role = "CASHIER";
 
   const route = useParams();
@@ -23,6 +24,7 @@ function EditUser() {
         username: username.trim(),
         email: email.trim(),
         role,
+        status,
       };
       if (password) {
         payload.password = password;
@@ -41,6 +43,7 @@ function EditUser() {
     if (data) {
       setUsername(data.username || "");
       setEmail(data.email || "");
+      setStatus(data.status || "ACTIVE");
     }
   }, [data]);
 
@@ -51,7 +54,7 @@ function EditUser() {
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
           <Link
             to="/admin/cashiers"
-            className="flex items-center font-medium transition-colors hover:text-[#7033ff]"
+            className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
             Cashiers
           </Link>
@@ -93,7 +96,7 @@ function EditUser() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
-                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="Enter username"
                   />
                 </div>
@@ -113,7 +116,7 @@ function EditUser() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
-                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="Enter email"
                   />
                 </div>
@@ -133,10 +136,31 @@ function EditUser() {
                     onChange={(e) => setPassword(e.target.value)}
                     type="password"
                     minLength={6}
-                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                     placeholder="Enter new password (min 6 chars)"
                   />
                   <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-1">Leave blank if you don't want to change the password.</p>
+                </div>
+
+                {/* Status */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
+                  >
+                    Account Status <span className="text-red-500">*</span>
+                  </label>
+
+                  <select
+                    id="status"
+                    name="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
+                  >
+                    <option value="ACTIVE">Active (Can login)</option>
+                    <option value="INACTIVE">Inactive (Locked)</option>
+                  </select>
                 </div>
               </div>
 
@@ -152,7 +176,7 @@ function EditUser() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
+                  className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
                   {isLoading ? "Saving..." : "Save Changes"}
                 </button>

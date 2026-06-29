@@ -52,7 +52,7 @@ export default function ConfirmModal({
             className={`h-10 px-6 text-white font-bold rounded-lg transition-colors ${
               variant === "danger" 
                 ? "bg-red-600 hover:bg-red-700" 
-                : "bg-[#7033ff] hover:bg-[#7033ff]/90"
+                : "bg-[#06b6d4] hover:bg-[#06b6d4]/90"
             }`}
             disabled={isProcessing}
           >

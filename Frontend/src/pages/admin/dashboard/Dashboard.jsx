@@ -18,7 +18,7 @@ import formatDate from "../../../utils/formatters/formatDate";
 const currency = "$";
 const formatCurrency = (value) => `${currency}${Number(value || 0).toFixed(2)}`;
 
-function DashboardMetric({ label, value, icon: Icon, accentClass = "bg-violet-100 dark:bg-blue-50 text-violet-600 dark:text-[#3350BF]" }) {
+function DashboardMetric({ label, value, icon: Icon, accentClass = "bg-cyan-100 dark:bg-blue-50 text-cyan-600 dark:text-[#06b6d4]" }) {
   return (
     <div className="flex min-h-[120px] items-center justify-between rounded-2xl border border-slate-200 dark:border-[#2A2E36] bg-white dark:bg-[#1A1D22] p-5 shadow-sm transition hover:shadow-md dark:hover:shadow-lg dark:shadow-black/10">
       <div className="min-w-0">
@@ -34,7 +34,7 @@ function DashboardMetric({ label, value, icon: Icon, accentClass = "bg-violet-10
 
 function GradientCard({ label, value, icon: Icon }) {
   return (
-    <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 dark:from-[#3350BF] dark:to-[#AF68E0] p-6 text-white shadow-md dark:shadow-lg dark:shadow-[#3350BF]/20 relative overflow-hidden">
+    <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-600 dark:from-[#06b6d4] dark:to-[#AF68E0] p-6 text-white shadow-md dark:shadow-lg dark:shadow-[#06b6d4]/20 relative overflow-hidden">
       <div className="relative z-10">
         <p className="text-sm font-medium opacity-90">{label}</p>
         <p className="mt-2 text-3xl font-bold">{value}</p>
@@ -54,7 +54,7 @@ function Home() {
       label: "Today Revenue",
       value: formatCurrency(report?.totalSaleToday),
       icon: LuTrendingUp,
-      accentClass: "bg-violet-100 text-violet-600 dark:bg-[#3350BF]/10 dark:text-[#22D3EE]",
+      accentClass: "bg-cyan-100 text-cyan-600 dark:bg-[#06b6d4]/10 dark:text-[#06b6d4]",
     },
     {
       label: "Due Purchases",
@@ -89,7 +89,7 @@ function Home() {
           </button>
           <Link
             to="/admin/sales"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-violet-600 dark:bg-[#3350BF] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 dark:hover:bg-[#253A8F]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-cyan-600 dark:bg-[#06b6d4] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 dark:hover:bg-[#253A8F]"
           >
             <LuListChecks size={18} /> View Sales
           </Link>
@@ -115,7 +115,7 @@ function Home() {
             <p className="text-sm font-medium text-slate-500 dark:text-[#A9A6BB]">Products in System</p>
             <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-[#F8FAFC]">{report?.totalProducts || 0}</p>
           </div>
-          <LuPackage size={48} className="absolute right-4 bottom-4 opacity-10 rotate-[10deg] text-violet-500 dark:text-[#22D3EE]" />
+          <LuPackage size={48} className="absolute right-4 bottom-4 opacity-10 rotate-[10deg] text-cyan-500 dark:text-[#06b6d4]" />
         </div>
         <div className="flex min-h-[120px] items-center justify-between rounded-2xl bg-white dark:bg-[#1A1D22] p-6 text-slate-900 dark:text-white shadow-sm dark:shadow-lg relative overflow-hidden border border-slate-200 dark:border-[#2A2E36]">
           <div className="relative z-10">
@@ -143,7 +143,7 @@ function Home() {
             <h2 className="text-lg font-bold text-slate-900 dark:text-[#F8FAFC]">Recent Sales Transactions</h2>
             <p className="text-sm text-slate-500 dark:text-[#A9A6BB]">Latest invoices generated from POS.</p>
           </div>
-          <Link to="/admin/sales" className="text-sm font-semibold text-violet-600 dark:text-[#22D3EE] hover:underline">
+          <Link to="/admin/sales" className="text-sm font-semibold text-cyan-600 dark:text-[#06b6d4] hover:underline">
             View All Sales
           </Link>
         </div>

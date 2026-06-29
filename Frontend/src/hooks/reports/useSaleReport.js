@@ -9,11 +9,15 @@ export const useSaleReport = () => {
     const fetchSaleReport = async (startDate, endDate) => {
         try {
             setIsLoading(true)
-            // Pass dates as query parameters
-            const res = await api.get(`/report/sale`, {
-                params: { startDate, endDate }
-            })
-            return res.data
+            const [saleRes, shiftRes] = await Promise.all([
+                api.get(`/report/sale`, { params: { startDate, endDate } }),
+                api.get(`/daily-close/history`, { params: { startDate, endDate } })
+            ]);
+            
+            return {
+                ...saleRes.data,
+                shifts: shiftRes.data?.result || []
+            };
         } catch (error) {
             const msg = formatApiError(error)
             toast.error(msg)

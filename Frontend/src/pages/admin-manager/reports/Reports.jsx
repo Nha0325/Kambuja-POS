@@ -42,7 +42,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {
       <div className="relative">
         <input
           type="text"
-          className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] pr-10 pl-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors placeholder:text-[#64748b] dark:placeholder:text-[#a1a1aa] focus:border-[#7033ff] focus:ring-1 focus:ring-[#7033ff]"
+          className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] pr-10 pl-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors placeholder:text-[#64748b] dark:placeholder:text-[#a1a1aa] focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]"
           placeholder={placeholder}
           value={search}
           disabled={disabled}
@@ -64,7 +64,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {
             filteredOptions.map((opt) => (
               <div
                 key={opt._id}
-                className={`px-3 py-2 text-sm cursor-pointer transition-colors ${valueObj?._id === opt._id ? 'bg-[#7033ff]/10 text-[#7033ff] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}
+                className={`px-3 py-2 text-sm cursor-pointer transition-colors ${valueObj?._id === opt._id ? 'bg-[#06b6d4]/10 text-[#06b6d4] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}
                 onClick={() => {
                   onChange(opt)
                   setIsOpen(false)
@@ -175,7 +175,7 @@ function Reports() {
             <label className="block w-full sm:w-[160px]">
               <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Date Range</span>
               <select 
-                className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff] focus:ring-1 focus:ring-[#7033ff] appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M7%2010L12%2015L17%2010%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:24px] bg-[right_8px_center] bg-no-repeat" 
+                className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4] appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M7%2010L12%2015L17%2010%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:24px] bg-[right_8px_center] bg-no-repeat" 
                 value={period} 
                 onChange={(e) => setPeriod(e.target.value)}
               >
@@ -189,11 +189,11 @@ function Reports() {
               <>
                 <label className="block w-full sm:w-[140px]">
                   <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Start Date</span>
-                  <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff]" value={dateRange.startDate} onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})} />
+                  <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]" value={dateRange.startDate} onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})} />
                 </label>
                 <label className="block w-full sm:w-[140px]">
                   <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">End Date</span>
-                  <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#7033ff]" value={dateRange.endDate} onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})} />
+                  <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]" value={dateRange.endDate} onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})} />
                 </label>
               </>
             )}

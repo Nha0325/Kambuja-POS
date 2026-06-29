@@ -74,7 +74,7 @@ function PosAccess() {
 
       <div className="mb-6 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-5">
         <div className="flex items-start gap-3">
-          <div className="rounded-xl bg-white dark:bg-[#09090b] p-3 text-[#7033ff]">
+          <div className="rounded-xl bg-white dark:bg-[#09090b] p-3 text-[#06b6d4]">
             <FaCircleInfo />
           </div>
           <div>

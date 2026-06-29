@@ -11,6 +11,8 @@ export const adminManagerService = {
   archiveShop: (id) => api.patch(`${root}/shops/${id}/archive`),
   restoreShop: (id) => api.patch(`${root}/shops/${id}/restore`),
   getAdmins: (params) => api.get(`${root}/admins`, { params }),
+  getLocations: (params) => api.get(`${root}/locations`, { params }),
+  getLocationsSummary: () => api.get(`${root}/locations/summary`),
   getAdmin: (id) => api.get(`${root}/admins/${id}`),
   createAdmin: (payload) => api.post(`${root}/admins`, payload),
   updateAdmin: (id, payload) => api.patch(`${root}/admins/${id}`, payload),
@@ -21,10 +23,10 @@ export const adminManagerService = {
   getUnreadNotificationsCount: () => api.get(`${root}/notifications/unread-count`),
   markNotificationAsRead: (id) => api.patch(`${root}/notifications/${id}/read`),
   markAllNotificationsAsRead: () => api.patch(`${root}/notifications/read-all`),
-  alerts: (params) => api.get(`/alerts`, { params }),
-  markAlertAsRead: (id) => api.patch(`/alerts/${id}/read`),
-  markAllAlertsAsRead: () => api.patch(`/alerts/read-all`),
-  resolveAlert: (id) => api.patch(`/alerts/${id}/resolve`),
+  alerts: (params) => api.get(`${root}/alerts`, { params }),
+  markAlertAsRead: (id) => api.patch(`${root}/alerts/${id}/read`),
+  markAllAlertsAsRead: () => api.patch(`${root}/alerts/read-all`),
+  resolveAlert: (id) => api.patch(`${root}/alerts/${id}/resolve`),
   
   // Retaining existing methods that might be used by other parts
   updateShopStatus: (id, status) => api.patch(`${root}/shops/${id}/status`, { status }),

@@ -81,7 +81,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
               onChange={(e) => setPaidAmount(e.target.value)}
               value={paidAmount}
               type="number"
-              className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+              className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
               placeholder="Enter amount in $"
             />
           </div>
@@ -112,7 +112,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
             </div>
           </div>
           
-          <button type="submit" disabled={isSaving} className="mt-4 bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full">
+          <button type="submit" disabled={isSaving} className="mt-4 bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full">
             {isSaving ? "Saving..." : "Save Payment"}
           </button>
         </form>

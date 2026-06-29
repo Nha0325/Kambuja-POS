@@ -59,12 +59,12 @@ function AdminManagerLayout() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const isExpanded = isPinned || isHovered
+  const isExpanded = isMobileOpen || isPinned || isHovered
   const sidebarPadding = isExpanded ? "lg:pl-[260px]" : "lg:pl-[72px]"
 
   return (
     <ConfirmProvider>
-      <div className="min-h-screen overflow-x-hidden bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
+      <div className="min-h-screen bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
       {isMobileOpen && (
         <button
           type="button"
@@ -83,7 +83,7 @@ function AdminManagerLayout() {
         }}
       />
       
-      <div className={`${sidebarPadding} min-w-0 max-w-full overflow-x-hidden transition-all duration-300`}>
+      <div className={`${sidebarPadding} min-w-0 max-w-full transition-all duration-300`}>
         <TopMenu
           title={getPageTitle(location.pathname)}
           eyebrow="Platform Manager"

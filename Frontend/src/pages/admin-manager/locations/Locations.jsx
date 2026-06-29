@@ -31,24 +31,12 @@ function Locations() {
     try {
       setIsLoading(true)
       setError("")
-      const res = await adminManagerService.getShops()
-      const shopData = res.data?.result || []
-      
-      setLocations(shopData)
-
-      const uniqueProvinces = new Set()
-      const uniqueDistricts = new Set()
-      shopData.forEach(shop => {
-        if (shop.province) uniqueProvinces.add(shop.province)
-        if (shop.district) uniqueDistricts.add(shop.district)
-      })
-
-      setSummary({
-        total: shopData.length,
-        provinces: uniqueProvinces.size,
-        districts: uniqueDistricts.size,
-        mappedShops: shopData.length
-      })
+      const [locRes, sumRes] = await Promise.all([
+        adminManagerService.getLocations(),
+        adminManagerService.getLocationsSummary()
+      ])
+      setLocations(locRes.data?.result || [])
+      setSummary(sumRes.data?.result || null)
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || "Something went wrong loading locations")
     } finally {
@@ -66,13 +54,13 @@ function Locations() {
     .filter((loc) => {
       if (!search) return true
       const s = search.toLowerCase()
-      const ownerName = loc.ownerAdminId?.username || ""
+      const managerName = loc.manager?.username || ""
       return (
         loc.name?.toLowerCase().includes(s) ||
         loc.code?.toLowerCase().includes(s) ||
         loc.province?.toLowerCase().includes(s) || 
         loc.district?.toLowerCase().includes(s) ||
-        ownerName.toLowerCase().includes(s)
+        managerName.toLowerCase().includes(s)
       )
     })
 
@@ -93,7 +81,7 @@ function Locations() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className={`${cardClass} p-5 flex flex-col gap-3`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#7033ff]/10 dark:bg-[#7033ff]/20 flex items-center justify-center text-[#7033ff]">
+            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 flex items-center justify-center text-[#06b6d4]">
               <FaMapLocationDot className="text-xl" />
             </div>
             <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Total Locations</p>
@@ -123,7 +111,7 @@ function Locations() {
 
         <div className={`${cardClass} p-5 flex flex-col gap-3`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#7033ff]/10 dark:bg-[#7033ff]/20 flex items-center justify-center text-[#7033ff]">
+            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 flex items-center justify-center text-[#06b6d4]">
               <FaStore className="text-xl" />
             </div>
             <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Mapped Shops</p>
@@ -183,31 +171,31 @@ function Locations() {
                 <TableEmpty colSpan="8">No shops found. Create a shop first.</TableEmpty>
               ) : (
                 filteredLocations.map((loc) => {
-                  const ownerName = loc.ownerAdminId?.username || "Unknown"
-                  const locationArea = [loc.province, loc.district].filter(Boolean).join(" - ") || loc.address || "-"
+                  const managerName = loc.manager?.username || "Unknown"
+                  const locationArea = [loc.province, loc.district].filter(Boolean).join(" - ") || loc.addressDetail || "-"
 
                   return (
                     <tr key={loc._id} className="hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors group">
                       <td className={tableCellClass}>
                         <div className="font-bold text-[#020617] dark:text-[#f8fafc]">{loc.name}</div>
-                        {loc.code && <div className="text-xs text-[#7033ff] font-mono mt-0.5">{loc.code}</div>}
+                        {loc.code && <div className="text-xs text-[#06b6d4] font-mono mt-0.5">{loc.code}</div>}
                       </td>
                       <td className={tableCellClass}>
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] text-[#64748b] dark:text-[#a1a1aa]">
-                          Main Shop
+                          {loc.type || "Branch"}
                         </span>
                       </td>
                       <td className={tableCellClass}>
                         <div className="flex items-center gap-2">
                           <span className="material-symbols-outlined text-[18px] text-[#64748b] dark:text-[#a1a1aa]">storefront</span>
-                          <span className="text-sm font-medium">{loc.name}</span>
+                          <span className="text-sm font-medium">{loc.shop?.name || "-"}</span>
                         </div>
                       </td>
                       <td className={tableCellClass}>
                         <div className="text-sm">
-                          <p className="font-semibold">{ownerName}</p>
-                          {(loc.ownerAdminId?.email || loc.ownerAdminId?.phone) && (
-                            <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-0.5">{loc.ownerAdminId?.phone || loc.ownerAdminId?.email}</p>
+                          <p className="font-semibold">{managerName}</p>
+                          {(loc.manager?.email || loc.manager?.phone || loc.phone) && (
+                            <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-0.5">{loc.manager?.phone || loc.phone || loc.manager?.email}</p>
                           )}
                         </div>
                       </td>
@@ -217,8 +205,8 @@ function Locations() {
                         </div>
                       </td>
                       <td className={`${tableCellClass} text-center`}>
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${loc.posAccess ? 'bg-[#7033ff]/10 dark:bg-[#7033ff]/20 text-[#7033ff] border border-[#7033ff]/20' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${loc.posAccess ? 'bg-[#7033ff]' : 'bg-[#64748b] dark:bg-[#a1a1aa]'}`}></span>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${loc.posAccess ? 'bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] border border-[#06b6d4]/20' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${loc.posAccess ? 'bg-[#06b6d4]' : 'bg-[#64748b] dark:bg-[#a1a1aa]'}`}></span>
                           {loc.posAccess ? "Yes" : "No"}
                         </span>
                       </td>
@@ -229,7 +217,7 @@ function Locations() {
                         <div className="flex items-center justify-end gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                           <Link 
                             to={`/admin-manager/shops`}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 dark:hover:bg-[#7033ff]/20 transition-colors" 
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors" 
                             title="View Shop in Directory"
                           >
                             <span className="material-symbols-outlined text-[18px]">visibility</span>

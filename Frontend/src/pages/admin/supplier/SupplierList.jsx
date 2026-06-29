@@ -16,6 +16,7 @@ import { useCollection } from "../../../hooks/common/useCollection";
 import { useQuery } from "../../../hooks/common/useQuery";
 import { adminSurface } from "../adminPageUi";
 import { downloadCsv } from "../../../utils/helpers/downloadCsv";
+import { useConfirm } from "../../../hooks/ui/useConfirm";
 import AdminPagination from "../../../components/admin/AdminPagination";
 
 const supplierStats = [
@@ -29,9 +30,9 @@ function Supplier() {
   const [limit, setLimit] = useState(10);
   const [refetch, setRefetch] = useState(false);
   const [showWithPhoneOnly, setShowWithPhoneOnly] = useState(false);
-
   const { data: suppliers, totalPage, isLoading } = useQuery("suppliers", search, page, limit, refetch);
   const { remove, isLoading: isDeleting } = useCollection("suppliers");
+  const { confirm, closeConfirm } = useConfirm();
   const visibleSuppliers = showWithPhoneOnly
     ? suppliers?.filter((item) => item?.phone)
     : suppliers;
@@ -44,12 +45,21 @@ function Supplier() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure! you want to delete?")) {
+    const isConfirmed = await confirm({
+      title: "Delete Supplier",
+      message: "Are you sure you want to delete this supplier? This action cannot be undone.",
+      confirmText: "Yes, delete",
+      cancelText: "Cancel",
+      variant: "danger"
+    });
+
+    if (isConfirmed) {
       const res = await remove(id);
       if (res) {
         setRefetch(!refetch);
         toast.success("Deleted successfully!");
       }
+      closeConfirm();
     }
   };
 
@@ -137,7 +147,7 @@ function Supplier() {
                   aria-pressed={showWithPhoneOnly}
                   onClick={() => setShowWithPhoneOnly((value) => !value)}
                   className={`inline-flex h-10 w-10 items-center justify-center border-r border-[#2A2E36] transition hover:bg-[#2A2E36] ${
-                    showWithPhoneOnly ? "bg-[#3350BF]/20 text-[#22D3EE]" : "text-[#A9A6BB]"
+                    showWithPhoneOnly ? "bg-[#06b6d4]/20 text-[#06b6d4]" : "text-[#A9A6BB]"
                   }`}
                 >
                   <LuFilter />
@@ -176,7 +186,7 @@ function Supplier() {
                 <tr>
                   <td colSpan={7} className="p-8">
                     <div className="flex items-center justify-center gap-3 text-[#A9A6BB]">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#22D3EE]" />
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#06b6d4]" />
                       Loading suppliers...
                     </div>
                   </td>
@@ -187,7 +197,7 @@ function Supplier() {
                 <tr>
                   <td colSpan={7} className="px-5 py-20 text-center">
                     <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#3350BF]/10 text-3xl text-[#22D3EE]">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#06b6d4]/10 text-3xl text-[#06b6d4]">
                         <FaHandshake />
                       </div>
                       <div>

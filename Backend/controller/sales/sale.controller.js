@@ -1,6 +1,7 @@
 const calculatePaymentStatus = require('../../helper/calculatePaymentStatus')
 const Product = require('../../models/inventory/Product.model')
 const Sale = require('../../models/sales/Sale.model')
+const DailyClose = require('../../models/sales/DailyClose.model')
 const { generateInvoiceNumber } = require('../system/counter.controller')
 const Payment = require('../../models/payment/Payment.model')
 const Receipt = require('../../models/sales/Receipt.model')
@@ -375,10 +376,24 @@ exports.findToday = async (req, res, next) => {
         const end = new Date()
         end.setHours(23, 59, 59, 999)
 
+        // For CASHIER: only show sales since last shift close today
+        let salesStart = start;
+        if (req.user && req.user.role === 'CASHIER') {
+            const lastClose = await DailyClose.findOne({
+                shopId: req.shopId,
+                cashier: req.user._id,
+                status: 'CLOSED',
+                createdAt: { $gte: start, $lte: end }
+            }).sort({ closedAt: -1 });
+            if (lastClose && lastClose.closedAt) {
+                salesStart = new Date(lastClose.closedAt);
+            }
+        }
+
         const docs = await Sale.find({
             ...req.shopFilter,
             ...(req.user && req.user.role === 'CASHIER' ? { user: req.user._id } : {}),
-            createdAt: { $gte: start, $lte: end },
+            createdAt: { $gt: salesStart, $lte: end },
         })
             .populate("user", "username role")
             .populate("items.product", "name code salePrice stock currentStock")

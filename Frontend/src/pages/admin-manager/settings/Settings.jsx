@@ -5,10 +5,10 @@ import { cardClass } from "../adminManagerUi"
 import toast from "react-hot-toast"
 import { adminManagerService } from "../../../services/users/adminManager.service"
 
-const customInputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20"
+const customInputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20"
 const customInputErrorClass = "h-10 w-full rounded-lg border border-red-300 dark:border-red-500/50 bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
 const customSelectClass = customInputClass
-const customPrimaryButton = "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7033ff] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5f27e6] disabled:opacity-50 disabled:cursor-not-allowed"
+const customPrimaryButton = "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#06b6d4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0891b2] disabled:opacity-50 disabled:cursor-not-allowed"
 
 const Badge = ({ status }) => {
   if (status === "Working" || status === "Auto-save") {
@@ -237,8 +237,8 @@ function Settings() {
         description="Manage platform defaults, notifications, security, backup tools, and appearance."
       />
       
-      <div className="bg-[#7033ff]/5 border border-[#7033ff]/20 text-[#7033ff] dark:text-[#a180ff] px-5 py-4 rounded-xl text-sm font-medium flex items-center gap-3">
-         <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#7033ff]/10 flex items-center justify-center">
+      <div className="bg-[#06b6d4]/5 border border-[#06b6d4]/20 text-[#06b6d4] dark:text-[#a180ff] px-5 py-4 rounded-xl text-sm font-medium flex items-center gap-3">
+         <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#06b6d4]/10 flex items-center justify-center">
             <FaGlobe />
          </span>
          Settings auto-save as you edit and are stored locally in this browser.
@@ -252,7 +252,7 @@ function Settings() {
           <div className={`${cardClass} p-5 md:p-6`}>
             <div className="flex items-start justify-between mb-6 pb-4 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-[#7033ff]/10 dark:bg-[#7033ff]/20 flex items-center justify-center text-[#7033ff] mt-0.5">
+                <div className="w-10 h-10 shrink-0 rounded-full bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 flex items-center justify-center text-[#06b6d4] mt-0.5">
                   <FaGlobe className="text-lg" />
                 </div>
                 <div>
@@ -450,7 +450,7 @@ function Settings() {
                   <input
                     type="checkbox"
                     id={item.id}
-                    className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#7033ff] focus:ring-[#7033ff] mt-0.5 cursor-pointer"
+                    className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#06b6d4] focus:ring-[#06b6d4] mt-0.5 cursor-pointer"
                     checked={form[item.id]}
                     onChange={(e) => handleChange({ [item.id]: e.target.checked }, 'notifications')}
                   />
@@ -487,7 +487,7 @@ function Settings() {
                 <input
                   type="checkbox"
                   id="requireStrongPassword"
-                  className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#7033ff] focus:ring-[#7033ff] mt-0.5 cursor-pointer"
+                  className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#06b6d4] focus:ring-[#06b6d4] mt-0.5 cursor-pointer"
                   checked={form.requireStrongPassword}
                   onChange={(e) => handleChange({ requireStrongPassword: e.target.checked }, 'security')}
                 />
@@ -501,7 +501,7 @@ function Settings() {
                 <input
                   type="checkbox"
                   id="loginAlertToggle"
-                  className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#7033ff] focus:ring-[#7033ff] mt-0.5 cursor-pointer"
+                  className="w-5 h-5 rounded border-[#e5e7eb] dark:border-[#27272a] text-[#06b6d4] focus:ring-[#06b6d4] mt-0.5 cursor-pointer"
                   checked={form.loginAlertToggle}
                   onChange={(e) => handleChange({ loginAlertToggle: e.target.checked }, 'security')}
                 />

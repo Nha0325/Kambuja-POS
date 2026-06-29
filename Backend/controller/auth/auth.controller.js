@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const { ROLES, normalizeRole } = require('../../constants/roles')
 const { createLoginAlert, createFailedLoginAlert } = require('../../helper/alert.helper')
 const SystemLog = require('../../models/system/SystemLog')
+const { notifyLogin } = require('../../services/notification.service')
 
 exports.signup = async (req, res, next) => {
     try {
@@ -30,7 +31,7 @@ exports.signup = async (req, res, next) => {
             password: hashed,
             role: ROLES.CASHIER,
             shopId: req.user.shopId,
-            status: "ACTIVE",
+            status: req.body.status || "ACTIVE",
         })
 
         newUser.password = undefined
@@ -110,6 +111,7 @@ exports.signin = async (req, res, next) => {
 
         if (['ADMIN_MANAGER', 'ADMIN', 'CASHIER'].includes(user.role)) {
             await createLoginAlert(user, req);
+            await notifyLogin(user, req).catch(console.error);
         }
 
         await SystemLog.create({

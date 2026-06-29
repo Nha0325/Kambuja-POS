@@ -34,7 +34,7 @@ const footerItems = [
 function AdminManagerSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) {
   
   const navLinkClass = ({ isActive }) => (
-    `${isActive ? "bg-[#7033ff]/10 text-[#7033ff] dark:bg-[#7033ff]/20 dark:text-[#7033ff] font-semibold" : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#020617] dark:text-[#a1a1aa] dark:hover:bg-[#111113] dark:hover:text-[#f8fafc] font-medium"} group relative flex h-10 w-full items-center rounded-lg transition-colors px-3 ${!isExpanded && "justify-center"}`
+    `${isActive ? "bg-[#06b6d4]/10 text-[#06b6d4] dark:bg-[#06b6d4]/20 dark:text-[#06b6d4] font-semibold" : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#020617] dark:text-[#a1a1aa] dark:hover:bg-[#111113] dark:hover:text-[#f8fafc] font-medium"} group relative flex h-10 w-full items-center rounded-lg transition-colors px-3 ${!isExpanded && "justify-center"}`
   )
 
   return (
@@ -45,7 +45,7 @@ function AdminManagerSidebar({ isMobileOpen, isExpanded, onHover, onNavigate }) 
     >
       <div className="shrink-0 flex items-center h-16 border-b border-[#e5e7eb] dark:border-[#27272a] px-4">
         <div className={`flex items-center gap-3 w-full ${!isExpanded && "justify-center"}`}>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#7033ff] text-sm font-bold text-white shadow-sm dark:shadow-none">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#06b6d4] text-sm font-bold text-white shadow-sm dark:shadow-none">
               KP
             </div>
             <div className={`flex flex-col min-w-0 transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0 pointer-events-none hidden"}`}>

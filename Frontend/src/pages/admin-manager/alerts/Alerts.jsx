@@ -27,7 +27,7 @@ const severityClass = {
   CRITICAL: "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/50",
   WARNING: "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border border-orange-100 dark:border-orange-900/50",
   SUCCESS: "bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20",
-  INFO: "bg-[#7033ff]/10 dark:bg-[#7033ff]/20 text-[#7033ff] border border-[#7033ff]/20",
+  INFO: "bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] border border-[#06b6d4]/20",
 }
 
 const alertTypeLabel = {
@@ -221,7 +221,7 @@ function Alerts() {
                     ) : selectedAlert.read ? (
                       <span className="text-[#64748b] font-semibold">Read</span>
                     ) : (
-                      <span className="text-[#7033ff] font-bold">Unread</span>
+                      <span className="text-[#06b6d4] font-bold">Unread</span>
                     )}
                   </p>
                 </div>
@@ -264,10 +264,10 @@ function Alerts() {
             key={card.label}
             type="button"
             onClick={() => setTypeFilter(card.type)}
-            className={`${cardClass} p-5 text-left transition hover:border-[#7033ff]/50 hover:bg-[#f8fafc] dark:hover:bg-[#09090b]`}
+            className={`${cardClass} p-5 text-left transition hover:border-[#06b6d4]/50 hover:bg-[#f8fafc] dark:hover:bg-[#09090b]`}
           >
             <div className="mb-4 flex items-center justify-between gap-3">
-              <span className="rounded-xl bg-[#7033ff]/10 dark:bg-[#7033ff]/20 p-2 text-[#7033ff]">
+              <span className="rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 p-2 text-[#06b6d4]">
                 <FaBell />
               </span>
               <span className="text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{card.label}</span>
@@ -275,7 +275,7 @@ function Alerts() {
             <div className="flex items-end justify-between">
               <strong className="block text-3xl font-bold text-[#020617] dark:text-[#f8fafc]">{Number(card.value || 0).toLocaleString()}</strong>
               {card.unread > 0 && (
-                <span className="text-xs font-bold text-[#7033ff] bg-[#7033ff]/10 dark:bg-[#7033ff]/20 px-2 py-1 rounded-lg">Unread: {card.unread}</span>
+                <span className="text-xs font-bold text-[#06b6d4] bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 px-2 py-1 rounded-lg">Unread: {card.unread}</span>
               )}
             </div>
           </button>
@@ -338,14 +338,14 @@ function Alerts() {
                 <tr 
                   key={alert._id} 
                   id={`alert-${alert._id}`}
-                  className={`transition-colors ${highlightedAlertId === alert._id ? 'bg-[#7033ff]/10 dark:bg-[#7033ff]/20 animate-pulse' : 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}
+                  className={`transition-colors ${highlightedAlertId === alert._id ? 'bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 animate-pulse' : 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}
                 >
                   <td className={tableCellClass}>
                     {alert.createdAt ? formatDate(alert.createdAt, "DD/MMM/YYYY HH:mm") : "-"}
                   </td>
                   <td className={`${tableCellClass} font-semibold text-[#020617] dark:text-[#f8fafc]`}>
                     <span className="inline-flex items-center gap-2">
-                      <FaTriangleExclamation className="text-[#7033ff]" />
+                      <FaTriangleExclamation className="text-[#06b6d4]" />
                       {alertTypeLabel[alert.type] || alert.title || "-"}
                     </span>
                   </td>
@@ -363,7 +363,7 @@ function Alerts() {
                     ) : alert.read ? (
                       <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Read</span>
                     ) : (
-                      <span className="text-xs font-bold text-[#7033ff]">Unread</span>
+                      <span className="text-xs font-bold text-[#06b6d4]">Unread</span>
                     )}
                   </td>
                   <td className={tableCellClass}>
@@ -385,7 +385,7 @@ function Alerts() {
                               loadAlerts(true);
                             });
                           }}
-                          className="text-xs font-semibold text-[#7033ff] hover:underline"
+                          className="text-xs font-semibold text-[#06b6d4] hover:underline"
                         >
                           Mark Read
                         </button>

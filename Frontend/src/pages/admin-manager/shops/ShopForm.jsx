@@ -33,12 +33,12 @@ const getShopId = (shopId) => {
 
 const sectionTitleClass = "mb-6 flex items-center gap-2 text-base font-semibold text-[#020617] dark:text-[#f8fafc]"
 const labelClass = "block text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]"
-const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
 const readOnlyInputClass = `${inputClass} opacity-60 cursor-not-allowed`
 const selectClass = inputClass
 const SectionTitle = ({ children }) => (
   <h3 className={sectionTitleClass}>
-    <span className="h-5 w-1 rounded-full bg-[#7033ff]" />
+    <span className="h-5 w-1 rounded-full bg-[#06b6d4]" />
     {children}
   </h3>
 )
@@ -102,7 +102,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled, required
             filteredOptions.map((opt) => (
               <div
                 key={opt.code}
-                className={`px-3 py-2 text-sm cursor-pointer transition-colors ${valueObj?.code === opt.code ? 'bg-[#7033ff]/10 text-[#7033ff] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-[#09090b]'}`}
+                className={`px-3 py-2 text-sm cursor-pointer transition-colors ${valueObj?.code === opt.code ? 'bg-[#06b6d4]/10 text-[#06b6d4] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-[#09090b]'}`}
                 onClick={() => {
                   onChange(opt)
                   setIsOpen(false)
@@ -279,7 +279,7 @@ function ShopForm() {
     <section className="mx-auto w-full max-w-4xl min-w-0 pb-10">
       <div className="w-full">
         <div className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7033ff]">Kambuja POS</p>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#06b6d4]">Kambuja POS</p>
           <h1 className="mt-1 text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? "Edit Shop" : "Create Shop"}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
             Configure business account and location details.
@@ -317,7 +317,7 @@ function ShopForm() {
                 {noOwnerAdmin && (
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                     <span className="text-[#64748b] dark:text-[#a1a1aa]">No available admins.</span>
-                    <Link className="font-bold text-[#7033ff] underline underline-offset-2 hover:opacity-80 transition-opacity" to="/admin-manager/admin-owners/create">Create Admin Owner</Link>
+                    <Link className="font-bold text-[#06b6d4] underline underline-offset-2 hover:opacity-80 transition-opacity" to="/admin-manager/admin-owners/create">Create Admin Owner</Link>
                   </div>
                 )}
               </label>
@@ -432,7 +432,7 @@ function ShopForm() {
           <div className="flex flex-col-reverse gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] pt-8 sm:flex-row sm:items-center sm:justify-end">
             <Link className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center w-full sm:w-auto" to="/admin-manager/shops">Cancel</Link>
             <button
-              className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center w-full sm:w-auto"
+              className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center w-full sm:w-auto"
               type="submit"
               disabled={isSaving || noOwnerAdmin}
             >

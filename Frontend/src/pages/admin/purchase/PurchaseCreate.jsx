@@ -129,10 +129,10 @@ function CreatePurchase() {
     setTotalCost(total);
   }, [carts]);
 
-  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-  const selectClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
+  const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+  const selectClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
   const labelClass = "mb-2 block text-xs font-bold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa]"
-  const textareaClass = "min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+  const textareaClass = "min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
@@ -140,7 +140,7 @@ function CreatePurchase() {
         <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl mb-6">Create Purchase</h1>
 
         <form onSubmit={handleSubmit} className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-5 md:p-6 shadow-none">
-          <h3 className="text-base font-semibold mt-1 mb-6 pb-2 w-fit border-b-2 border-[#7033ff] text-[#020617] dark:text-[#f8fafc]">
+          <h3 className="text-base font-semibold mt-1 mb-6 pb-2 w-fit border-b-2 border-[#06b6d4] text-[#020617] dark:text-[#f8fafc]">
             Import Product
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -213,7 +213,7 @@ function CreatePurchase() {
             </fieldset>
           </div>
 
-          <h3 className="text-base font-semibold mt-10 mb-6 pb-2 w-fit border-b-2 border-[#7033ff] text-[#020617] dark:text-[#f8fafc]">
+          <h3 className="text-base font-semibold mt-10 mb-6 pb-2 w-fit border-b-2 border-[#06b6d4] text-[#020617] dark:text-[#f8fafc]">
             Product Details
           </h3>
 
@@ -237,7 +237,7 @@ function CreatePurchase() {
                   <button
                     onClick={handleSearchProductByCode}
                     type="button"
-                    className="absolute top-1 right-1 h-8 px-3 rounded-md bg-[#7033ff] text-white font-bold hover:bg-[#5f27e6] transition-colors"
+                    className="absolute top-1 right-1 h-8 px-3 rounded-md bg-[#06b6d4] text-white font-bold hover:bg-[#0891b2] transition-colors"
                   >
                     +
                   </button>
@@ -279,7 +279,7 @@ function CreatePurchase() {
                 <button
                   onClick={handleAddToCart}
                   type="button"
-                  className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold transition-colors w-full"
+                  className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold transition-colors w-full"
                 >
                   Add Item
                 </button>
@@ -353,7 +353,7 @@ function CreatePurchase() {
             <button 
               type="submit" 
               disabled={isLoading} 
-              className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
+              className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
             >
               {isLoading ? "Saving..." : "Save Purchase"}
             </button>

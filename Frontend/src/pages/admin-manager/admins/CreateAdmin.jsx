@@ -100,7 +100,7 @@ const EmailAutocompleteInput = ({ value, onChange, placeholder, required }) => {
           {suggestions.map((s, idx) => (
             <li
               key={s}
-              className={`px-3 py-2 text-sm cursor-pointer transition-colors ${idx === activeIndex ? 'bg-[#7033ff]/10 text-[#7033ff] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-[#09090b]'}`}
+              className={`px-3 py-2 text-sm cursor-pointer transition-colors ${idx === activeIndex ? 'bg-[#06b6d4]/10 text-[#06b6d4] font-medium' : 'text-[#020617] dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-[#09090b]'}`}
               onMouseDown={(e) => {
                 e.preventDefault() // prevent blur before click registers
                 onChange({ target: { value: s } })
@@ -295,7 +295,7 @@ function CreateAdmin() {
             </label>
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-violet-100 pt-6 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 border-t border-cyan-100 pt-6 sm:flex-row sm:justify-end">
             <Link className={`${secondaryButtonClass} w-full sm:w-auto`} to="/admin-manager/admin-owners">Cancel</Link>
             <button className={`${primaryButtonClass} w-full sm:w-auto`} type="submit" disabled={isSaving}>
               {isSaving ? "Saving..." : (id ? "Update Admin Owner" : "Save Admin Owner")}
@@ -334,16 +334,16 @@ function CreateAdmin() {
 
           <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-slate-50 dark:bg-[#09090b] p-6">
             <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-[#020617] dark:text-[#f8fafc]">
-              <FaCircleInfo className="text-[#7033ff]" />
+              <FaCircleInfo className="text-[#06b6d4]" />
               Role Permissions
             </h3>
             <p className="mb-4 text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
               New admin owners receive the standard ADMIN role. Shop ownership is optional during account creation.
             </p>
             <ul className="space-y-3 text-sm text-[#020617] dark:text-[#f8fafc]">
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#7033ff]" /> Manage assigned shop operations</li>
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#7033ff]" /> Review shop analytics</li>
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#7033ff]" /> View assigned shop reports</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> Manage assigned shop operations</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> Review shop analytics</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> View assigned shop reports</li>
             </ul>
           </div>
         </aside>

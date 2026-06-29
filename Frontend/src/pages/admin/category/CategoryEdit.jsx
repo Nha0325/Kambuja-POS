@@ -80,7 +80,7 @@ function EditCategory() {
           <p className="mb-6 text-sm text-slate-500 dark:text-zinc-400">The category you're trying to edit does not exist or has been removed.</p>
           <Link
             to="/admin/categories"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#7033ff] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#5f27e6]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#06b6d4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0891b2]"
           >
             Back to Categories
           </Link>
@@ -98,7 +98,7 @@ function EditCategory() {
           <span>›</span>
           <Link
             to="/admin/categories"
-            className="flex items-center font-medium transition-colors hover:text-[#7033ff]"
+            className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
             Categories
           </Link>
@@ -134,7 +134,7 @@ function EditCategory() {
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-white dark:hover:bg-white/5"
                   title="View Products"
                 >
-                  <LuPackageSearch className="h-4 w-4 text-[#7033ff]" /> View Products
+                  <LuPackageSearch className="h-4 w-4 text-[#06b6d4]" /> View Products
                 </Link>
               </div>
             </div>
@@ -159,7 +159,7 @@ function EditCategory() {
                         if (nameError) setNameError("");
                       }}
                       type="text"
-                      className={`h-10 w-full rounded-lg border ${nameError ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : "border-[#e5e7eb] focus:border-[#7033ff] focus:ring-[#7033ff]/20 dark:border-[#27272a]"} bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500`}
+                      className={`h-10 w-full rounded-lg border ${nameError ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : "border-[#e5e7eb] focus:border-[#06b6d4] focus:ring-[#06b6d4]/20 dark:border-[#27272a]"} bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500`}
                       placeholder="Enter category name"
                     />
                     {nameError && (
@@ -181,7 +181,7 @@ function EditCategory() {
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       rows={4}
-                      className="min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500"
+                      className="min-h-[100px] py-2 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-white dark:placeholder:text-zinc-500"
                       placeholder="Short description for this category"
                     />
                   </div>
@@ -252,7 +252,7 @@ function EditCategory() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg bg-[#7033ff] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#5f27e6] disabled:opacity-60"
+                  className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg bg-[#06b6d4] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0891b2] disabled:opacity-60"
                 >
                   {isSaving ? (
                     <span className="flex items-center gap-2">

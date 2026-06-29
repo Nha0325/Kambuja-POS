@@ -8,7 +8,8 @@ function Invoice() {
   const { data } = useFetchOne("sales", id);
 
   return (
-    <div className="w-[80mm] mx-auto font-bold p-2 text-black">
+    <div className="min-h-screen bg-muted/30 py-8 px-4 flex justify-center items-start">
+      <div className="w-[80mm] bg-white font-bold p-4 text-black shadow-lg rounded-sm print:shadow-none print:m-0 print:p-0">
       <h1 className="text-center text-2xl tracking-wide font-extrabold">MASTER POS</h1>
       <div className="text-center text-xs mt-1">Receipt</div>
       <div className="border-b border-dashed border-black my-2"></div>
@@ -50,6 +51,7 @@ function Invoice() {
       <div className="border-b border-dashed border-black my-2"></div>
 
       <div className="text-center text-xs mt-4 italic font-normal">Thank you! Please come again.</div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 import toast from "react-hot-toast";
 import useCollection from "../../../hooks/common/useCollection";
@@ -25,9 +26,14 @@ function POS() {
   const scanInputRef = useRef(null);
   const [lastScannedProduct, setLastScannedProduct] = useState(null);
   const [recentScans, setRecentScans] = useState([]);
+  const [topActionEl, setTopActionEl] = useState(null);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setTopActionEl(document.getElementById("cashier-top-action"));
+  }, []);
 
   const toBaseQty = (item, quantity, saleUnit) => {
     const unitConfig = item?.productData?.unitConfig || item?.unitConfig || {};
@@ -222,6 +228,8 @@ function POS() {
         toast.success("Sale completed successfully!");
         setTotalCost(0);
         setCartItems([]);
+        setLastScannedProduct(null);
+        setRecentScans([]);
         window.open(`/cashier/invoice/${res._id}`, '_blank');
         
         if (searchParams.get('heldBill')) {
@@ -282,16 +290,16 @@ function POS() {
 
         {/* Left Product Browser / Scanned View */}
         <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-colors duration-200">
-          {/* Header with Search */}
-          <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between bg-muted/30">
-            <h1 className="text-lg font-extrabold tracking-tight">Scan Product</h1>
-            <div className="flex w-full items-center gap-2 sm:w-auto">
-              <div className="relative flex flex-1 items-center sm:w-60">
-                <LuScanBarcode className="absolute left-3 text-muted-foreground" size={18} />
+          
+          {/* Scanner Portaled to TopMenu */}
+          {topActionEl && createPortal(
+            <div className="flex w-full max-w-lg items-center gap-2">
+              <div className="relative flex flex-1 items-center">
+                <LuScanBarcode className="absolute left-3 text-muted-foreground dark:text-zinc-400" size={18} />
                 <input
                   ref={scanInputRef}
                   autoFocus
-                  className="h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/60"
+                  className="h-10 w-full rounded-xl border border-border bg-white dark:bg-[#111113] pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-500 text-foreground dark:text-[#f8fafc]"
                   onChange={(e) => setScanCode(e.target.value)}
                   value={scanCode}
                   onKeyDown={handleScanKeyDown}
@@ -301,13 +309,15 @@ function POS() {
               <button
                 onClick={() => setIsCameraOpen(true)}
                 type="button"
-                className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-extrabold uppercase tracking-wider text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98] shrink-0"
+                className="inline-flex h-10 w-10 sm:w-auto items-center justify-center sm:justify-start gap-2 rounded-xl bg-primary sm:px-4 text-xs font-extrabold uppercase tracking-wider text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98] shrink-0"
+                aria-label="Camera Scanner"
               >
                 <MdCameraAlt size={18} />
                 <span className="hidden sm:inline">Camera</span>
               </button>
-            </div>
-          </div>
+            </div>,
+            topActionEl
+          )}
 
           <div className="flex-1 overflow-y-auto p-4 bg-muted/10 space-y-6">
               {/* Last Scanned Product */}
@@ -389,7 +399,7 @@ function POS() {
           {/* Cart Header */}
           <div className="flex items-center justify-between border-b border-border p-4 shrink-0 bg-muted/30">
             <h4 className="font-bold text-lg tracking-tight">Cart</h4>
-            <button onClick={() => setCartItems([])} className="text-[11px] font-bold uppercase tracking-wider text-destructive hover:text-destructive/80 transition">
+            <button onClick={() => { setCartItems([]); setLastScannedProduct(null); setRecentScans([]); }} className="text-[11px] font-bold uppercase tracking-wider text-destructive hover:text-destructive/80 transition">
               CLEAR
             </button>
           </div>

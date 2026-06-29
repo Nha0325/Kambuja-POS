@@ -7,7 +7,6 @@ import {
   FaUserShield,
   FaUsers,
   FaBoxOpen,
-  FaArrowUp,
   FaArrowRight,
   FaCircleCheck,
   FaMoneyBillWave
@@ -121,9 +120,6 @@ function Dashboard() {
               <div className={`p-1.5 rounded-lg bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] ${card.color}`}>
                 <card.icon className="h-4 w-4" />
               </div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-[#10b981] bg-[#10b981]/10 px-1.5 py-0.5 rounded">
-                <FaArrowUp /> 0%
-              </div>
             </div>
             <div>
               <h3 className="text-2xl font-bold tracking-tight">{card.value}</h3>
@@ -215,7 +211,7 @@ function Dashboard() {
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
           <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
             <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Shop Registrations</h3>
-            <Link to="/admin-manager/shops" className="text-sm font-semibold text-[#7033ff] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
+            <Link to="/admin-manager/shops" className="text-sm font-semibold text-[#06b6d4] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
               View all <FaArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -265,7 +261,7 @@ function Dashboard() {
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
           <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
             <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Admin Owners</h3>
-            <Link to="/admin-manager/admin-owners" className="text-sm font-semibold text-[#7033ff] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
+            <Link to="/admin-manager/admin-owners" className="text-sm font-semibold text-[#06b6d4] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
               View all <FaArrowRight className="h-3 w-3" />
             </Link>
           </div>

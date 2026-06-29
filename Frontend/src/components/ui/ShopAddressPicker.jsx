@@ -223,8 +223,8 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
                     className={[
                       "rounded-full px-3 py-1 text-xs font-medium transition",
                       item.disabled
-                        ? "cursor-default bg-[#7033ff] text-white shadow-sm"
-                        : "bg-white text-[#7033ff] dark:bg-white/5 dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-white/10",
+                        ? "cursor-default bg-[#06b6d4] text-white shadow-sm"
+                        : "bg-white text-[#06b6d4] dark:bg-white/5 dark:text-[#f8fafc] hover:bg-slate-50 dark:hover:bg-white/10",
                     ].join(" ")}
                   >
                     {item.label}
@@ -247,7 +247,7 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
             <label className="block space-y-2">
               <span className="block text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{levelLabels[level]}</span>
               <input
-                className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+                className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search"
@@ -264,8 +264,8 @@ function ShopAddressPicker({ open, value, onClose, onChange }) {
                   type="button"
                   className={`w-full rounded-lg border px-4 py-3 text-left text-sm shadow-sm transition-all ${
                     isSelected
-                      ? "border-[#7033ff] bg-[#7033ff]/10 text-[#7033ff]"
-                      : "border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] text-[#020617] dark:text-[#f8fafc] hover:border-[#7033ff] dark:hover:border-[#7033ff]"
+                      ? "border-[#06b6d4] bg-[#06b6d4]/10 text-[#06b6d4]"
+                      : "border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] text-[#020617] dark:text-[#f8fafc] hover:border-[#06b6d4] dark:hover:border-[#06b6d4]"
                   }`}
                   onClick={() => handleSelect(item)}
                 >

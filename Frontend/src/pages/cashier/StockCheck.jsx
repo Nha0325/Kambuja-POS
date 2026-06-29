@@ -19,20 +19,20 @@ function StockCheck() {
 
   const filteredProducts = useMemo(() => {
     if (!searchQuery) return products
-    return Array.isArray(products) ? products.filter(product => 
-      product.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    return Array.isArray(products) ? products.filter(product =>
+      product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.code?.toLowerCase().includes(searchQuery.toLowerCase())
     ) : []
   }, [products, searchQuery])
 
   const getStockStatus = (stock, reorderLevel) => {
     if (stock <= 0) {
-      return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-red-100 text-red-700">Out of Stock</span>
+      return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400">Out of Stock</span>
     }
     if (reorderLevel && stock <= reorderLevel) {
-      return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-yellow-100 text-yellow-700">Low Stock</span>
+      return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-yellow-100 dark:bg-amber-500/10 text-yellow-700 dark:text-amber-400">Low Stock</span>
     }
-    return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-700">In Stock</span>
+    return <span className="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 dark:bg-emerald-500/10 text-green-700 dark:text-emerald-400">In Stock</span>
   }
 
   const getImageUrl = (image) => {
@@ -42,13 +42,13 @@ function StockCheck() {
   }
 
   return (
-    <section className="w-full max-w-full p-4 sm:p-6 bg-[#f8f9ff] min-h-screen">
+    <section className="w-full max-w-full p-4 sm:p-6 bg-background text-foreground min-h-[calc(100vh-64px)]">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Stock Check</h1>
-          <p className="text-sm text-slate-500">Search and view current product inventory</p>
+          <h1 className="text-2xl font-bold">Stock Check</h1>
+          <p className="text-sm text-muted-foreground">Search and view current product inventory</p>
         </div>
-        <button 
+        <button
           onClick={() => {
             setLoading(true)
             cashierService.getProducts().then((response) => {
@@ -56,64 +56,64 @@ function StockCheck() {
               setLoading(false)
             }).catch(() => setLoading(false))
           }}
-          className="px-4 py-2 bg-white border border-[#d7dced] rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+          className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-semibold text-card-foreground hover:bg-muted transition"
         >
           {loading ? "Refreshing..." : "Refresh"}
         </button>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-        <input 
+        <input
           type="text"
           placeholder="Search by Product Name or Code..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-80 px-4 py-2 border border-[#d7dced] rounded-lg text-sm outline-none focus:border-[#0058be]"
+          className="w-full sm:w-80 px-4 py-2 border border-border bg-background rounded-lg text-sm outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 transition"
         />
       </div>
 
-      <div className="bg-white border border-[#d7dced] rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-[#d7dced] text-xs uppercase font-semibold text-slate-500">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto sidebar-scroll">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-4 py-3">Image</th>
-                <th className="px-4 py-3">Product Name</th>
-                <th className="px-4 py-3">Code</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3 text-right">Sale Price</th>
-                <th className="px-4 py-3 text-center">Current Stock</th>
-                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-3 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Image</th>
+                <th className="px-3 sm:px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Product Name</th>
+                <th className="hidden sm:table-cell px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Code</th>
+                <th className="hidden md:table-cell px-4 py-3 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Category</th>
+                <th className="px-3 sm:px-4 py-3 font-bold text-right text-muted-foreground uppercase tracking-wider text-[11px]">Sale Price</th>
+                <th className="hidden sm:table-cell px-4 py-3 font-bold text-center text-muted-foreground uppercase tracking-wider text-[11px]">Current Stock</th>
+                <th className="px-3 sm:px-4 py-3 font-bold text-center text-muted-foreground uppercase tracking-wider text-[11px]">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#d7dced]">
+            <tbody className="divide-y divide-border/50">
               {loading && (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500">Loading...</td>
+                  <td colSpan="7" className="px-4 py-8 text-center text-muted-foreground">Loading...</td>
                 </tr>
               )}
               {!loading && filteredProducts.map((product) => (
-                <tr key={product._id} className="hover:bg-slate-50 transition">
-                  <td className="px-4 py-3">
+                <tr key={product._id} className="hover:bg-muted transition-colors">
+                  <td className="px-3 sm:px-4 py-3">
                     <img 
                       src={getImageUrl(product.imageUrl)} 
                       alt={product.name} 
-                      className="w-10 h-10 rounded object-cover border border-slate-200"
+                      className="w-10 h-10 rounded-md object-cover border border-border"
                     />
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-800">{product.name}</td>
-                  <td className="px-4 py-3">{product.code}</td>
-                  <td className="px-4 py-3 capitalize">{product.category?.name || product.category || "-"}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-800">{formatUsd(product.salePrice)}</td>
-                  <td className="px-4 py-3 text-center font-bold text-slate-700">{product.currentStock || 0}</td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 sm:px-4 py-3 font-bold text-foreground">{product.name}</td>
+                  <td className="hidden sm:table-cell px-4 py-3 text-muted-foreground font-medium">{product.code}</td>
+                  <td className="hidden md:table-cell px-4 py-3 capitalize text-muted-foreground font-medium">{product.category?.name || product.category || "-"}</td>
+                  <td className="px-3 sm:px-4 py-3 text-right font-bold text-foreground">{formatUsd(product.salePrice)}</td>
+                  <td className="hidden sm:table-cell px-4 py-3 text-center font-bold text-foreground">{product.currentStock || 0}</td>
+                  <td className="px-3 sm:px-4 py-3 text-center">
                     {getStockStatus(product.currentStock || 0, product.reorderLevel)}
                   </td>
                 </tr>
               ))}
               {!loading && filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500">No products found</td>
+                  <td colSpan="7" className="px-4 py-8 text-center text-muted-foreground">No products found</td>
                 </tr>
               )}
             </tbody>

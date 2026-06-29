@@ -7,8 +7,10 @@ import useFetchData from "../../../hooks/common/useFetchData";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
 import formatDate from "../../../utils/formatters/formatDate";
+import { useConfirm } from "../../../hooks/ui/useConfirm";
 
 function Category() {
+  const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -26,12 +28,21 @@ function Category() {
   const productsLinked = allProducts?.filter(p => p.category || p.categoryId).length || 0;
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure? you want to delete!")) {
+    const isConfirmed = await confirm({
+      title: "Delete Category",
+      message: "Are you sure you want to delete this category? This action cannot be undone.",
+      confirmText: "Yes, delete",
+      cancelText: "Cancel",
+      variant: "danger"
+    });
+
+    if (isConfirmed) {
       const res = await remove(id);
       if (res && isDeleting === false) {
         setRefetch(!refetch);
         toast.success("Deleted successfully!");
       }
+      closeConfirm();
     }
   };
 
@@ -138,7 +149,7 @@ function Category() {
                 <tr>
                   <td colSpan={6} className="p-8">
                     <div className="flex justify-center text-[#A9A6BB]">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#22D3EE]" />
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#06b6d4]" />
                     </div>
                   </td>
                 </tr>

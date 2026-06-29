@@ -144,7 +144,7 @@ function Purchase() {
                       </td>
 
                       {/* Change Amount */}
-                      <td className={`${adminSurface.td} text-right font-medium text-[#22D3EE]`}>
+                      <td className={`${adminSurface.td} text-right font-medium text-[#06b6d4]`}>
                         ${Number(el?.changeAmount || 0).toFixed(2)}
                       </td>
 
@@ -180,7 +180,7 @@ function Purchase() {
                           </span>
                         )}
                         {el?.purchaseStatus === "ordered" && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#3350BF]/20 border border-[#3350BF]/50 text-[#22D3EE] rounded-full">
+                          <span className="px-2.5 py-1 text-xs font-semibold bg-[#06b6d4]/20 border border-[#06b6d4]/50 text-[#06b6d4] rounded-full">
                             Ordered
                           </span>
                         )}

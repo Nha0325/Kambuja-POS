@@ -20,7 +20,7 @@ const createInitialForm = () => ({
 })
 
 const labelClass = "block text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa] mb-2"
-const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#7033ff] focus:ring-2 focus:ring-[#7033ff]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
+const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
 const selectClass = `${inputClass} appearance-none cursor-pointer`
 
 function LocationForm() {
@@ -113,11 +113,11 @@ function LocationForm() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <nav className="flex gap-2 text-xs font-medium text-[#64748b] dark:text-[#a1a1aa] mb-2 items-center">
-            <Link to="/admin-manager" className="hover:text-[#7033ff] transition-colors">Admin Manager</Link>
+            <Link to="/admin-manager" className="hover:text-[#06b6d4] transition-colors">Admin Manager</Link>
             <span>/</span>
-            <Link to="/admin-manager/locations" className="hover:text-[#7033ff] transition-colors">Locations</Link>
+            <Link to="/admin-manager/locations" className="hover:text-[#06b6d4] transition-colors">Locations</Link>
             <span>/</span>
-            <span className="text-[#7033ff] font-bold">{id ? "Edit" : "Create"}</span>
+            <span className="text-[#06b6d4] font-bold">{id ? "Edit" : "Create"}</span>
           </nav>
           <h2 className="font-semibold text-2xl sm:text-3xl text-[#020617] dark:text-[#f8fafc] tracking-tight">{id ? "Edit Location" : "Create Location"}</h2>
           <p className="text-[#64748b] dark:text-[#a1a1aa] mt-1 text-sm">Register a new physical outlet or management hub to the enterprise system.</p>
@@ -130,7 +130,7 @@ function LocationForm() {
             type="submit" 
             form="location-form"
             disabled={isSaving}
-            className="bg-[#7033ff] text-white hover:bg-[#5f27e6] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center gap-2"
+            className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center gap-2"
           >
             <FaCheck />
             {isSaving ? "Saving..." : "Save Location"}
@@ -150,7 +150,7 @@ function LocationForm() {
         {/* Main Details Card */}
         <div className="lg:col-span-8 bg-white dark:bg-[#111113] rounded-xl p-5 md:p-8 border border-[#e5e7eb] dark:border-[#27272a] shadow-none">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#e5e7eb] dark:border-[#27272a]">
-            <div className="w-10 h-10 rounded-full bg-[#7033ff]/10 flex items-center justify-center text-[#7033ff]">
+            <div className="w-10 h-10 rounded-full bg-[#06b6d4]/10 flex items-center justify-center text-[#06b6d4]">
               <FaCircleInfo className="text-lg" />
             </div>
             <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">Location Details</h3>
@@ -250,7 +250,7 @@ function LocationForm() {
           {/* Shop Assignment Card */}
           <div className="bg-white dark:bg-[#111113] rounded-xl p-5 md:p-6 border border-[#e5e7eb] dark:border-[#27272a] shadow-none">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#e5e7eb] dark:border-[#27272a]">
-              <div className="w-10 h-10 rounded-full bg-[#7033ff]/10 flex items-center justify-center text-[#7033ff]">
+              <div className="w-10 h-10 rounded-full bg-[#06b6d4]/10 flex items-center justify-center text-[#06b6d4]">
                 <FaStore className="text-lg" />
               </div>
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">Shop Assignment</h3>
@@ -273,8 +273,8 @@ function LocationForm() {
                   ))}
                 </select>
               </div>
-              <div className="p-4 bg-[#7033ff]/5 rounded-xl border border-[#7033ff]/10">
-                <p className="text-xs text-[#7033ff] leading-relaxed font-medium">Assigning a location to a shop allows managers to track inventory and sales data specifically for this physical space.</p>
+              <div className="p-4 bg-[#06b6d4]/5 rounded-xl border border-[#06b6d4]/10">
+                <p className="text-xs text-[#06b6d4] leading-relaxed font-medium">Assigning a location to a shop allows managers to track inventory and sales data specifically for this physical space.</p>
               </div>
             </div>
           </div>
@@ -303,7 +303,7 @@ function LocationForm() {
                 onClick={() => setForm({...form, status: 'ACTIVE'})}
                 className={`flex-1 py-3 rounded-lg border-2 font-bold transition-all text-sm ${
                   form.status === 'ACTIVE'
-                    ? "border-[#7033ff] bg-[#7033ff]/5 text-[#7033ff]"
+                    ? "border-[#06b6d4] bg-[#06b6d4]/5 text-[#06b6d4]"
                     : "border-transparent bg-slate-50 dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >

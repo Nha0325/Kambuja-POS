@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { api } from "../../utils/config/api";
-import { FaMoneyBillWave, FaReceipt, FaCoins, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import { FaMoneyBillWave, FaReceipt, FaCheckCircle } from "react-icons/fa";
 import { cashierService } from "../../services/users/cashier.service";
+import useSignout from "../../hooks/auth/useSignout";
+import { useConfirm } from "../../hooks/ui/useConfirm";
 
 const formatUsd = (value) => {
   const num = Number(value || 0);
@@ -10,6 +12,8 @@ const formatUsd = (value) => {
 };
 
 function DailyClose() {
+  const { signout } = useSignout();
+  const { confirm, closeConfirm } = useConfirm();
   const [sales, setSales] = useState([]);
   const [countedCash, setCountedCash] = useState("");
   const [note, setNote] = useState("");
@@ -45,7 +49,15 @@ function DailyClose() {
   const difference = countedCashNumber - expectedCash;
 
   const handleClose = async () => {
-    if (!window.confirm("Are you sure you want to close this shift?")) return;
+    const isConfirmed = await confirm({
+      title: "Close Shift",
+      message: "Are you sure you want to close this shift? This action cannot be undone.",
+      confirmText: "Yes, Close Shift",
+      cancelText: "Cancel",
+      variant: "primary"
+    });
+    
+    if (!isConfirmed) return;
     
     const payload = {
       salesCount,
@@ -53,7 +65,7 @@ function DailyClose() {
       paidAmount,
       dueAmount,
       expectedCash,
-      countedCash: countedCashNumber,
+      cashCounted: countedCashNumber,
       difference,
       note
     };
@@ -63,13 +75,21 @@ function DailyClose() {
       const res = await api.post("/daily-close/close", payload);
       
       if (res.data?.success || res.status === 200 || res.status === 201) {
-        toast.success("Shift closed successfully!");
         setIsClosed(true);
         setClosedData({
           closedAt: new Date().toISOString(),
           note,
           ...payload
         });
+
+        // Trigger print and then logout
+        setTimeout(() => {
+          window.print();
+          setTimeout(async () => {
+            await signout();
+            window.location.href = '/login';
+          }, 1000); // Logout shortly after print dialog returns
+        }, 500);
       } else {
         toast.error(res.data?.message || "Failed to close shift. Endpoint may not be ready.");
       }
@@ -77,6 +97,7 @@ function DailyClose() {
       toast.error(err?.response?.data?.message || "Daily close save endpoint is not ready yet.");
     } finally {
       setIsSubmitting(false);
+      closeConfirm();
     }
   };
 
@@ -86,19 +107,58 @@ function DailyClose() {
     paidAmount,
     dueAmount,
     expectedCash,
-    countedCash: countedCashNumber,
+    cashCounted: countedCashNumber,
     difference
   };
 
+  const printStats = displayStats;
+
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#f8f9ff] p-4 lg:p-8 text-[#0b1c30]">
+    <div className="min-h-[calc(100vh-64px)] bg-background p-4 lg:p-8 text-foreground">
+
+      {/* ===== PRINT ONLY RECEIPT ===== */}
+      <div className="hidden print:block font-mono text-[12px] text-black bg-white w-[300px] mx-auto p-4">
+        <div className="text-center mb-3">
+          <p className="text-[15px] font-bold tracking-wide">Kambuja POS</p>
+          <p className="text-[11px] text-gray-500 uppercase tracking-widest">Shift Close Report</p>
+          <p className="text-[11px] mt-1">
+            {isClosed && closedData ? new Date(closedData.closedAt).toLocaleString() : new Date().toLocaleString()}
+          </p>
+        </div>
+        <div className="border-t border-dashed border-gray-400 my-2" />
+        <div className="flex justify-between py-0.5"><span>Sales Count</span><span className="font-bold">{printStats.salesCount}</span></div>
+        <div className="flex justify-between py-0.5"><span>Total Sales</span><span className="font-bold">{formatUsd(printStats.totalSales)}</span></div>
+        <div className="border-t border-dashed border-gray-400 my-2" />
+        <div className="flex justify-between py-0.5"><span>Expected Cash</span><span className="font-bold">{formatUsd(printStats.expectedCash)}</span></div>
+        <div className="flex justify-between py-0.5"><span>Counted Cash</span><span className="font-bold">{formatUsd(printStats.cashCounted)}</span></div>
+        <div className="border-t border-gray-400 my-1" />
+        <div className="flex justify-between py-1 font-bold">
+          <span>Difference</span>
+          <span>
+            {printStats.difference > 0 ? '+' : ''}{formatUsd(printStats.difference)}
+            {printStats.difference < 0 ? ' ⚠ SHORTAGE' : printStats.difference > 0 ? ' SURPLUS' : ' ✓ OK'}
+          </span>
+        </div>
+        {printStats.note && (
+          <>
+            <div className="border-t border-dashed border-gray-400 my-2" />
+            <p className="text-[11px] italic text-gray-600">Note: "{printStats.note}"</p>
+          </>
+        )}
+        <div className="border-t border-dashed border-gray-400 my-2" />
+        <p className="text-center text-[10px] text-gray-400">— Shift Closed —</p>
+      </div>
+      {/* ===== END PRINT ONLY ===== */}
+
+      {/* ===== SCREEN ONLY ===== */}
+      <div className="print:hidden">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Shift</h1>
-          <p className="text-sm text-[#45464d] mt-1">Review your shift sales and balance your cash drawer.</p>
+          <p className="text-sm text-muted-foreground mt-1">Review your shift sales and balance your cash drawer.</p>
         </div>
         {isClosed && (
-          <div className="flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-bold text-green-700">
+          <div className="flex items-center gap-2 rounded-full bg-green-100 dark:bg-emerald-500/10 px-4 py-2 text-sm font-bold text-green-700 dark:text-emerald-400">
             <FaCheckCircle />
             <span>Shift Closed</span>
           </div>
@@ -109,55 +169,39 @@ function DailyClose() {
 
         {/* Left: Summary */}
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center gap-2 text-[#76777d]">
+          <div className="grid gap-4 grid-cols-2">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="mb-2 flex items-center gap-2 text-muted-foreground">
                 <FaReceipt />
                 <span className="text-sm font-semibold uppercase tracking-wider">Sales Count</span>
               </div>
-              <p className="text-2xl font-bold text-[#131b2e]">{displayStats.salesCount}</p>
+              <p className="text-2xl font-bold text-foreground">{displayStats.salesCount}</p>
             </div>
 
-            <div className="rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center gap-2 text-[#76777d]">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="mb-2 flex items-center gap-2 text-muted-foreground">
                 <FaMoneyBillWave />
                 <span className="text-sm font-semibold uppercase tracking-wider">Total Sales</span>
               </div>
-              <p className="text-2xl font-bold text-[#0058be]">{formatUsd(displayStats.totalSales)}</p>
-            </div>
-
-            <div className="rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center gap-2 text-[#76777d]">
-                <FaCoins />
-                <span className="text-sm font-semibold uppercase tracking-wider">Paid Amount</span>
-              </div>
-              <p className="text-2xl font-bold text-[#009668]">{formatUsd(displayStats.paidAmount)}</p>
-            </div>
-
-            <div className="rounded-xl border border-[#d7dced] bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center gap-2 text-[#76777d]">
-                <FaExclamationTriangle />
-                <span className="text-sm font-semibold uppercase tracking-wider">Due Amount</span>
-              </div>
-              <p className="text-2xl font-bold text-[#ba1a1a]">{formatUsd(displayStats.dueAmount)}</p>
+              <p className="text-2xl font-bold text-primary">{formatUsd(displayStats.totalSales)}</p>
             </div>
           </div>
         </div>
 
         {/* Right: Close Form */}
-        <div className="rounded-xl border border-[#d7dced] bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold mb-4 border-b border-[#e5e7ef] pb-3">Drawer Balance</h2>
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="text-lg font-bold mb-4 border-b border-border pb-3">Drawer Balance</h2>
 
           <div className="mb-6 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="font-semibold text-[#45464d]">Expected Cash</span>
+              <span className="font-semibold text-muted-foreground">Expected Cash</span>
               <span className="font-bold">{formatUsd(displayStats.expectedCash)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="font-semibold text-[#45464d]">Counted Cash</span>
-              <span className="font-bold">{formatUsd(displayStats.countedCash)}</span>
+              <span className="font-semibold text-muted-foreground">Counted Cash</span>
+              <span className="font-bold">{formatUsd(displayStats.cashCounted)}</span>
             </div>
-            <div className={`flex justify-between border-t border-[#e5e7ef] pt-3 text-base font-bold ${displayStats.difference < 0 ? 'text-[#ba1a1a]' : displayStats.difference > 0 ? 'text-[#0058be]' : 'text-[#009668]'}`}>
+            <div className={`flex justify-between border-t border-border pt-3 text-base font-bold ${displayStats.difference < 0 ? 'text-destructive' : displayStats.difference > 0 ? 'text-primary' : 'text-emerald-600 dark:text-emerald-500'}`}>
               <span>Difference</span>
               <span>{displayStats.difference > 0 ? '+' : ''}{formatUsd(displayStats.difference)}</span>
             </div>
@@ -166,21 +210,21 @@ function DailyClose() {
           {!isClosed ? (
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-bold text-[#0b1c30]">Actual Counted Cash ($)</label>
+                <label className="mb-1 block text-sm font-bold text-foreground">Actual Counted Cash ($)</label>
                 <input
                   type="number"
                   value={countedCash}
                   onChange={(e) => setCountedCash(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-[#c6c6cd] bg-white px-3 text-sm outline-none transition focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10"
+                  className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-bold text-[#0b1c30]">Note (Optional)</label>
+                <label className="mb-1 block text-sm font-bold text-foreground">Note (Optional)</label>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="h-20 w-full resize-none rounded-lg border border-[#c6c6cd] bg-white p-3 text-sm outline-none transition focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10"
+                  className="h-20 w-full resize-none rounded-lg border border-border bg-background p-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground"
                   placeholder="Explain any differences..."
                 />
               </div>
@@ -192,32 +236,33 @@ function DailyClose() {
                     fetchSales();
                   }}
                   disabled={isLoading}
-                  className="h-12 flex-1 rounded-xl border border-[#c6c6cd] bg-white text-sm font-bold uppercase tracking-wider text-[#45464d] transition hover:bg-[#f8f9ff] disabled:opacity-50"
+                  className="h-12 flex-1 rounded-xl border border-[#c6c6cd] dark:border-[#27272a] bg-white dark:bg-[#111113] text-sm font-bold uppercase tracking-wider text-[#45464d] dark:text-[#a1a1aa] transition hover:bg-[#f8f9ff] dark:hover:bg-[#18181b] disabled:opacity-50"
                 >
                   {isLoading ? "..." : "Refresh"}
                 </button>
                 <button
                   onClick={handleClose}
                   disabled={isSubmitting || countedCash === "" || salesCount === 0}
-                  className="h-12 flex-[2] rounded-xl bg-[#131b2e] text-sm font-bold uppercase tracking-wider text-white transition hover:bg-[#213145] disabled:opacity-50"
+                  className="h-12 flex-[2] rounded-xl bg-[#131b2e] dark:bg-[#06b6d4] text-sm font-bold uppercase tracking-wider text-white transition hover:bg-[#213145] dark:hover:bg-[#8B5CF6] disabled:opacity-50"
                 >
                   Close Day
                 </button>
               </div>
             </div>
           ) : (
-            <div className="mt-4 rounded-lg bg-[#f8f9ff] p-4 text-center border border-[#e5e7ef]">
-              <p className="text-sm font-medium text-[#45464d]">
+            <div className="mt-4 rounded-lg bg-[#f8f9ff] dark:bg-[#09090b] p-4 text-center border border-[#e5e7ef] dark:border-[#27272a]">
+              <p className="text-sm font-medium text-[#45464d] dark:text-[#a1a1aa]">
                 Closed at {new Date(closedData.closedAt).toLocaleString()}
               </p>
               {closedData.note && (
-                <p className="mt-2 text-xs italic text-[#76777d]">"{closedData.note}"</p>
+                <p className="mt-2 text-xs italic text-[#76777d] dark:text-[#71717a]">"{closedData.note}"</p>
               )}
             </div>
           )}
         </div>
 
       </div>
+      </div>{/* end screen only */}
     </div>
   );
 }

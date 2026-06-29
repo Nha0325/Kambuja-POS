@@ -9,8 +9,10 @@ import { useQuery } from "../../../hooks/common/useQuery";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
 import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
+import { useConfirm } from "../../../hooks/ui/useConfirm";
 
 function Product() {
+  const { confirm, closeConfirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -24,12 +26,21 @@ function Product() {
   const currency = "$";
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure! you want to delete?")) {
+    const isConfirmed = await confirm({
+      title: "Delete Product",
+      message: "Are you sure you want to delete this product? This action cannot be undone.",
+      confirmText: "Yes, delete",
+      cancelText: "Cancel",
+      variant: "danger"
+    });
+
+    if (isConfirmed) {
       const res = await remove(id);
       if (res && isDeleting === false) {
         setRefetch(!refetch);
         toast.success("Deleted successfully!");
       }
+      closeConfirm();
     }
   };
 
@@ -109,7 +120,7 @@ function Product() {
                 <tr>
                   <td colSpan={9} className="p-8">
                     <div className="flex justify-center text-[#A9A6BB]">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#22D3EE]" />
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#06b6d4]" />
                     </div>
                   </td>
                 </tr>
@@ -159,7 +170,7 @@ function Product() {
                       <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-slate-900 dark:text-white`}>
                         {currency}{cost.toFixed(2)}
                       </td>
-                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-[#22D3EE]`}>
+                      <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-[#06b6d4]`}>
                         {currency}{sale.toFixed(2)}
                       </td>
                       <td className={`${adminSurface.td} min-w-32 text-center text-slate-900 dark:text-white`}>{item?.currentStock ?? 0}</td>

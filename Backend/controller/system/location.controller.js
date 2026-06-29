@@ -9,7 +9,7 @@ exports.getAll = async (req, res, next) => {
             .populate("shop", "name code")
             .populate("manager", "username email phone")
             .sort({ createdAt: -1 })
-        res.status(200).json({ success: true, data: locations })
+        res.status(200).json({ success: true, result: locations })
     } catch (error) {
         next(error)
     }
@@ -26,7 +26,7 @@ exports.getSummary = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: { totalLocations, totalProvinces, totalDistricts, mappedShops }
+            result: { totalLocations, totalProvinces, totalDistricts, mappedShops }
         })
     } catch (error) {
         next(error)
@@ -36,7 +36,7 @@ exports.getSummary = async (req, res, next) => {
 exports.create = async (req, res, next) => {
     try {
         const location = await Location.create(req.body)
-        res.status(201).json({ success: true, data: location })
+        res.status(201).json({ success: true, result: location })
     } catch (error) {
         next(error)
     }

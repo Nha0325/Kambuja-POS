@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import TopMenu from "../components/navigation/TopMenu"
 import CashierSidebar from "../components/navigation/CashierSidebar"
+import CashierBottomNav from "../components/navigation/CashierBottomNav"
+import ConfirmProvider from "../components/ui/ConfirmProvider"
 
 const pageTitles = [
-  ["/cashier/pos", "POS"],
+  ["/cashier/pos", "Cashier's Page"],
   ["/cashier/checkout", "Checkout"],
   ["/cashier/sales-history", "Sales History"],
   ["/cashier/sales-today", "Sales History"],
@@ -54,16 +56,17 @@ function CashierLayout() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const isExpanded = isPinned || isHovered
+  const isExpanded = isMobileOpen || isPinned || isHovered
   const sidebarPadding = isExpanded ? "lg:pl-[240px]" : "lg:pl-[72px]"
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
+    <ConfirmProvider>
+    <div className="min-h-screen bg-[#f8fafc] text-[#020617] dark:bg-[#09090b] dark:text-[#f8fafc] transition-colors duration-300">
       {isMobileOpen && (
         <button
           type="button"
           aria-label="Close sidebar"
-          className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+          className="fixed inset-0 z-[60] bg-slate-950/30 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -77,7 +80,7 @@ function CashierLayout() {
         }}
       />
       
-      <div className={`${sidebarPadding} min-w-0 max-w-full overflow-x-hidden transition-all duration-300`}>
+      <div className={`${sidebarPadding} min-w-0 max-w-full transition-all duration-300 pb-16 lg:pb-0 print:pb-0 print:pl-0`}>
         <TopMenu
           title={getPageTitle(location.pathname)}
           eyebrow="Shop Cashier"
@@ -91,13 +94,15 @@ function CashierLayout() {
           isDark={isDark}
           onToggleTheme={() => setIsDark(!isDark)}
         />
-        <main className="min-h-[calc(100vh-64px)] max-w-full p-4 lg:p-8">
+        <main className="min-h-[calc(100vh-64px)] max-w-full p-4 lg:p-8 print:p-0 print:min-h-0">
           <div className="w-full max-w-full min-w-0">
             <Outlet />
           </div>
         </main>
+        <CashierBottomNav />
       </div>
     </div>
+    </ConfirmProvider>
   )
 }
 

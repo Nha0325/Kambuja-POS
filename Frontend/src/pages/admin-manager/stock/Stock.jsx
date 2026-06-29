@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { FaDownload, FaMagnifyingGlass, FaTriangleExclamation, FaFilter, FaXmark, FaEye, FaPenToSquare, FaClockRotateLeft } from "react-icons/fa6"
-import { adminService } from "../../../services/users/admin.service"
+
 import { api } from "../../../utils/config/api"
 import { downloadCsv } from "../../../utils/helpers/downloadCsv"
 import { formatApiError } from "../../../utils/formatters/formatApiError"
@@ -95,7 +95,7 @@ function Stock() {
     setHistoryLoading(true)
     
     try {
-        const res = await adminService.inventoryMovements();
+        const res = await api.get("/inventory/movements");
         const allMovements = res.data?.result || [];
         const filtered = allMovements.filter(m => {
              const mProdId = typeof m.product === 'object' ? m.product?._id : m.product;
@@ -251,11 +251,11 @@ function Stock() {
 
       {statFilter !== "ALL" && (
         <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-2 bg-[#7033ff]/10 dark:bg-[#7033ff]/20 text-[#7033ff] px-3 py-1.5 rounded-full text-sm font-bold border border-[#7033ff]/20">
+          <div className="inline-flex items-center gap-2 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] px-3 py-1.5 rounded-full text-sm font-bold border border-[#06b6d4]/20">
             Showing: {statFilter === "LOW" ? "Low Stock" : "Healthy Stock"}
             <button 
               onClick={() => setStatFilter("ALL")}
-              className="hover:bg-[#7033ff]/20 p-0.5 rounded-full transition-colors flex items-center justify-center"
+              className="hover:bg-[#06b6d4]/20 p-0.5 rounded-full transition-colors flex items-center justify-center"
             >
               <FaXmark />
             </button>
@@ -274,7 +274,7 @@ function Stock() {
           <article 
             key={card.label} 
             onClick={() => setStatFilter(card.filter)}
-            className={`${cardClass} p-5 cursor-pointer transition-colors hover:border-[#7033ff] ${statFilter === card.filter && card.filter !== 'ALL' ? 'border-[#7033ff] ring-1 ring-[#7033ff]' : ''}`}
+            className={`${cardClass} p-5 cursor-pointer transition-colors hover:border-[#06b6d4] ${statFilter === card.filter && card.filter !== 'ALL' ? 'border-[#06b6d4] ring-1 ring-[#06b6d4]' : ''}`}
           >
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{card.label}</p>
             <strong className="block text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{Number(card.value || 0).toLocaleString()}</strong>
@@ -365,10 +365,10 @@ function Stock() {
                   >
                     <td className={tableCellClass}>{getShopName(row)}</td>
                     <td className={`${tableCellClass} font-bold text-[#020617] dark:text-[#f8fafc]`}>{row.name || "-"}</td>
-                    <td className={`${tableCellClass} font-mono text-[#7033ff]`}>{row.code || "-"}</td>
+                    <td className={`${tableCellClass} font-mono text-[#06b6d4]`}>{row.code || "-"}</td>
                     <td className={`${tableCellClass} text-sm text-[#64748b]`}>{row.barcode || row.sku || "-"}</td>
                     <td className={`${tableCellClass} text-right font-bold`}>{Number(row.currentStock ?? 0).toLocaleString()}</td>
-                    <td className={`${tableCellClass} text-right font-semibold text-[#7033ff]`}>
+                    <td className={`${tableCellClass} text-right font-semibold text-[#06b6d4]`}>
                       {(() => {
                         const baseQty = row.currentStock ?? 0;
                         const baseCode = row.unitConfig?.baseUnit?.code || "";
@@ -405,7 +405,7 @@ function Stock() {
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); loadHistory(row); }}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#7033ff] hover:bg-[#7033ff]/10 transition-colors" 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-colors" 
                           title="Stock History"
                         >
                           <FaClockRotateLeft className="text-[16px]" />
@@ -460,7 +460,7 @@ function Stock() {
                                         <td className="py-3 pr-4 text-[#020617] dark:text-[#f8fafc] whitespace-nowrap">
                                            {new Date(h.createdAt).toLocaleDateString()} {new Date(h.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                         </td>
-                                        <td className="py-3 pr-4 font-bold text-[#7033ff] text-xs uppercase tracking-wider">{h.type}</td>
+                                        <td className="py-3 pr-4 font-bold text-[#06b6d4] text-xs uppercase tracking-wider">{h.type}</td>
                                         <td className="py-3 pr-4 text-right font-mono font-bold text-[#020617] dark:text-[#f8fafc]">
                                             {h.quantity > 0 && h.type === 'STOCK_IN' ? `+${h.quantity}` : h.quantity}
                                         </td>
@@ -480,7 +480,7 @@ function Stock() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Code</p>
-                      <p className="text-sm font-bold text-[#7033ff] font-mono">{selectedRow.code || "-"}</p>
+                      <p className="text-sm font-bold text-[#06b6d4] font-mono">{selectedRow.code || "-"}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop</p>
@@ -560,7 +560,7 @@ function Stock() {
                       <button
                         type="button"
                         onClick={() => loadHistory(selectedRow)}
-                        className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#7033ff] text-[#7033ff] text-sm font-semibold rounded-lg hover:bg-[#7033ff]/5 transition-colors shadow-sm"
+                        className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#06b6d4] text-[#06b6d4] text-sm font-semibold rounded-lg hover:bg-[#06b6d4]/5 transition-colors shadow-sm"
                       >
                         Stock History
                       </button>
@@ -568,7 +568,7 @@ function Stock() {
                       <button
                         type="button"
                         onClick={() => setShowHistory(false)}
-                        className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#7033ff] text-[#7033ff] text-sm font-semibold rounded-lg hover:bg-[#7033ff]/5 transition-colors shadow-sm"
+                        className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#06b6d4] text-[#06b6d4] text-sm font-semibold rounded-lg hover:bg-[#06b6d4]/5 transition-colors shadow-sm"
                       >
                         Back to Details
                       </button>
@@ -576,7 +576,7 @@ function Stock() {
 
                   <button
                     type="button"
-                    className="h-10 px-4 bg-[#7033ff]/50 text-white text-sm font-semibold rounded-lg transition-colors opacity-50 cursor-not-allowed"
+                    className="h-10 px-4 bg-[#06b6d4]/50 text-white text-sm font-semibold rounded-lg transition-colors opacity-50 cursor-not-allowed"
                     disabled
                     title="Stock adjustment is handled by shop admins from Admin Inventory."
                   >
