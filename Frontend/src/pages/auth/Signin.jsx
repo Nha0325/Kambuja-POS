@@ -66,7 +66,7 @@ const SignIn = () => {
               <img 
                 src="/Logo.jpg" 
                 alt="Kambuja POS Logo" 
-                className="h-20 object-contain"
+                className="w-full max-w-[280px] object-contain mx-auto"
               />
             </div>
             
