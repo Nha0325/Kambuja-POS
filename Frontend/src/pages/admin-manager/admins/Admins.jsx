@@ -153,7 +153,12 @@ function Admins() {
                     <td className={tableCellClass}>
                       <div className={`flex items-center gap-3 ${admin.status === 'INACTIVE' ? 'opacity-60' : ''}`}>
                         <div>
-                          <p className="font-bold">{admin.fullName || admin.username}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold text-[#020617] dark:text-[#f8fafc]">{admin.fullName || admin.username}</p>
+                            {admin.role === 'ADMIN_MANAGER' && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/20 uppercase tracking-wider">Manager</span>
+                            )}
+                          </div>
                           {admin.fullName && <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-0.5">@{admin.username}</p>}
                         </div>
                       </div>

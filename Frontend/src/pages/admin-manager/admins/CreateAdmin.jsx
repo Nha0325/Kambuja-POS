@@ -125,7 +125,7 @@ function CreateAdmin() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [shops, setShops] = useState([])
-  const [form, setForm] = useState({ username: "", fullName: "", email: "", phone: "", password: "", shopId: "", status: "ACTIVE" })
+  const [form, setForm] = useState({ username: "", fullName: "", email: "", phone: "", password: "", shopId: "", status: "ACTIVE", role: "ADMIN" })
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successSummary, setSuccessSummary] = useState(null)
@@ -150,7 +150,8 @@ function CreateAdmin() {
               phone: admin.phone || "",
               password: "",
               shopId: admin.shopId?._id || admin.shopId || "",
-              status: admin.status || "ACTIVE"
+              status: admin.status || "ACTIVE",
+              role: admin.role || "ADMIN"
             })
           }
         })
@@ -191,9 +192,10 @@ function CreateAdmin() {
           shopLocation: getShopLocation(selectedShop),
           temporaryPassword: form.password,
           status: admin.status || form.status,
+          role: admin.role || form.role,
           loginUrl: typeof window === "undefined" ? "/login" : `${window.location.origin}/login`,
         })
-        setForm({ username: "", fullName: "", email: "", phone: "", password: "", shopId: "", status: "ACTIVE" })
+        setForm({ username: "", fullName: "", email: "", phone: "", password: "", shopId: "", status: "ACTIVE", role: "ADMIN" })
         toast.success("Admin owner created")
       }
     } catch (error) {
@@ -287,6 +289,14 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
+              <span className={labelClass}>Role *</span>
+              <select className={selectClass} value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
+                <option value="ADMIN">Shop Admin (ADMIN)</option>
+                <option value="ADMIN_MANAGER">System Admin (ADMIN_MANAGER)</option>
+              </select>
+            </label>
+
+            <label className="space-y-2">
               <span className={labelClass}>Status</span>
               <select className={selectClass} value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
                 <option value="ACTIVE">Active</option>
@@ -314,6 +324,7 @@ function CreateAdmin() {
                 {[
                   ["Admin name", successSummary.adminName],
                   ["Username", successSummary.username],
+                  ["Role", successSummary.role],
                   ["Email", successSummary.email],
                   ["Assigned shop", successSummary.assignedShop],
                   ["Shop location", successSummary.shopLocation],
@@ -338,7 +349,8 @@ function CreateAdmin() {
               Role Permissions
             </h3>
             <p className="mb-4 text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-              New admin owners receive the standard ADMIN role. Shop ownership is optional during account creation.
+              <strong>ADMIN:</strong> Manage assigned shop operations, analytics, and reports.<br/>
+              <strong>ADMIN_MANAGER:</strong> Full system access across all shops.
             </p>
             <ul className="space-y-3 text-sm text-[#020617] dark:text-[#f8fafc]">
               <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> Manage assigned shop operations</li>

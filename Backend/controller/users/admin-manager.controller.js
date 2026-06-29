@@ -608,7 +608,7 @@ exports.createAdmin = async (req, res, next) => {
             email,
             password: await bcryptjs.hash(password, 10),
             phone: phone || undefined,
-            role: ROLES.ADMIN,
+            role: [ROLES.ADMIN, ROLES.ADMIN_MANAGER].includes(req.body.role) ? req.body.role : ROLES.ADMIN,
             shopId: shopId || null,
             status: status || "ACTIVE",
         })
@@ -632,7 +632,10 @@ exports.createAdmin = async (req, res, next) => {
 
 exports.updateAdmin = async (req, res, next) => {
     try {
-        const updates = { ...req.body, role: ROLES.ADMIN }
+        const updates = { ...req.body }
+        if (updates.role && ![ROLES.ADMIN, ROLES.ADMIN_MANAGER].includes(updates.role)) {
+            delete updates.role
+        }
         if (updates.password) {
             updates.password = await bcryptjs.hash(updates.password, 10)
         } else {
