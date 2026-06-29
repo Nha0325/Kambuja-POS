@@ -114,6 +114,11 @@ function StockAdjustment() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
+      <nav className="mb-2 flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
+        <Link to="/admin/inventory" className="hover:text-[#06b6d4]">{t('inventory')}</Link>
+        <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
+        <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">{t('stock_adjustment')}</span>
+      </nav>
       <div className={adminSurface.header}>
         <div>
           <div className="flex items-center gap-3">

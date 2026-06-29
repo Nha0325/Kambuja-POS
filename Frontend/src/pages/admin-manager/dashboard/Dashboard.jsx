@@ -14,6 +14,7 @@ import {
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from "recharts"
+import { useTranslation } from "react-i18next"
 
 function Dashboard() {
   const [data, setData] = useState({})
@@ -22,6 +23,7 @@ function Dashboard() {
   const [isDark, setIsDark] = useState(
     () => typeof window !== "undefined" && window.document.documentElement.classList.contains('dark')
   )
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,7 +75,7 @@ function Dashboard() {
   if (error) {
     return (
       <div className="p-6 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 rounded-xl text-center font-bold">
-        Failed to load dashboard data
+        {t('failed_to_load_dashboard_data')}
       </div>
     )
   }
@@ -97,23 +99,23 @@ function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Kambuja POS Dashboard</h1>
-          <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Monitor platform shops, subscriptions, users, and sales performance.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('kambuja_pos_dashboard')}</h1>
+          <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('dashboard_desc_manager')}</p>
         </div>
         <button onClick={loadDashboard} className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] text-[#020617] dark:text-[#f8fafc] text-sm font-semibold rounded-xl hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors inline-flex items-center justify-center gap-2">
-          Refresh
+          {t('refresh')}
         </button>
       </div>
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
         {[
-          { label: "Total Shops", value: data.totalShops || 0, sub: "Registered shops", icon: FaStore, color: "text-[#3b82f6]" },
-          { label: "Active Shops", value: data.activeShops || 0, sub: "Currently operational", icon: FaCircleCheck, color: "text-[#10b981]" },
-          { label: "Total Admins", value: data.totalAdmins || 0, sub: "Across all instances", icon: FaUserShield, color: "text-[#8b5cf6]" },
-          { label: "Total Cashiers", value: data.totalCashiers || 0, sub: "Active accounts", icon: FaUsers, color: "text-[#f59e0b]" },
-          { label: "Monthly Sales", value: formatRiel(data.monthlySales), sub: "Current month", icon: FaMoneyBillWave, color: "text-[#ef4444]" },
-          { label: "Total Products", value: data.totalProducts || 0, sub: "Across platform", icon: FaBoxOpen, color: "text-[#06b6d4]" },
+          { label: t('total_shops'), value: data.totalShops || 0, sub: t('registered_shops'), icon: FaStore, color: "text-[#3b82f6]" },
+          { label: t('active_shops'), value: data.activeShops || 0, sub: t('currently_operational'), icon: FaCircleCheck, color: "text-[#10b981]" },
+          { label: t('total_admins'), value: data.totalAdmins || 0, sub: t('across_all_instances'), icon: FaUserShield, color: "text-[#8b5cf6]" },
+          { label: t('total_cashiers'), value: data.totalCashiers || 0, sub: t('active_accounts'), icon: FaUsers, color: "text-[#f59e0b]" },
+          { label: t('monthly_sales'), value: formatRiel(data.monthlySales), sub: t('current_month'), icon: FaMoneyBillWave, color: "text-[#ef4444]" },
+          { label: t('total_products'), value: data.totalProducts || 0, sub: t('across_platform'), icon: FaBoxOpen, color: "text-[#06b6d4]" },
         ].map((card, i) => (
           <div key={i} className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-5 flex flex-col justify-between h-[120px]">
             <div className="flex justify-between items-start">
@@ -138,8 +140,8 @@ function Dashboard() {
         {/* Left Chart: Platform Performance */}
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Platform Performance</h3>
-            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Monthly platform performance this year</p>
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('platform_performance')}</h3>
+            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('platform_performance_desc')}</p>
           </div>
           
           <ResponsiveContainer width="100%" height={320}>
@@ -161,16 +163,16 @@ function Dashboard() {
                 formatter={(value) => formatRiel(value)}
               />
               <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: isDark ? '#a1a1aa' : '#64748b' }} />
-              <Line type="monotone" name="Shop Sales Revenue" dataKey="sales" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-              <Line type="monotone" name="Subscription Revenue" dataKey="subscriptions" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+              <Line type="monotone" name={t('shop_sales_revenue')} dataKey="sales" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+              <Line type="monotone" name={t('subscription_revenue')} dataKey="subscriptions" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Sales by Category</h3>
-            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Product distribution across platform</p>
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('sales_by_category')}</h3>
+            <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('product_distribution_desc')}</p>
           </div>
           
           {categories.length > 0 ? (
@@ -191,7 +193,7 @@ function Dashboard() {
                   itemStyle={{ color: isDark ? "#f8fafc" : "#020617" }}
                   cursor={{ fill: isDark ? "rgba(255,255,255,0.04)" : "rgba(2,6,23,0.04)" }}
                 />
-                <Bar dataKey="value" name="Products" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                <Bar dataKey="value" name={t('products')} radius={[4, 4, 0, 0]} maxBarSize={60}>
                   {categories.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
@@ -199,7 +201,7 @@ function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[320px] text-sm text-[#94a3b8]">No category data available</div>
+            <div className="flex items-center justify-center h-[320px] text-sm text-[#94a3b8]">{t('no_category_data_available')}</div>
           )}
         </div>
       </div>
@@ -210,19 +212,19 @@ function Dashboard() {
         {/* Recent Shop Registrations */}
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
           <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
-            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Shop Registrations</h3>
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('recent_shop_registrations')}</h3>
             <Link to="/admin-manager/shops" className="text-sm font-semibold text-[#06b6d4] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
-              View all <FaArrowRight className="h-3 w-3" />
+              {t('view_all')} <FaArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#f8fafc] dark:bg-[#09090b] border-b border-[#e5e7eb] dark:border-[#27272a]">
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Shop Name</th>
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Plan</th>
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Date</th>
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Status</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('shop_name')}</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('plan')}</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('date')}</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
@@ -239,7 +241,7 @@ function Dashboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{shop.subscriptionPlan || "Free"}</td>
+                    <td className="px-5 py-3 text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{shop.subscriptionPlan || t('free')}</td>
                     <td className="px-5 py-3 text-sm text-[#64748b] dark:text-[#a1a1aa]">{formatDate(shop.createdAt, "MMM DD, YYYY")}</td>
                     <td className="px-5 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${shop.status === 'ACTIVE' ? 'bg-[#10b981]/10 text-[#10b981]' : 'bg-[#ef4444]/10 text-[#ef4444]'}`}>
@@ -249,7 +251,7 @@ function Dashboard() {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">No recent shops</td>
+                    <td colSpan="4" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">{t('no_recent_shops')}</td>
                   </tr>
                 )}
               </tbody>
@@ -260,18 +262,18 @@ function Dashboard() {
         {/* Recent Admin Owners */}
         <div className="bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl overflow-hidden flex flex-col">
           <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-white dark:bg-[#111113]">
-            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Admin Owners</h3>
+            <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('recent_admin_owners')}</h3>
             <Link to="/admin-manager/admin-owners" className="text-sm font-semibold text-[#06b6d4] hover:text-[#5b21b6] dark:hover:text-[#9061f9] flex items-center gap-1">
-              View all <FaArrowRight className="h-3 w-3" />
+              {t('view_all')} <FaArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#f8fafc] dark:bg-[#09090b] border-b border-[#e5e7eb] dark:border-[#27272a]">
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Admin Name</th>
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Contact</th>
-                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Status</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('admin_name')}</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('contact')}</th>
+                  <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
@@ -297,7 +299,7 @@ function Dashboard() {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="3" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">No recent admins</td>
+                    <td colSpan="3" className="px-5 py-4 text-center text-[#64748b] dark:text-[#a1a1aa] text-sm">{t('no_recent_admins')}</td>
                   </tr>
                 )}
               </tbody>

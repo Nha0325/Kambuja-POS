@@ -4,8 +4,9 @@ import useFetchOneByCode from "../../../hooks/common/useFetchOneByCode";
 import toast from "react-hot-toast";
 import useFetchData from "../../../hooks/common/useFetchData";
 import useCollection from "../../../hooks/common/useCollection";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { getImageUrl } from "../../../utils/helpers/getImageUrl";
+import { useTranslation } from "react-i18next";
 
 function CreatePurchase() {
   const [productCode, setProductCode] = useState("");
@@ -23,6 +24,7 @@ function CreatePurchase() {
   const [totalCost, setTotalCost] = useState(0);
 
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { fetchData } = useFetchOneByCode();
 
@@ -31,7 +33,7 @@ function CreatePurchase() {
 
   const handleSearchProductByCode = async () => {
     if (!productCode) {
-      toast.error("Please enter product code");
+      toast.error(t('enter_product_code_req'));
       return;
     }
     try {
@@ -40,16 +42,16 @@ function CreatePurchase() {
         setUnitPrice(data?.costPrice || 0); 
         setProduct(data);
       } else {
-        toast.error("Product not found!");
+        toast.error(t('product_not_found_msg_2'));
       }
     } catch {
-      toast.error("Error searching product.");
+      toast.error(t('error_searching_product'));
     }
   };
 
   const handleAddToCart = () => {
     if (!product?._id) {
-      toast.error("សូមស្វែងរកផលិតផលតាមលេខកូដសិន!");
+      toast.error(t('search_product_first_req'));
       return;
     }
 
@@ -64,12 +66,12 @@ function CreatePurchase() {
 
     const exist = carts.find((el) => el.product == data.product);
     if (exist) {
-      toast.error("ផលិតផលនេះមានក្នុងបញ្ជីរួចហើយ!");
+      toast.error(t('product_already_in_cart'));
       return;
     }
 
     if (data.quantity <= 0) {
-      toast.error("ចំនួនទំនិញត្រូវតែធំជាង 0!");
+      toast.error(t('qty_greater_than_0_req'));
       return;
     }
 
@@ -85,7 +87,7 @@ function CreatePurchase() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (carts.length <= 0) {
-      toast.error("សូមបន្ថែមផលិតផលទៅក្នុងបញ្ជីទិញ!");
+      toast.error(t('add_product_to_purchase_list'));
       return;
     }
 
@@ -103,7 +105,7 @@ function CreatePurchase() {
     try {
       const res = await create(data);
       if (res) {
-        toast.success("បានបង្កើតការទិញចូលស្តុកដោយជោគជ័យ!");
+        toast.success(t('purchase_created_success'));
         navigate("/admin/purchases");
       }
     } catch (error) {
@@ -137,15 +139,20 @@ function CreatePurchase() {
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] px-3 py-4 text-[#020617] dark:text-[#f8fafc] sm:px-4 lg:px-6">
       <div className="mx-auto max-w-8xl">
-        <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl mb-6">Create Purchase</h1>
+        <nav className="mb-2 flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
+          <Link to="/admin/purchases" className="hover:text-[#06b6d4]">{t('purchases')}</Link>
+          <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
+          <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">{t('create_purchase')}</span>
+        </nav>
+        <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl mb-6">{t('create_purchase')}</h1>
 
         <form onSubmit={handleSubmit} className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-5 md:p-6 shadow-none">
           <h3 className="text-base font-semibold mt-1 mb-6 pb-2 w-fit border-b-2 border-[#06b6d4] text-[#020617] dark:text-[#f8fafc]">
-            Import Product
+            {t('import_product')}
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
             <fieldset>
-              <label className={labelClass}>Supplier</label>
+              <label className={labelClass}>{t('supplier')}</label>
               <select
                 onChange={(e) => setSupplier(e.target.value)}
                 value={supplier}
@@ -153,7 +160,7 @@ function CreatePurchase() {
               required
             >
               <option value="" disabled>
-                Select supplier
+                {t('select_supplier')}
               </option>
               {suppliers?.map((el) => (
                 <option key={el._id} value={el?._id}>
@@ -163,18 +170,18 @@ function CreatePurchase() {
             </select>
             </fieldset>
             <fieldset>
-              <label className={labelClass}>Invoice Number</label>
+              <label className={labelClass}>{t('invoice_number')}</label>
               <div className="flex items-center">
                 <input
                   type="number"
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   className={inputClass}
-                  placeholder="Enter invoice number"
+                  placeholder={t('enter_invoice_number')}
                 />
               </div>
             </fieldset>
             <fieldset>
-              <label className={labelClass}>Import Date</label>
+              <label className={labelClass}>{t('import_date')}</label>
               <div className="flex items-center">
                 <input
                   onChange={(e) => setPurchaseDate(e.target.value)}
@@ -185,7 +192,7 @@ function CreatePurchase() {
               </div>
             </fieldset>
             <fieldset>
-              <label className={labelClass}>Status</label>
+              <label className={labelClass}>{t('status')}</label>
               <div className="flex items-center">
                 <select
                   required
@@ -194,33 +201,33 @@ function CreatePurchase() {
                   onChange={(e) => setPurchaseStatus(e.target.value)}
                 >
                 <option value="" disabled>
-                  Select Purchase Status
+                  {t('select_purchase_status')}
                 </option>
-                <option value="received">Received</option>
-                <option value="pending">Pending</option>
-                <option value="ordered">Ordered</option>
+                <option value="received">{t('received')}</option>
+                <option value="pending">{t('pending')}</option>
+                <option value="ordered">{t('ordered')}</option>
                 </select>
               </div>
             </fieldset>
 
             <fieldset className="md:col-span-2 xl:col-span-4">
-              <label className={labelClass}>Note</label>
+              <label className={labelClass}>{t('note')}</label>
               <textarea
                 onChange={(e) => setNote(e.target.value)}
                 className={textareaClass}
-                placeholder="Type shipping address..."
+                placeholder={t('type_shipping_address')}
               ></textarea>
             </fieldset>
           </div>
 
           <h3 className="text-base font-semibold mt-10 mb-6 pb-2 w-fit border-b-2 border-[#06b6d4] text-[#020617] dark:text-[#f8fafc]">
-            Product Details
+            {t('product_details')}
           </h3>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="min-w-0 space-y-6 lg:col-span-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-5">
               <fieldset>
-                <label className={labelClass}>Product Code</label>
+                <label className={labelClass}>{t('product_code')}</label>
                 <div className="flex items-center relative">
                 <input
                   type="text"
@@ -232,7 +239,7 @@ function CreatePurchase() {
                   }}
                     value={productCode}
                     className={`${inputClass} pr-12`}
-                    placeholder="e.g pro-0001"
+                    placeholder={t('eg_product_code')}
                   />
                   <button
                     onClick={handleSearchProductByCode}
@@ -246,7 +253,7 @@ function CreatePurchase() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <fieldset>
-                  <label className={labelClass}>Quantity</label>
+                  <label className={labelClass}>{t('quantity')}</label>
                   <div className="flex items-center">
                     <input
                       type="number"
@@ -257,7 +264,7 @@ function CreatePurchase() {
                   </div>
                 </fieldset>
                 <fieldset>
-                  <label className={labelClass}>Unit Price ($)</label>
+                  <label className={labelClass}>{t('unit_price_usd')}</label>
                   <div className="flex items-center relative">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
                     <input
@@ -272,7 +279,7 @@ function CreatePurchase() {
 
               <fieldset>
                 <label className="text-sm font-semibold text-[#020617] dark:text-[#f8fafc]">
-                  Total : <span className="text-red-500 font-bold ml-1">${total.toFixed(2)}</span>
+                  {t('total')} : <span className="text-red-500 font-bold ml-1">${total.toFixed(2)}</span>
                 </label>
               </fieldset>
               <fieldset className="flex justify-end pt-2 border-t border-[#e5e7eb] dark:border-[#27272a]">
@@ -281,7 +288,7 @@ function CreatePurchase() {
                   type="button"
                   className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold transition-colors w-full"
                 >
-                  Add Item
+                  {t('add_item')}
                 </button>
               </fieldset>
             </div>
@@ -291,12 +298,12 @@ function CreatePurchase() {
                 <table className="min-w-[760px] w-full text-sm">
                   <thead>
                     <tr className="bg-[#f8fafc] dark:bg-[#09090b] text-left text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa] border-b border-[#e5e7eb] dark:border-[#27272a]">
-                      <th className="p-4">Image</th>
-                      <th className="p-4">Product</th>
-                      <th className="p-4 text-right">Unit Price</th>
-                      <th className="p-4 text-right">Qty</th>
-                      <th className="p-4 text-right">Total</th>
-                      <th className="p-4 text-right">Action</th>
+                      <th className="p-4">{t('image')}</th>
+                      <th className="p-4">{t('product')}</th>
+                      <th className="p-4 text-right">{t('unit_price')}</th>
+                      <th className="p-4 text-right">{t('qty')}</th>
+                      <th className="p-4 text-right">{t('total')}</th>
+                      <th className="p-4 text-right">{t('actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
@@ -333,7 +340,7 @@ function CreatePurchase() {
 
                     <tr className="bg-[#f8fafc] dark:bg-[#09090b]">
                       <td colSpan="6" className="text-right p-4 text-[#020617] dark:text-[#f8fafc] font-semibold uppercase tracking-wider text-xs">
-                        Total Cost : <span className="text-red-500 text-sm font-bold ml-2">${Number(totalCost || 0).toFixed(2)}</span>
+                        {t('total_cost')} : <span className="text-red-500 text-sm font-bold ml-2">${Number(totalCost || 0).toFixed(2)}</span>
                       </td>
                     </tr>
                 </tbody>
@@ -348,14 +355,14 @@ function CreatePurchase() {
               onClick={() => navigate("/admin/purchases")}
               className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button 
               type="submit" 
               disabled={isLoading} 
               className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto"
             >
-              {isLoading ? "Saving..." : "Save Purchase"}
+              {isLoading ? t('saving') : t('save_purchase')}
             </button>
           </fieldset>
         </form>

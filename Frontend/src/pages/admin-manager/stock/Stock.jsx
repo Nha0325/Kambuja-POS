@@ -15,6 +15,7 @@ import {
   modalClass,
 } from "../adminManagerUi"
 import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 function getShopName(row) {
   if (row.shopId && typeof row.shopId === "object") return row.shopId.name || row.shopId.code || "-"
@@ -38,6 +39,7 @@ const getStockStatus = (row) => {
 };
 
 function Stock() {
+  const { t } = useTranslation()
   const [rows, setRows] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
@@ -61,7 +63,7 @@ function Stock() {
       .then((response) => setRows(response.data.result || []))
       .catch((loadError) => {
         if (loadError?.response?.status !== 401) {
-          setError(formatApiError(loadError) || "Unable to load stock")
+          setError(formatApiError(loadError) || t('unable_to_load_stock'))
         }
       })
       .finally(() => setIsLoading(false))
@@ -210,12 +212,12 @@ function Stock() {
   return (
     <section className="max-w-[1600px] mx-auto flex flex-col gap-6">
       <PageHeader
-        title="Stock Overview"
-        description="Monitor product quantities, reorder levels, and low-stock signals across shops."
+        title={t('stock_overview')}
+        description={t('stock_overview_desc')}
         action={(
           <button className={primaryButtonClass} type="button" onClick={exportStock} disabled={displayedRows.length === 0}>
             <FaDownload />
-            Export
+            {t('export')}
           </button>
         )}
       />
@@ -234,17 +236,17 @@ function Stock() {
           <div className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-400">
             <FaTriangleExclamation />
             <span>
-              <strong>Low stock alert:</strong>{" "}
-              {lowStockCount} product(s) are at or below reorder level.
+              <strong>{t('low_stock_alert')}</strong>{" "}
+              {lowStockCount} {t('products_below_reorder_level')}
               {outOfStockCount > 0 && (
                 <span className="ml-1 font-semibold text-red-700 dark:text-red-400">
-                  ({outOfStockCount} out of stock)
+                  ({outOfStockCount} {t('out_of_stock_lowercase')})
                 </span>
               )}
             </span>
           </div>
           <div className="text-sm font-semibold text-amber-800 dark:text-amber-400 underline underline-offset-2">
-            {statFilter === "LOW" ? "Clear filter" : "View low stock"}
+            {statFilter === "LOW" ? t('clear_filter') : t('view_low_stock')}
           </div>
         </div>
       )}
@@ -252,7 +254,7 @@ function Stock() {
       {statFilter !== "ALL" && (
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center gap-2 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] px-3 py-1.5 rounded-full text-sm font-bold border border-[#06b6d4]/20">
-            Showing: {statFilter === "LOW" ? "Low Stock" : "Healthy Stock"}
+            {t('showing_colon')} {statFilter === "LOW" ? t('low_stock') : t('healthy_stock')}
             <button 
               onClick={() => setStatFilter("ALL")}
               className="hover:bg-[#06b6d4]/20 p-0.5 rounded-full transition-colors flex items-center justify-center"
@@ -266,10 +268,10 @@ function Stock() {
       {/* Clickable Stat Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
         {[
-          { label: "Products", value: rows.length, filter: "ALL" },
-          { label: "Total Quantity", value: totalQuantity, filter: "ALL" },
-          { label: "Low Stock", value: lowStockCount, filter: "LOW" },
-          { label: "Healthy", value: healthyCount, filter: "OK" },
+          { label: t('products'), value: rows.length, filter: "ALL" },
+          { label: t('total_quantity'), value: totalQuantity, filter: "ALL" },
+          { label: t('low_stock'), value: lowStockCount, filter: "LOW" },
+          { label: t('healthy'), value: healthyCount, filter: "OK" },
         ].map((card) => (
           <article 
             key={card.label} 
@@ -288,7 +290,7 @@ function Stock() {
           <FaMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]" />
           <input
             className={`${inputClass} pl-10`}
-            placeholder="Search by shop, product, or code..."
+            placeholder={t('search_by_shop_product_code')}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -298,24 +300,24 @@ function Stock() {
           <div className="relative min-w-[140px] flex-1 md:flex-none">
              <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa] text-xs" />
              <select className={`${selectClass} pl-8`} value={shopFilter} onChange={(e) => setShopFilter(e.target.value)}>
-                <option value="ALL">All Shops</option>
+                <option value="ALL">{t('all_shops')}</option>
                 {shopsList.map(s => <option key={s} value={s}>{s}</option>)}
              </select>
           </div>
 
           <div className="relative min-w-[140px] flex-1 md:flex-none">
              <select className={selectClass} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="ALL">All Status</option>
-                <option value="LOW">Low Stock</option>
-                <option value="OK">Healthy</option>
-                <option value="OUT">Out of Stock</option>
+                <option value="ALL">{t('all_status')}</option>
+                <option value="LOW">{t('low_stock')}</option>
+                <option value="OK">{t('healthy')}</option>
+                <option value="OUT">{t('out_of_stock_title')}</option>
              </select>
           </div>
 
           {categoriesList.length > 0 && (
              <div className="relative min-w-[140px] flex-1 md:flex-none">
                <select className={selectClass} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-                  <option value="ALL">All Categories</option>
+                  <option value="ALL">{t('all_categories')}</option>
                   {categoriesList.map(c => <option key={c} value={c}>{c}</option>)}
                </select>
             </div>
@@ -329,23 +331,23 @@ function Stock() {
           <table className="min-w-[1000px] w-full border-collapse">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Shop</th>
-                <th className={tableHeadCellClass}>Product</th>
-                <th className={tableHeadCellClass}>Code</th>
-                <th className={tableHeadCellClass}>Barcode/SKU</th>
-                <th className={`${tableHeadCellClass} text-right`}>Current Stock</th>
-                <th className={`${tableHeadCellClass} text-right`}>Stock Display</th>
-                <th className={`${tableHeadCellClass} text-right`}>Reorder Level</th>
-                <th className={`${tableHeadCellClass} text-center`}>Status</th>
-                <th className={`${tableHeadCellClass} text-right`}>Actions</th>
+                <th className={tableHeadCellClass}>{t('shop')}</th>
+                <th className={tableHeadCellClass}>{t('product')}</th>
+                <th className={tableHeadCellClass}>{t('code')}</th>
+                <th className={tableHeadCellClass}>{t('barcode_sku')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('current_stock')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('stock_display')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('reorder_level')}</th>
+                <th className={`${tableHeadCellClass} text-center`}>{t('status')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {isLoading ? (
-                <TableEmpty colSpan="9">Loading stock...</TableEmpty>
+                <TableEmpty colSpan="9">{t('loading_stock')}</TableEmpty>
               ) : displayedRows.length === 0 ? (
                 <TableEmpty colSpan="9">
-                  {search || shopFilter !== "ALL" || statusFilter !== "ALL" || categoryFilter !== "ALL" || statFilter !== "ALL" ? "No result matches your search/filters." : "No stock records found."}
+                  {search || shopFilter !== "ALL" || statusFilter !== "ALL" || categoryFilter !== "ALL" || statFilter !== "ALL" ? t('no_result_matches_search_filters') : t('no_stock_records_found')}
                 </TableEmpty>
               ) : displayedRows.map((row) => {
                 const status = getStockStatus(row)
@@ -384,7 +386,7 @@ function Stock() {
                     <td className={`${tableCellClass} text-center`}>
                       <span className={badgeClass}>
                         {status !== "OK" && <FaTriangleExclamation />}
-                        {status === "OUT" ? "OUT OF STOCK" : status}
+                        {status === "OUT" ? t('out_of_stock_uppercase') : status === "LOW" ? t('low_stock') : t('healthy')}
                       </span>
                     </td>
                     <td className={`${tableCellClass} text-right`}>
@@ -392,21 +394,21 @@ function Stock() {
                         <button 
                           onClick={(e) => { e.stopPropagation(); setSelectedRow(row); setShowHistory(false); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-blue-600 hover:bg-blue-600/10 transition-colors" 
-                          title="View"
+                          title={t('view')}
                         >
                           <FaEye className="text-[16px]" />
                         </button>
                         <button 
                           disabled
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] opacity-50 cursor-not-allowed" 
-                          title="Admin Only: Stock adjustment is handled by shop admins"
+                          title={t('admin_only_stock_adjustment')}
                         >
                           <FaPenToSquare className="text-[16px]" />
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); loadHistory(row); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-colors" 
-                          title="Stock History"
+                          title={t('stock_history')}
                         >
                           <FaClockRotateLeft className="text-[16px]" />
                         </button>
@@ -426,7 +428,7 @@ function Stock() {
           <div className="bg-[#ffffff] dark:bg-[#111113] rounded-xl w-full max-w-2xl overflow-hidden border border-[#e5e7eb] dark:border-[#27272a] shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center p-6 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc] flex items-center gap-2">
-                {showHistory ? "Stock History" : "Stock Details"}
+                {showHistory ? t('stock_history') : t('stock_details')}
               </h3>
               <button 
                 onClick={() => { setSelectedRow(null); setShowHistory(false); }}
@@ -439,19 +441,19 @@ function Stock() {
             <div className="p-6 overflow-y-auto max-h-[60vh] min-h-[300px]">
               {showHistory ? (
                    historyLoading ? (
-                       <div className="flex items-center justify-center h-full min-h-[200px] text-[#64748b] dark:text-[#a1a1aa]">Loading history...</div>
+                       <div className="flex items-center justify-center h-full min-h-[200px] text-[#64748b] dark:text-[#a1a1aa]">{t('loading_history')}</div>
                    ) : historyData.length === 0 ? (
-                       <div className="flex items-center justify-center h-full min-h-[200px] text-[#64748b] dark:text-[#a1a1aa]">No stock movements found.</div>
+                       <div className="flex items-center justify-center h-full min-h-[200px] text-[#64748b] dark:text-[#a1a1aa]">{t('no_stock_movements_found')}</div>
                    ) : (
                        <div className="overflow-x-auto">
                            <table className="w-full text-left border-collapse text-sm">
                                <thead className="border-b border-[#e5e7eb] dark:border-[#27272a] text-[#64748b] dark:text-[#a1a1aa] uppercase text-[11px] tracking-wider font-bold">
                                   <tr>
-                                     <th className="pb-3 pr-4">Date</th>
-                                     <th className="pb-3 pr-4">Type</th>
-                                     <th className="pb-3 pr-4 text-right">Qty</th>
-                                     <th className="pb-3 pr-4">Reason / Note</th>
-                                     <th className="pb-3">User</th>
+                                     <th className="pb-3 pr-4">{t('date')}</th>
+                                     <th className="pb-3 pr-4">{t('type')}</th>
+                                     <th className="pb-3 pr-4 text-right">{t('qty')}</th>
+                                     <th className="pb-3 pr-4">{t('reason_note')}</th>
+                                     <th className="pb-3">{t('user')}</th>
                                   </tr>
                                </thead>
                                <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
@@ -475,48 +477,48 @@ function Stock() {
               ) : (
                   <div className="grid grid-cols-2 gap-y-6 gap-x-6">
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Product</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('product')}</p>
                       <p className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{selectedRow.name || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Code</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('code')}</p>
                       <p className="text-sm font-bold text-[#06b6d4] font-mono">{selectedRow.code || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('shop')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{getShopName(selectedRow)}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Category</p>
-                      <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedRow.category?.name || "Uncategorized"}</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('category')}</p>
+                      <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedRow.category?.name || t('uncategorized')}</p>
                     </div>
                     
                     <div className="col-span-2 pt-4 border-t border-[#e5e7eb] dark:border-[#27272a]">
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-3">Stock Information</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-3">{t('stock_information')}</p>
                       
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#f8fafc] dark:bg-[#09090b] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a]">
                         <div className="flex flex-col items-center justify-center text-center">
                            <span className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{Number(selectedRow.currentStock ?? 0).toLocaleString()}</span>
-                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">Quantity</span>
+                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">{t('quantity_uppercase')}</span>
                         </div>
                         <div className="flex flex-col items-center justify-center text-center border-l border-[#e5e7eb] dark:border-[#27272a]">
                            <span className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{Number(selectedRow.reorderLevel || 0).toLocaleString()}</span>
-                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">Reorder</span>
+                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">{t('reorder_uppercase')}</span>
                         </div>
                         <div className="flex flex-col items-center justify-center text-center border-l border-[#e5e7eb] dark:border-[#27272a]">
                            <span className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{Number(selectedRow.maxStock || 0) > 0 ? Number(selectedRow.maxStock).toLocaleString() : "-"}</span>
-                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">Max</span>
+                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">{t('max_uppercase')}</span>
                         </div>
                         <div className="flex flex-col items-center justify-center text-center border-l border-[#e5e7eb] dark:border-[#27272a]">
                            <span className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{getStockPercent(selectedRow) !== null ? `${getStockPercent(selectedRow)}%` : "-"}</span>
-                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">Stock %</span>
+                           <span className="text-[10px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase mt-1">{t('stock_percent')}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="col-span-2 flex items-center justify-between">
                        <div>
-                         <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Status</p>
+                         <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('status')}</p>
                          {(() => {
                             const s = getStockStatus(selectedRow)
                             const bClass = s === "OUT" ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20" 
@@ -525,14 +527,14 @@ function Stock() {
                             return (
                                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${bClass}`}>
                                   {s !== "OK" && <FaTriangleExclamation />}
-                                  {s === "OUT" ? "OUT OF STOCK" : s}
+                                  {s === "OUT" ? t('out_of_stock_uppercase') : s === "LOW" ? t('low_stock') : t('healthy')}
                                </span>
                             )
                          })()}
                        </div>
                        {selectedRow.updatedAt && (
                           <div className="text-right">
-                             <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Last Movement</p>
+                             <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('last_movement')}</p>
                              <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">
                                {new Date(selectedRow.updatedAt).toLocaleDateString()} {new Date(selectedRow.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                              </p>
@@ -545,7 +547,7 @@ function Stock() {
             
             <div className="p-4 border-t border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] flex-1 text-left">
-                 {!showHistory && "Stock adjustment is handled by shop admins."}
+                 {!showHistory && t('stock_adjustment_by_shop_admins')}
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <button
@@ -553,7 +555,7 @@ function Stock() {
                     onClick={() => { setSelectedRow(null); setShowHistory(false); }}
                     className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] text-[#020617] dark:text-[#f8fafc] text-sm font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                   >
-                    Close
+                    {t('close')}
                   </button>
 
                   {!showHistory ? (
@@ -562,7 +564,7 @@ function Stock() {
                         onClick={() => loadHistory(selectedRow)}
                         className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#06b6d4] text-[#06b6d4] text-sm font-semibold rounded-lg hover:bg-[#06b6d4]/5 transition-colors shadow-sm"
                       >
-                        Stock History
+                        {t('stock_history')}
                       </button>
                   ) : (
                       <button
@@ -570,7 +572,7 @@ function Stock() {
                         onClick={() => setShowHistory(false)}
                         className="h-10 px-4 bg-white dark:bg-[#111113] border border-[#06b6d4] text-[#06b6d4] text-sm font-semibold rounded-lg hover:bg-[#06b6d4]/5 transition-colors shadow-sm"
                       >
-                        Back to Details
+                        {t('back_to_details')}
                       </button>
                   )}
 
@@ -578,9 +580,9 @@ function Stock() {
                     type="button"
                     className="h-10 px-4 bg-[#06b6d4]/50 text-white text-sm font-semibold rounded-lg transition-colors opacity-50 cursor-not-allowed"
                     disabled
-                    title="Stock adjustment is handled by shop admins from Admin Inventory."
+                    title={t('admin_only_stock_adjustment_admin_inventory')}
                   >
-                    Admin Only
+                    {t('admin_only')}
                   </button>
               </div>
             </div>

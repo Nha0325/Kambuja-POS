@@ -6,10 +6,12 @@ import useCurrent from "../../../hooks/auth/useCurrent";
 import { api } from "../../../utils/config/api";
 import dayjs from "dayjs";
 import { FiEye, FiX } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 function StockReport() {
   const { data: currentUser } = useCurrent();
   const isAdminManager = currentUser?.role === "ADMIN_MANAGER";
+  const { t } = useTranslation();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -43,9 +45,9 @@ function StockReport() {
     const res = await fetchStockReport(activeFilters);
     if (res?.success) {
       setReportData({ result: res.result, summary: res.summary });
-      if (e) toast.success("Filtered Successfully!");
+      if (e) toast.success(t('filtered_success'));
     } else if (e) {
-      toast.error(res?.error || "Failed to fetch report");
+      toast.error(res?.error || t('failed_fetch_report'));
     }
   };
 
@@ -119,10 +121,10 @@ function StockReport() {
     <div className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Reports</p>
-          <h1 className={adminSurface.title}>Stock Report</h1>
+          <p className={adminSurface.eyebrow}>{t('reports')}</p>
+          <h1 className={adminSurface.title}>{t('stock_report')}</h1>
           <p className={adminSurface.description}>
-            View current stock, stock value, low stock, out of stock, and stock movement summary.
+            {t('stock_report_desc')}
           </p>
         </div>
       </div>
@@ -130,42 +132,42 @@ function StockReport() {
       <div className={adminSurface.statGrid}>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>P</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Total Products</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('total_products')}</p>
           <p className={adminSurface.statValue}>{summary.totalProducts || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>Q</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Total Stock Qty</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('total_stock_qty')}</p>
           <p className={adminSurface.statValue}>{summary.totalStockQuantity || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>V</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Total Stock Value</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('total_stock_value')}</p>
           <p className={adminSurface.statValue}>${Number(summary.totalStockValue || 0).toFixed(2)}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>L</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Low Stock Products</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('low_stock_products')}</p>
           <p className={adminSurface.statValue}>{summary.lowStockProducts || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>O</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Out of Stock Products</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('out_of_stock_products')}</p>
           <p className={adminSurface.statValue}>{summary.outOfStockProducts || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>R</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Received Qty</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('received_qty')}</p>
           <p className={adminSurface.statValue}>{summary.receivedQty || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>S</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Sold Qty</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('sold_qty')}</p>
           <p className={adminSurface.statValue}>{summary.soldQty || 0}</p>
         </div>
         <div className={adminSurface.statCard}>
           <div className={adminSurface.statIcon}>A</div>
-          <p className={`mt-4 ${adminSurface.statLabel}`}>Adjusted Qty</p>
+          <p className={`mt-4 ${adminSurface.statLabel}`}>{t('adjusted_qty')}</p>
           <p className={adminSurface.statValue}>{summary.adjustedQty || 0}</p>
         </div>
       </div>
@@ -173,7 +175,7 @@ function StockReport() {
       <div className={adminSurface.card}>
         <form onSubmit={handleFilter} className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Search (Name/SKU/Barcode)</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('search_name_sku_barcode')}</label>
             <input
               type="text"
               name="search"
@@ -185,7 +187,7 @@ function StockReport() {
           </div>
           
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Date From</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('date_from')}</label>
             <input
               type="date"
               name="dateFrom"
@@ -196,7 +198,7 @@ function StockReport() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Date To</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('date_to')}</label>
             <input
               type="date"
               name="dateTo"
@@ -207,14 +209,14 @@ function StockReport() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Category</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('category')}</label>
             <select
               name="categoryId"
               value={filters.categoryId}
               onChange={handleFilterChange}
               className={`${adminSurface.select} w-full`}
             >
-              <option value="">All Categories</option>
+              <option value="">{t('all_categories')}</option>
               {categories.map((c) => (
                 <option key={c._id} value={c._id}>{c.name}</option>
               ))}
@@ -222,14 +224,14 @@ function StockReport() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Supplier</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('supplier')}</label>
             <select
               name="supplierId"
               value={filters.supplierId}
               onChange={handleFilterChange}
               className={`${adminSurface.select} w-full`}
             >
-              <option value="">All Suppliers</option>
+              <option value="">{t('all_suppliers')}</option>
               {suppliers.map((s) => (
                 <option key={s._id} value={s._id}>{s.name}</option>
               ))}
@@ -237,30 +239,30 @@ function StockReport() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Status</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('status')}</label>
             <select
               name="status"
               value={filters.status}
               onChange={handleFilterChange}
               className={`${adminSurface.select} w-full`}
             >
-              <option value="">All Statuses</option>
-              <option value="IN_STOCK">In Stock</option>
-              <option value="LOW_STOCK">Low Stock</option>
-              <option value="OUT_OF_STOCK">Out of Stock</option>
+              <option value="">{t('all_statuses')}</option>
+              <option value="IN_STOCK">{t('in_stock')}</option>
+              <option value="LOW_STOCK">{t('low_stock')}</option>
+              <option value="OUT_OF_STOCK">{t('out_of_stock')}</option>
             </select>
           </div>
 
           {isAdminManager && (
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Shop</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('shop')}</label>
               <select
                 name="shopId"
                 value={filters.shopId}
                 onChange={handleFilterChange}
                 className={`${adminSurface.select} w-full`}
               >
-                <option value="">All Shops</option>
+                <option value="">{t('all_shops')}</option>
                 {shops.map((s) => (
                   <option key={s._id} value={s._id}>{s.name}</option>
                 ))}
@@ -270,14 +272,14 @@ function StockReport() {
 
           <div className="flex gap-2 lg:col-span-1">
             <button type="submit" disabled={isLoading} className={`${adminSurface.primaryButton} flex-1`}>
-              {isLoading ? "..." : "Filter"}
+              {isLoading ? "..." : t('filter')}
             </button>
             <button
               onClick={clearFilters}
               type="button"
               className="flex-1 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 transition"
             >
-              Reset
+              {t('reset')}
             </button>
           </div>
         </form>
@@ -285,28 +287,28 @@ function StockReport() {
 
       <div className={adminSurface.tableShell}>
         <div className={adminSurface.toolbar}>
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">Stock results</p>
-          <p className="mt-1 text-xs text-slate-500">{products.length} product(s) found</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('stock_results')}</p>
+          <p className="mt-1 text-xs text-slate-500">{products.length} {t('products_found')}</p>
         </div>
         <div className={adminSurface.tableWrap}>
           <table className={`${adminSurface.table} min-w-[1200px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={adminSurface.th}>Product</th>
-                {isAdminManager && <th className={adminSurface.th}>Shop</th>}
-                <th className={adminSurface.th}>SKU/Barcode</th>
-                <th className={adminSurface.th}>Category</th>
-                <th className={adminSurface.th}>Supplier</th>
-                <th className={`${adminSurface.th} text-right`}>Current Stock</th>
-                <th className={`${adminSurface.th} text-right`}>Base Unit</th>
-                <th className={`${adminSurface.th} text-right`}>Low Threshold</th>
-                <th className={adminSurface.th}>Status</th>
-                <th className={`${adminSurface.th} text-right`}>Stock Value</th>
-                <th className={`${adminSurface.th} text-right`}>Received</th>
-                <th className={`${adminSurface.th} text-right`}>Sold</th>
-                <th className={`${adminSurface.th} text-right`}>Adjusted</th>
-                <th className={adminSurface.th}>Last Movement</th>
-                <th className={`${adminSurface.th} text-center`}>Action</th>
+                <th className={adminSurface.th}>{t('product')}</th>
+                {isAdminManager && <th className={adminSurface.th}>{t('shop')}</th>}
+                <th className={adminSurface.th}>{t('sku_barcode')}</th>
+                <th className={adminSurface.th}>{t('category')}</th>
+                <th className={adminSurface.th}>{t('supplier')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('current_stock')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('base_unit')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('low_threshold')}</th>
+                <th className={adminSurface.th}>{t('status')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('stock_value')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('received')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('sold')}</th>
+                <th className={`${adminSurface.th} text-right`}>{t('adjusted')}</th>
+                <th className={adminSurface.th}>{t('last_movement')}</th>
+                <th className={`${adminSurface.th} text-center`}>{t('actions')}</th>
               </tr>
             </thead>
 
@@ -336,7 +338,7 @@ function StockReport() {
                       <td className={`${adminSurface.td} text-right text-slate-600 dark:text-slate-400`}>{item.lowStockThreshold}</td>
                       <td className={adminSurface.td}>
                         <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusBadge}`}>
-                          {item.stockStatus === 'OUT_OF_STOCK' ? 'Out of Stock' : item.stockStatus === 'LOW_STOCK' ? 'Low Stock' : 'In Stock'}
+                          {item.stockStatus === 'OUT_OF_STOCK' ? t('out_of_stock') : item.stockStatus === 'LOW_STOCK' ? t('low_stock') : t('in_stock')}
                         </span>
                       </td>
                       <td className={`${adminSurface.td} text-right font-semibold text-slate-900 dark:text-white`}>${Number(item.stockValue).toFixed(2)}</td>
@@ -350,7 +352,7 @@ function StockReport() {
                         <button
                           onClick={() => openMovementModal(item.productId)}
                           className={adminSurface.iconButton}
-                          title="View Movement"
+                          title={t('view_movement')}
                         >
                           <FiEye />
                         </button>
@@ -363,7 +365,7 @@ function StockReport() {
               <tbody>
                 <tr>
                   <td colSpan={15} className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                    {isLoading ? "Loading..." : "No stock report data found"}
+                    {isLoading ? t('loading') : t('no_stock_report_data')}
                   </td>
                 </tr>
               </tbody>
@@ -376,7 +378,7 @@ function StockReport() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-4xl rounded-2xl bg-white dark:bg-[#1A1D22] shadow-2xl flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#2A2E36] p-6">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Stock Movement Detail</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('stock_movement_detail')}</h2>
               <button onClick={closeMovementModal} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                 <FiX size={24} />
               </button>
@@ -384,20 +386,20 @@ function StockReport() {
             
             <div className="overflow-y-auto p-6 flex-1">
               {isLoadingMovements ? (
-                <p className="text-center text-slate-500">Loading...</p>
+                <p className="text-center text-slate-500">{t('loading')}</p>
               ) : movements.length > 0 ? (
                 <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-[#2A2E36]">
                   <table className="w-full border-collapse text-left text-sm">
                     <thead className="bg-slate-50 dark:bg-[#111318] text-slate-500 dark:text-[#6B7280]">
                       <tr>
-                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">Date</th>
-                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">Type</th>
-                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">Qty Change</th>
-                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">Before</th>
-                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">After</th>
-                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">Reason</th>
-                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">User</th>
-                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">Note</th>
+                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">{t('date')}</th>
+                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">{t('type')}</th>
+                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">{t('qty_change')}</th>
+                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">{t('before')}</th>
+                        <th className="px-4 py-3 font-semibold text-right border-b border-slate-200 dark:border-[#2A2E36]">{t('after')}</th>
+                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">{t('reason')}</th>
+                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">{t('user')}</th>
+                        <th className="px-4 py-3 font-semibold border-b border-slate-200 dark:border-[#2A2E36]">{t('note')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -423,7 +425,7 @@ function StockReport() {
                   </table>
                 </div>
               ) : (
-                <p className="text-center text-slate-500 py-8">No movement history found.</p>
+                <p className="text-center text-slate-500 py-8">{t('no_movement_history')}</p>
               )}
             </div>
           </div>

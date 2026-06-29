@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import toast from "react-hot-toast";
 import { FaHandshake, FaCircleCheck } from "react-icons/fa6";
+import { useTranslation } from "react-i18next";
 
 import {
   LuPlus,
@@ -20,11 +21,12 @@ import { useConfirm } from "../../../hooks/ui/useConfirm";
 import AdminPagination from "../../../components/admin/AdminPagination";
 
 const supplierStats = [
-  { label: "Total Suppliers", key: "total", icon: LuUsers },
-  { label: "With Phone", key: "withPhone", icon: FaCircleCheck },
+  { label: 'total_suppliers', key: "total", icon: LuUsers },
+  { label: 'suppliers_with_phone', key: "withPhone", icon: FaCircleCheck },
 ];
 
 function Supplier() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -46,10 +48,10 @@ function Supplier() {
 
   const handleDelete = async (id) => {
     const isConfirmed = await confirm({
-      title: "Delete Supplier",
-      message: "Are you sure you want to delete this supplier? This action cannot be undone.",
-      confirmText: "Yes, delete",
-      cancelText: "Cancel",
+      title: t('delete_supplier'),
+      message: t('delete_supplier_msg'),
+      confirmText: t('yes_delete'),
+      cancelText: t('cancel'),
       variant: "danger"
     });
 
@@ -57,7 +59,7 @@ function Supplier() {
       const res = await remove(id);
       if (res) {
         setRefetch(!refetch);
-        toast.success("Deleted successfully!");
+        toast.success(t('deleted_success'));
       }
       closeConfirm();
     }
@@ -67,11 +69,11 @@ function Supplier() {
     downloadCsv(
       "suppliers.csv",
       [
-        { label: "Business Name", value: (row) => row?.businessName || "" },
-        { label: "Name", value: (row) => row?.name || "" },
-        { label: "Phone", value: (row) => row?.phone || "" },
-        { label: "Address", value: (row) => row?.address || "" },
-        { label: "Note", value: (row) => row?.note || "" },
+        { label: t('business_name'), value: (row) => row?.businessName || "" },
+        { label: t('name'), value: (row) => row?.name || "" },
+        { label: t('phone'), value: (row) => row?.phone || "" },
+        { label: t('address'), value: (row) => row?.address || "" },
+        { label: t('note'), value: (row) => row?.note || "" },
       ],
       visibleSuppliers || []
     );
@@ -81,15 +83,15 @@ function Supplier() {
     <div className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Procurement</p>
-          <h1 className={adminSurface.title}>Suppliers</h1>
+          <p className={adminSurface.eyebrow}>{t('procurement')}</p>
+          <h1 className={adminSurface.title}>{t('suppliers')}</h1>
           <p className={adminSurface.description}>
-            Manage and monitor your supply chain network and vendor relationships.
+            {t('suppliers_desc')}
           </p>
         </div>
         <Link to="/admin/suppliers/create" className={adminSurface.primaryButton}>
           <LuPlus />
-          Add Supplier
+          {t('add_supplier')}
         </Link>
       </div>
 
@@ -99,7 +101,7 @@ function Supplier() {
             <div className={adminSurface.statIcon}>
               <Icon />
             </div>
-            <p className={`mt-4 ${adminSurface.statLabel}`}>{label}</p>
+            <p className={`mt-4 ${adminSurface.statLabel}`}>{t(label)}</p>
             <p className={adminSurface.statValue}>{statValues[key]}</p>
           </div>
         ))}
@@ -136,14 +138,14 @@ function Supplier() {
                     setSearch(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Search suppliers, contacts, or phone..."
+                  placeholder={t('search_suppliers')}
                 />
               </label>
               <div className="flex overflow-hidden rounded-lg border border-[#2A2E36] bg-[#111318]">
                 <button
                   type="button"
-                  aria-label="Show suppliers with phone"
-                  title="Show suppliers with phone"
+                  aria-label={t('show_suppliers_with_phone')}
+                  title={t('show_suppliers_with_phone')}
                   aria-pressed={showWithPhoneOnly}
                   onClick={() => setShowWithPhoneOnly((value) => !value)}
                   className={`inline-flex h-10 w-10 items-center justify-center border-r border-[#2A2E36] transition hover:bg-[#2A2E36] ${
@@ -154,8 +156,8 @@ function Supplier() {
                 </button>
                 <button
                   type="button"
-                  aria-label="Download suppliers"
-                  title="Download suppliers"
+                  aria-label={t('download_suppliers')}
+                  title={t('download_suppliers')}
                   onClick={handleDownload}
                   disabled={!visibleSuppliers?.length}
                   className="inline-flex h-10 w-10 items-center justify-center text-[#A9A6BB] transition hover:bg-[#2A2E36] disabled:cursor-not-allowed disabled:opacity-50"
@@ -171,13 +173,13 @@ function Supplier() {
           <table className={`${adminSurface.table} min-w-[980px]`}>
             <thead className={adminSurface.tableHead}>
               <tr>
-                <th className={`${adminSurface.th} w-16 text-center`}>N.o</th>
-                <th className={adminSurface.th}>Business Name</th>
-                <th className={adminSurface.th}>Name</th>
-                <th className={adminSurface.th}>Phone</th>
-                <th className={adminSurface.th}>Address</th>
-                <th className={adminSurface.th}>Note</th>
-                <th className={`${adminSurface.th} w-28 text-center`}>Actions</th>
+                <th className={`${adminSurface.th} w-16 text-center`}>{t('no')}</th>
+                <th className={adminSurface.th}>{t('business_name')}</th>
+                <th className={adminSurface.th}>{t('name')}</th>
+                <th className={adminSurface.th}>{t('phone')}</th>
+                <th className={adminSurface.th}>{t('address')}</th>
+                <th className={adminSurface.th}>{t('note')}</th>
+                <th className={`${adminSurface.th} w-28 text-center`}>{t('actions')}</th>
               </tr>
             </thead>
 
@@ -187,7 +189,7 @@ function Supplier() {
                   <td colSpan={7} className="p-8">
                     <div className="flex items-center justify-center gap-3 text-[#A9A6BB]">
                       <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#2A2E36] border-t-[#06b6d4]" />
-                      Loading suppliers...
+                      {t('loading_suppliers')}
                     </div>
                   </td>
                 </tr>
@@ -201,14 +203,14 @@ function Supplier() {
                         <FaHandshake />
                       </div>
                       <div>
-                        <h2 className="text-base font-semibold text-[#F8FAFC]">No suppliers found</h2>
+                        <h2 className="text-base font-semibold text-[#F8FAFC]">{t('no_suppliers_found')}</h2>
                         <p className="mt-1 text-sm text-[#A9A6BB]">
-                          You have not registered any suppliers yet.
+                          {t('no_suppliers_desc')}
                         </p>
                       </div>
                       <Link to="/admin/suppliers/create" className={adminSurface.secondaryButton}>
                         <LuPlus />
-                        Add Your First Supplier
+                        {t('add_first_supplier')}
                       </Link>
                     </div>
                   </td>

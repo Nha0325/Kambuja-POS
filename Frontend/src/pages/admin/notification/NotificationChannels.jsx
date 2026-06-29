@@ -2,11 +2,13 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { notificationService } from "../../../services/engagement/notification.service"
 import { adminSurface } from "../adminPageUi"
+import { useTranslation } from "react-i18next";
 
 function NotificationChannels() {
   const [channels, setChannels] = useState([])
   const [chatId, setChatId] = useState("")
   const [enabled, setEnabled] = useState(true)
+  const { t } = useTranslation();
 
   const load = () => notificationService.channels()
     .then((response) => {
@@ -27,10 +29,10 @@ function NotificationChannels() {
     event.preventDefault()
     try {
       await notificationService.saveChannel({ type: "TELEGRAM", chatId, enabled })
-      toast.success("Notification channel saved")
+      toast.success(t('notification_channel_saved'))
       load()
     } catch (error) {
-      toast.error(error.response?.data?.error || "Unable to save channel")
+      toast.error(error.response?.data?.error || t('unable_save_channel'))
     }
   }
 
@@ -38,20 +40,20 @@ function NotificationChannels() {
     <section className={adminSurface.page}>
       <div className={adminSurface.header}>
         <div>
-          <p className={adminSurface.eyebrow}>Notifications</p>
-          <h1 className={adminSurface.title}>Notification Channels</h1>
+          <p className={adminSurface.eyebrow}>{t('notifications')}</p>
+          <h1 className={adminSurface.title}>{t('notification_channels')}</h1>
           <p className={adminSurface.description}>
-            Configure delivery channels used for shop alerts and operational updates.
+            {t('notification_channels_desc')}
           </p>
         </div>
       </div>
 
       <div className={adminSurface.statGrid}>
         {[
-          ["Configured", channels.length],
-          ["Enabled", channels.filter((channel) => channel?.enabled).length],
-          ["Type", "Telegram"],
-          ["Current", enabled ? "Enabled" : "Disabled"],
+          [t('configured'), channels.length],
+          [t('enabled'), channels.filter((channel) => channel?.enabled).length],
+          [t('type'), "Telegram"],
+          [t('current'), enabled ? t('enabled') : t('disabled')],
         ].map(([label, value]) => (
           <div key={label} className={adminSurface.statCard}>
             <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
@@ -63,14 +65,14 @@ function NotificationChannels() {
 
       <form onSubmit={submit} className={`${adminSurface.card} max-w-2xl space-y-5`}>
         <label className="form-control">
-          <span className="mb-2 text-sm font-semibold text-[#0b1c30]">Telegram Chat ID</span>
+          <span className="mb-2 text-sm font-semibold text-[#0b1c30]">{t('telegram_chat_id')}</span>
           <input required className={`${adminSurface.input} h-12 w-full`} value={chatId} onChange={(event) => setChatId(event.target.value)} />
         </label>
         <label className="flex items-center gap-3 rounded-xl border border-[#d7dced] bg-[#f8f9ff] px-4 py-3">
           <input className="checkbox checkbox-sm border-[#0058be] checked:border-[#0058be] checked:bg-[#0058be]" type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />
-          <span className="text-sm font-medium text-[#213145]">Enabled</span>
+          <span className="text-sm font-medium text-[#213145]">{t('enabled')}</span>
         </label>
-        <button className={adminSurface.primaryButton} type="submit">Save</button>
+        <button className={adminSurface.primaryButton} type="submit">{t('save')}</button>
       </form>
     </section>
   )

@@ -12,8 +12,10 @@ import {
   tableHeadClass,
 } from "../adminManagerUi"
 import { PageHeader, StatusBadge, TableEmpty } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 function PosAccess() {
+  const { t } = useTranslation()
   const [shops, setShops] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
@@ -25,7 +27,7 @@ function PosAccess() {
       .then((response) => setShops(response.data.result || []))
       .catch((loadError) => {
         if (loadError?.response?.status !== 401) {
-          setError(formatApiError(loadError) || "Unable to load shops")
+          setError(formatApiError(loadError) || t('unable_to_load_shops'))
         }
       })
       .finally(() => setIsLoading(false))
@@ -41,12 +43,12 @@ function PosAccess() {
   return (
     <section>
       <PageHeader
-        title="POS"
-        description="POS is shop-scoped. Platform managers can review shop readiness and create shop users from here."
+        title={t('pos')}
+        description={t('pos_access_desc')}
         action={(
           <Link className={primaryButtonClass} to="/admin-manager/admin-owners/create">
             <FaUserShield />
-            Create Admin Owner
+            {t('create_admin_owner')}
           </Link>
         )}
       />
@@ -59,15 +61,15 @@ function PosAccess() {
 
       <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">Total Shops</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{t('total_shops')}</p>
           <strong className="block text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{shops.length.toLocaleString()}</strong>
         </article>
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">Active Shops</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{t('active_shops')}</p>
           <strong className="block text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{activeShops.length.toLocaleString()}</strong>
         </article>
         <article className={`${cardClass} p-5`}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">Assigned Admin Owners</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.05em] text-[#64748b] dark:text-[#a1a1aa]">{t('assigned_admin_owners')}</p>
           <strong className="block text-2xl font-bold text-[#020617] dark:text-[#f8fafc]">{assignedShops.length.toLocaleString()}</strong>
         </article>
       </div>
@@ -78,18 +80,18 @@ function PosAccess() {
             <FaCircleInfo />
           </div>
           <div>
-            <h2 className="font-semibold text-[#020617] dark:text-[#f8fafc]">Why this is not the cashier POS screen</h2>
+            <h2 className="font-semibold text-[#020617] dark:text-[#f8fafc]">{t('why_not_cashier_pos')}</h2>
             <p className="mt-1 text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-              Cashier POS creates sales under one shop. An ADMIN_MANAGER account is platform-wide, so it must create or assign a shop ADMIN/CASHIER account before that user opens the business POS.
+              {t('why_not_cashier_pos_desc')}
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link className={secondaryButtonClass} to="/admin-manager/shops">
                 <FaStore />
-                Manage Shops
+                {t('manage_shops')}
               </Link>
               <Link className={secondaryButtonClass} to="/admin-manager/admin-owners">
                 <FaUserShield />
-                Manage Admin Owners
+                {t('manage_admin_owners')}
               </Link>
             </div>
           </div>
@@ -100,24 +102,24 @@ function PosAccess() {
         <div className="border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4">
           <h3 className="flex items-center gap-2 text-base font-semibold text-[#020617] dark:text-[#f8fafc]">
             <FaCashRegister />
-            POS Readiness
+            {t('pos_readiness')}
           </h3>
-          <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">Active shops with assigned admin owners are ready for shop users to run POS.</p>
+          <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('pos_readiness_desc')}</p>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-[760px] w-full border-collapse">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Shop</th>
-                <th className={tableHeadCellClass}>Code</th>
-                <th className={tableHeadCellClass}>Admin Owner</th>
-                <th className={tableHeadCellClass}>Status</th>
-                <th className={tableHeadCellClass}>Ready</th>
+                <th className={tableHeadCellClass}>{t('shop')}</th>
+                <th className={tableHeadCellClass}>{t('code')}</th>
+                <th className={tableHeadCellClass}>{t('admin_owner')}</th>
+                <th className={tableHeadCellClass}>{t('status')}</th>
+                <th className={tableHeadCellClass}>{t('ready')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {isLoading ? (
-                <TableEmpty colSpan="5">Loading shops...</TableEmpty>
+                <TableEmpty colSpan="5">{t('loading_shops')}</TableEmpty>
               ) : shops.map((shop) => {
                 const ready = shop.status === "ACTIVE" && Boolean(shop.ownerAdminId)
 
@@ -129,13 +131,13 @@ function PosAccess() {
                     <td className={tableCellClass}><StatusBadge status={shop.status} /></td>
                     <td className={tableCellClass}>
                       <span className={ready ? "font-semibold text-emerald-600 dark:text-emerald-400" : "font-semibold text-amber-600 dark:text-amber-400"}>
-                        {ready ? "Ready" : "Needs setup"}
+                        {ready ? t('ready') : t('needs_setup')}
                       </span>
                     </td>
                   </tr>
                 )
               })}
-              {!isLoading && shops.length === 0 && <TableEmpty colSpan="5">No shops found</TableEmpty>}
+              {!isLoading && shops.length === 0 && <TableEmpty colSpan="5">{t('no_shops_found')}</TableEmpty>}
             </tbody>
           </table>
         </div>

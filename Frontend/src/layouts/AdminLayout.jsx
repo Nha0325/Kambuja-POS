@@ -3,43 +3,45 @@ import { Outlet, useLocation } from 'react-router-dom'
 import AdminSidebar from '../components/navigation/AdminSidebar'
 import TopMenu from '../components/navigation/TopMenu'
 import ConfirmProvider from '../components/ui/ConfirmProvider'
+import { useTranslation } from "react-i18next"
 
 const pageTitles = [
-  ["/admin/suppliers/create", "Create Supplier"],
-  ["/admin/suppliers/", "Edit Supplier"],
-  ["/admin/suppliers", "Suppliers"],
-  ["/admin/categories/create", "Create Category"],
-  ["/admin/categories/", "Edit Category"],
-  ["/admin/categories", "Categories"],
-  ["/admin/products/print-label", "Print Labels"],
-  ["/admin/products/create", "Create Product"],
-  ["/admin/products/", "Edit Product"],
-  ["/admin/products", "Products"],
-  ["/admin/inventory/stock-in", "Receive Stock"],
-  ["/admin/inventory/adjustment", "Stock Adjustment"],
-  ["/admin/inventory/adjust", "Adjustment"],
-  ["/admin/inventory", "Stock Overview"],
-  ["/admin/purchases/create", "Create Purchase"],
-  ["/admin/purchases", "Purchases"],
-  ["/admin/cashiers/create", "Create Cashier"],
-  ["/admin/cashiers/", "Edit Cashier"],
-  ["/admin/cashiers", "Cashiers"],
-  ["/admin/sales", "Sale Lists"],
-  ["/admin/reports/sales", "Sale Report"],
-  ["/admin/reports/stock", "Stock Report"],
-  ["/admin/channels", "Channels"],
-  ["/admin/logs", "Logs"],
-  ["/admin/notifications/channels", "Notification Channels"],
-  ["/admin/notifications/logs", "Notification Logs"],
-  ["/admin/settings", "Settings"],
-  ["/admin/shop-settings", "Shop Settings"],
+  ["/admin/suppliers/create", "create_new_supplier"],
+  ["/admin/suppliers/", "edit_supplier"],
+  ["/admin/suppliers", "suppliers"],
+  ["/admin/categories/create", "create_new_category"],
+  ["/admin/categories/", "edit_category"],
+  ["/admin/categories", "categories"],
+  ["/admin/products/print-label", "print_barcode_qr_label"],
+  ["/admin/products/create", "create_new_product"],
+  ["/admin/products/", "edit_product"],
+  ["/admin/products", "products"],
+  ["/admin/inventory/stock-in", "receive_stock"],
+  ["/admin/inventory/adjustment", "stock_adjustment"],
+  ["/admin/inventory/adjust", "stock_adjustment"],
+  ["/admin/inventory", "stock_overview"],
+  ["/admin/purchases/create", "create_purchase"],
+  ["/admin/purchases", "purchases"],
+  ["/admin/cashiers/create", "create_new_cashier"],
+  ["/admin/cashiers/", "edit_cashier"],
+  ["/admin/cashiers", "cashiers"],
+  ["/admin/sales", "view_all_sales"],
+  ["/admin/reports/sales", "sales_report"],
+  ["/admin/reports/stock", "stock_report"],
+  ["/admin/channels", "notification_channels"],
+  ["/admin/logs", "notification_logs"],
+  ["/admin/notifications/channels", "notification_channels"],
+  ["/admin/notifications/logs", "notification_logs"],
+  ["/admin/settings", "shop_settings"],
+  ["/admin/shop-settings", "shop_settings"],
 ]
 
-const getPageTitle = (pathname) => (
-  pageTitles.find(([path]) => pathname.startsWith(path))?.[1] || "Dashboard"
+const getPageTitleKey = (pathname) => (
+  pageTitles.find(([path]) => pathname.startsWith(path))?.[1] || "dashboard"
 )
 
 function AdminLayout() {
+  const { t } = useTranslation()
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -99,8 +101,8 @@ function AdminLayout() {
       
       <div className={`${sidebarPadding} min-w-0 max-w-full transition-all duration-300`}>
         <TopMenu
-          title={getPageTitle(location.pathname)}
-          eyebrow="Shop Admin"
+          title={t(getPageTitleKey(location.pathname))}
+          eyebrow={t('shop_admin')}
           onShowSidebar={() => {
             if (window.innerWidth < 1024) {
               setIsMobileOpen(!isMobileOpen)

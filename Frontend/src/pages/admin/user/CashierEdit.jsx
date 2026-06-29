@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import useCollection from "../../../hooks/common/useCollection";
 import useFetchOne from "../../../hooks/common/useFetchOne";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 function EditUser() {
   const [username, setUsername] = useState("");
@@ -16,6 +17,7 @@ function EditUser() {
 
   const { data } = useFetchOne("users", route.id);
   const { update, isLoading } = useCollection("users");
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,11 +33,11 @@ function EditUser() {
       }
       const res = await update(route.id, payload);
       if (res) {
-        toast.success("Cashier updated successfully!");
+        toast.success(t('cashier_updated_success'));
         navigate("/admin/cashiers");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to update cashier.");
+      toast.error(error?.response?.data?.message || t('failed_to_update_cashier'));
     }
   };
 
@@ -56,13 +58,13 @@ function EditUser() {
             to="/admin/cashiers"
             className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
-            Cashiers
+            {t('cashiers')}
           </Link>
 
           <span className="text-[#64748b] dark:text-[#a1a1aa]">›</span>
 
           <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">
-            Edit Cashier
+            {t('edit_cashier')}
           </span>
         </nav>
 
@@ -72,10 +74,10 @@ function EditUser() {
             {/* Card Header */}
             <div className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6">
               <h1 className="text-xl font-semibold text-[#020617] dark:text-[#f8fafc]">
-                Edit Cashier
+                {t('edit_cashier')}
               </h1>
               <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-                Update cashier permissions and login credentials.
+                {t('edit_cashier_desc')}
               </p>
             </div>
 
@@ -87,7 +89,7 @@ function EditUser() {
                     htmlFor="username"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Username <span className="text-red-500">*</span>
+                    {t('username')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="username"
@@ -97,7 +99,7 @@ function EditUser() {
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="Enter username"
+                    placeholder={t('enter_username')}
                   />
                 </div>
 
@@ -107,7 +109,7 @@ function EditUser() {
                     htmlFor="email"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Email <span className="text-red-500">*</span>
+                    {t('email')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="email"
@@ -117,7 +119,7 @@ function EditUser() {
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="Enter email"
+                    placeholder={t('enter_email_2')}
                   />
                 </div>
 
@@ -127,7 +129,7 @@ function EditUser() {
                     htmlFor="password"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Password <span className="text-sm font-normal text-slate-500">(Optional)</span>
+                    {t('password')} <span className="text-sm font-normal text-slate-500">{t('optional')}</span>
                   </label>
                   <input
                     id="password"
@@ -137,9 +139,9 @@ function EditUser() {
                     type="password"
                     minLength={6}
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="Enter new password (min 6 chars)"
+                    placeholder={t('enter_new_password')}
                   />
-                  <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-1">Leave blank if you don't want to change the password.</p>
+                  <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('leave_blank_password')}</p>
                 </div>
 
                 {/* Status */}
@@ -148,7 +150,7 @@ function EditUser() {
                     htmlFor="status"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Account Status <span className="text-red-500">*</span>
+                    {t('account_status')} <span className="text-red-500">*</span>
                   </label>
 
                   <select
@@ -158,8 +160,8 @@ function EditUser() {
                     onChange={(e) => setStatus(e.target.value)}
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
                   >
-                    <option value="ACTIVE">Active (Can login)</option>
-                    <option value="INACTIVE">Inactive (Locked)</option>
+                    <option value="ACTIVE">{t('active_can_login')}</option>
+                    <option value="INACTIVE">{t('inactive_locked')}</option>
                   </select>
                 </div>
               </div>
@@ -170,7 +172,7 @@ function EditUser() {
                   to="/admin/cashiers"
                   className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Link>
 
                 <button
@@ -178,7 +180,7 @@ function EditUser() {
                   disabled={isLoading}
                   className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
-                  {isLoading ? "Saving..." : "Save Changes"}
+                  {isLoading ? t('saving') : t('save_changes')}
                 </button>
               </div>
             </form>

@@ -8,6 +8,7 @@ import {
 import {
   FaStore, FaBoxOpen, FaMoneyBillWave, FaTag, FaTruck, FaChartBar
 } from "react-icons/fa6";
+import { useTranslation } from "react-i18next";
 
 const labelClass = "text-[11px] font-bold uppercase tracking-[0.08em] text-[#64748b] dark:text-[#a1a1aa]";
 const valueClass = "mt-1 font-semibold text-[#0f172a] dark:text-[#f8fafc]";
@@ -23,6 +24,7 @@ function Row({ label, value }) {
 }
 
 function ProductDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [movements, setMovements] = useState([]);
@@ -55,7 +57,7 @@ function ProductDetail() {
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#06b6d4] border-t-transparent mb-4" />
-          <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Loading product details...</p>
+          <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('loading_product_details')}</p>
         </div>
       </div>
     );
@@ -65,9 +67,9 @@ function ProductDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] gap-3">
         <LuPackageSearch className="h-12 w-12 text-[#64748b] dark:text-[#a1a1aa]" />
-        <p className="text-sm font-semibold text-red-500">Product not found</p>
+        <p className="text-sm font-semibold text-red-500">{t('product_not_found')}</p>
         <Link to="/admin-manager/products" className="text-xs text-[#06b6d4] underline">
-          Back to Products Monitor
+          {t('back_to_products_monitor')}
         </Link>
       </div>
     );
@@ -76,12 +78,12 @@ function ProductDetail() {
   const { shopId } = product;
   const stockQty = product.stock ?? product.currentStock ?? 0;
   const stockStatus =
-    stockQty <= 0 ? "Out of Stock"
-    : stockQty <= (product.reorderLevel || 5) ? "Low Stock"
-    : "In Stock";
+    stockQty <= 0 ? t('out_of_stock')
+    : stockQty <= (product.reorderLevel || 5) ? t('low_stock')
+    : t('in_stock');
   const statusBadge =
-    stockStatus === "Out of Stock" ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-    : stockStatus === "Low Stock" ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+    stockStatus === t('out_of_stock') ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+    : stockStatus === t('low_stock') ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
     : "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400";
 
   const margin = product.costPrice && product.salePrice
@@ -89,9 +91,9 @@ function ProductDetail() {
     : "0.0";
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: FaChartBar },
-    { id: "movements", label: "Stock Movements", icon: LuHistory },
-    { id: "sales", label: "Sales History", icon: LuListOrdered },
+    { id: "overview", label: t('overview'), icon: FaChartBar },
+    { id: "movements", label: t('stock_movements'), icon: LuHistory },
+    { id: "sales", label: t('sales_history'), icon: LuListOrdered },
   ];
 
   return (
@@ -100,7 +102,7 @@ function ProductDetail() {
       <div className="mb-6">
         <div className="flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa] mb-3">
           <Link to="/admin-manager/products" className="hover:text-[#06b6d4] transition-colors flex items-center gap-1">
-            <LuArrowLeft className="h-3.5 w-3.5" /> Products Monitor
+            <LuArrowLeft className="h-3.5 w-3.5" /> {t('products_monitor')}
           </Link>
           <span>/</span>
           <span className="font-medium text-[#06b6d4] truncate max-w-[200px]">{product.name}</span>
@@ -126,7 +128,7 @@ function ProductDetail() {
             to="/admin-manager/products"
             className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-4 text-sm font-semibold text-[#0f172a] dark:text-[#f8fafc] hover:bg-[#f8fafc] dark:hover:bg-[#18181b] transition-colors"
           >
-            <LuArrowLeft className="h-4 w-4" /> Back
+            <LuArrowLeft className="h-4 w-4" /> {t('back')}
           </Link>
         </div>
       </div>
@@ -147,27 +149,27 @@ function ProductDetail() {
             ) : (
               <div className="mx-auto flex h-44 w-44 flex-col items-center justify-center rounded-xl border border-dashed border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b]">
                 <LuPackageSearch className="h-10 w-10 opacity-20 text-[#64748b]" />
-                <span className="mt-2 text-xs text-[#64748b]">No Image</span>
+                <span className="mt-2 text-xs text-[#64748b]">{t('no_image')}</span>
               </div>
             )}
 
             <div className="mt-5 grid grid-cols-2 gap-3 text-left border-t border-[#f1f5f9] dark:border-[#27272a] pt-5">
               <div>
-                <p className={labelClass}>Barcode</p>
-                <p className={`${valueClass} text-sm`}>{product.barcode || "N/A"}</p>
+                <p className={labelClass}>{t('barcode')}</p>
+                <p className={`${valueClass} text-sm`}>{product.barcode || t('n_a')}</p>
               </div>
               <div>
-                <p className={labelClass}>SKU</p>
-                <p className={`${valueClass} text-sm`}>{product.sku || "N/A"}</p>
+                <p className={labelClass}>{t('sku')}</p>
+                <p className={`${valueClass} text-sm`}>{product.sku || t('n_a')}</p>
               </div>
               <div>
-                <p className={labelClass}>Supplier</p>
-                <p className={`${valueClass} text-sm`}>{product.supplier?.name || "N/A"}</p>
+                <p className={labelClass}>{t('supplier')}</p>
+                <p className={`${valueClass} text-sm`}>{product.supplier?.name || t('n_a')}</p>
               </div>
               <div>
-                <p className={labelClass}>Created</p>
+                <p className={labelClass}>{t('created')}</p>
                 <p className={`${valueClass} text-xs`}>
-                  {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "N/A"}
+                  {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : t('n_a')}
                 </p>
               </div>
             </div>
@@ -180,15 +182,15 @@ function ProductDetail() {
                 <FaStore className="h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#0f172a] dark:text-[#f8fafc]">Shop Info</h3>
-                <p className="text-xs text-[#64748b] dark:text-[#a1a1aa]">Platform isolation</p>
+                <h3 className="text-sm font-bold text-[#0f172a] dark:text-[#f8fafc]">{t('shop_info')}</h3>
+                <p className="text-xs text-[#64748b] dark:text-[#a1a1aa]">{t('platform_isolation')}</p>
               </div>
             </div>
-            <Row label="Shop Name" value={shopId?.name} />
-            <Row label="Shop Code" value={shopId?.code} />
-            <Row label="Owner/Admin" value={shopId?.ownerAdminId?.fullName || shopId?.ownerAdminId?.username} />
-            <Row label="Province" value={shopId?.provinceEn || shopId?.provinceKh} />
-            <Row label="Shop Status" value={shopId?.status} />
+            <Row label={t('shop_name')} value={shopId?.name} />
+            <Row label={t('shop_code')} value={shopId?.code} />
+            <Row label={t('owner_admin')} value={shopId?.ownerAdminId?.fullName || shopId?.ownerAdminId?.username} />
+            <Row label={t('province')} value={shopId?.provinceEn || shopId?.provinceKh} />
+            <Row label={t('shop_status')} value={shopId?.status} />
           </div>
         </div>
 
@@ -198,10 +200,10 @@ function ProductDetail() {
           {/* Stats Strip */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Current Stock", value: stockQty, color: "text-[#06b6d4]", icon: FaBoxOpen },
-              { label: "Sale Price", value: `$${(product.salePrice || 0).toFixed(2)}`, color: "text-green-500", icon: FaMoneyBillWave },
-              { label: "Cost Price", value: `$${(product.costPrice || 0).toFixed(2)}`, color: "text-red-400", icon: FaTruck },
-              { label: "Margin", value: `${margin}%`, color: "text-purple-500", icon: FaTag },
+              { label: t('current_stock'), value: stockQty, color: "text-[#06b6d4]", icon: FaBoxOpen },
+              { label: t('sale_price'), value: `$${(product.salePrice || 0).toFixed(2)}`, color: "text-green-500", icon: FaMoneyBillWave },
+              { label: t('cost_price'), value: `$${(product.costPrice || 0).toFixed(2)}`, color: "text-red-400", icon: FaTruck },
+              { label: t('margin'), value: `${margin}%`, color: "text-purple-500", icon: FaTag },
             ].map(({ label, value, color, icon: Icon }) => (
               <div key={label} className={`${cardClass} py-4 flex flex-col gap-2`}>
                 <Icon className={`h-4 w-4 ${color}`} />
@@ -234,31 +236,31 @@ function ProductDetail() {
             {activeTab === "overview" && (
               <div className="space-y-5">
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">Product Info</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">{t('product_info')}</h4>
                   <div>
-                    <Row label="Product Name" value={product.name} />
-                    <Row label="Description" value={product.description || "No description"} />
-                    <Row label="Category" value={product.category?.name} />
-                    <Row label="Supplier" value={product.supplier?.name} />
-                    <Row label="Barcode" value={product.barcode} />
-                    <Row label="SKU" value={product.sku} />
-                    <Row label="Status" value={product.status} />
+                    <Row label={t('product_name')} value={product.name} />
+                    <Row label={t('description')} value={product.description || t('no_description')} />
+                    <Row label={t('category')} value={product.category?.name} />
+                    <Row label={t('supplier')} value={product.supplier?.name} />
+                    <Row label={t('barcode')} value={product.barcode} />
+                    <Row label={t('sku')} value={product.sku} />
+                    <Row label={t('status')} value={product.status} />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">Stock Settings</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">{t('stock_settings')}</h4>
                   <div>
-                    <Row label="Current Stock" value={stockQty} />
-                    <Row label="Low Stock Threshold" value={product.reorderLevel ?? product.lowStockThreshold ?? 5} />
-                    <Row label="Stock Status" value={stockStatus} />
+                    <Row label={t('current_stock')} value={stockQty} />
+                    <Row label={t('low_stock_threshold')} value={product.reorderLevel ?? product.lowStockThreshold ?? 5} />
+                    <Row label={t('stock_status')} value={stockStatus} />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">Pricing</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748b] dark:text-[#a1a1aa] mb-3">{t('pricing')}</h4>
                   <div>
-                    <Row label="Cost Price" value={`$${(product.costPrice || 0).toFixed(2)}`} />
-                    <Row label="Sale Price" value={`$${(product.salePrice || 0).toFixed(2)}`} />
-                    <Row label="Margin" value={`${margin}%`} />
+                    <Row label={t('cost_price')} value={`$${(product.costPrice || 0).toFixed(2)}`} />
+                    <Row label={t('sale_price')} value={`$${(product.salePrice || 0).toFixed(2)}`} />
+                    <Row label={t('margin')} value={`${margin}%`} />
                   </div>
                 </div>
               </div>
@@ -270,17 +272,17 @@ function ProductDetail() {
                 {movements.length === 0 ? (
                   <div className="py-12 text-center">
                     <LuHistory className="mx-auto h-8 w-8 text-[#64748b] dark:text-[#a1a1aa] mb-3 opacity-40" />
-                    <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">No stock movements found</p>
+                    <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('no_stock_movements_found')}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto -mx-6">
                     <table className="min-w-full text-sm">
                       <thead>
                         <tr className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b]">
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Date</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Type</th>
-                          <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#64748b]">Qty</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Note</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('date')}</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('type')}</th>
+                          <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('qty')}</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('note')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#f1f5f9] dark:divide-[#27272a]">
@@ -317,17 +319,17 @@ function ProductDetail() {
                 {sales.length === 0 ? (
                   <div className="py-12 text-center">
                     <LuListOrdered className="mx-auto h-8 w-8 text-[#64748b] dark:text-[#a1a1aa] mb-3 opacity-40" />
-                    <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">No sales history found</p>
+                    <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('no_sales_history_found')}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto -mx-6">
                     <table className="min-w-full text-sm">
                       <thead>
                         <tr className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b]">
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Date</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Invoice</th>
-                          <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#64748b]">Total</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">Cashier</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('date')}</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('invoice')}</th>
+                          <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('total')}</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#64748b]">{t('cashier')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#f1f5f9] dark:divide-[#27272a]">

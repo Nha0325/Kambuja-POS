@@ -16,8 +16,10 @@ import {
   tableCellClass 
 } from "../adminManagerUi"
 import { PageHeader, TableEmpty, StatusBadge } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 function Locations() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const [search, setSearch] = useState(searchParams.get("search") || "")
   const [statusFilter, setStatusFilter] = useState("ALL")
@@ -38,7 +40,7 @@ function Locations() {
       setLocations(locRes.data?.result || [])
       setSummary(sumRes.data?.result || null)
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || "Something went wrong loading locations")
+      setError(err.response?.data?.message || err.response?.data?.error || t('error_loading_locations'))
     } finally {
       setIsLoading(false)
     }
@@ -67,8 +69,8 @@ function Locations() {
   return (
     <div className="w-full max-w-none min-w-0 flex flex-col gap-6">
       <PageHeader 
-        title="Locations Summary" 
-        description="View main shop locations and regional distribution."
+        title={t('locations_summary_title')}
+        description={t('locations_summary_desc')}
       />
 
       {error && (
@@ -84,7 +86,7 @@ function Locations() {
             <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 flex items-center justify-center text-[#06b6d4]">
               <FaMapLocationDot className="text-xl" />
             </div>
-            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Total Locations</p>
+            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('total_locations')}</p>
           </div>
           <h3 className="text-3xl font-bold text-[#020617] dark:text-[#f8fafc]">{summary?.total || 0}</h3>
         </div>
@@ -94,7 +96,7 @@ function Locations() {
             <div className="w-10 h-10 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center text-orange-500">
               <FaCity className="text-xl" />
             </div>
-            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Total Provinces</p>
+            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('total_provinces')}</p>
           </div>
           <h3 className="text-3xl font-bold text-[#020617] dark:text-[#f8fafc]">{summary?.provinces || 0}</h3>
         </div>
@@ -104,7 +106,7 @@ function Locations() {
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-500">
               <FaBuilding className="text-xl" />
             </div>
-            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Total Districts</p>
+            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('total_districts')}</p>
           </div>
           <h3 className="text-3xl font-bold text-[#020617] dark:text-[#f8fafc]">{summary?.districts || 0}</h3>
         </div>
@@ -114,7 +116,7 @@ function Locations() {
             <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 flex items-center justify-center text-[#06b6d4]">
               <FaStore className="text-xl" />
             </div>
-            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Mapped Shops</p>
+            <p className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('mapped_shops')}</p>
           </div>
           <h3 className="text-3xl font-bold text-[#020617] dark:text-[#f8fafc]">{summary?.mappedShops || 0}</h3>
         </div>
@@ -129,7 +131,7 @@ function Locations() {
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-[#64748b] dark:text-[#a1a1aa]">search</span>
               <input 
                 className={`${inputClass} pl-10`}
-                placeholder="Search shops..." 
+                placeholder={t('search_shops')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -141,9 +143,9 @@ function Locations() {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active</option>
-                <option value="LOCKED">Locked</option>
+                <option value="ALL">{t('all_status')}</option>
+                <option value="ACTIVE">{t('active')}</option>
+                <option value="LOCKED">{t('locked')}</option>
               </select>
             </div>
           </div>
@@ -154,21 +156,21 @@ function Locations() {
           <table className="w-full min-w-[1100px] table-auto text-left border-collapse">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Name & Code</th>
-                <th className={tableHeadCellClass}>Type</th>
-                <th className={tableHeadCellClass}>Shop</th>
-                <th className={tableHeadCellClass}>Manager</th>
-                <th className={tableHeadCellClass}>Location/Area</th>
-                <th className={`${tableHeadCellClass} text-center`}>Allow POS</th>
-                <th className={`${tableHeadCellClass} text-center`}>Status</th>
-                <th className={`${tableHeadCellClass} text-right`}>Actions</th>
+                <th className={tableHeadCellClass}>{t('name_and_code')}</th>
+                <th className={tableHeadCellClass}>{t('type')}</th>
+                <th className={tableHeadCellClass}>{t('shop')}</th>
+                <th className={tableHeadCellClass}>{t('manager')}</th>
+                <th className={tableHeadCellClass}>{t('location_area')}</th>
+                <th className={`${tableHeadCellClass} text-center`}>{t('allow_pos')}</th>
+                <th className={`${tableHeadCellClass} text-center`}>{t('status')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {isLoading ? (
-                <TableEmpty colSpan="8">Loading shops...</TableEmpty>
+                <TableEmpty colSpan="8">{t('loading_shops')}</TableEmpty>
               ) : filteredLocations.length === 0 ? (
-                <TableEmpty colSpan="8">No shops found. Create a shop first.</TableEmpty>
+                <TableEmpty colSpan="8">{t('no_shops_found_create')}</TableEmpty>
               ) : (
                 filteredLocations.map((loc) => {
                   const managerName = loc.manager?.username || "Unknown"
@@ -182,7 +184,7 @@ function Locations() {
                       </td>
                       <td className={tableCellClass}>
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] text-[#64748b] dark:text-[#a1a1aa]">
-                          {loc.type || "Branch"}
+                          {loc.type || t('branch')}
                         </span>
                       </td>
                       <td className={tableCellClass}>
@@ -207,7 +209,7 @@ function Locations() {
                       <td className={`${tableCellClass} text-center`}>
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${loc.posAccess ? 'bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 text-[#06b6d4] border border-[#06b6d4]/20' : 'bg-[#f8fafc] dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] border border-[#e5e7eb] dark:border-[#27272a]'}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${loc.posAccess ? 'bg-[#06b6d4]' : 'bg-[#64748b] dark:bg-[#a1a1aa]'}`}></span>
-                          {loc.posAccess ? "Yes" : "No"}
+                          {loc.posAccess ? t('yes') : t('no')}
                         </span>
                       </td>
                       <td className={`${tableCellClass} text-center`}>
@@ -218,7 +220,7 @@ function Locations() {
                           <Link 
                             to={`/admin-manager/shops`}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors" 
-                            title="View Shop in Directory"
+                            title={t('view_shop_in_directory')}
                           >
                             <span className="material-symbols-outlined text-[18px]">visibility</span>
                           </Link>

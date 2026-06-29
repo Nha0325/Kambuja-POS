@@ -7,9 +7,11 @@ import { adminManagerService } from "../../../services/users/adminManager.servic
 import { downloadCsv } from "../../../utils/helpers/downloadCsv"
 import { formatApiError } from "../../../utils/formatters/formatApiError"
 import formatDate from "../../../utils/formatters/formatDate"
+import { useTranslation } from "react-i18next"
 
 
 const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const wrapperRef = useRef(null)
@@ -74,7 +76,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {
               </div>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">No results found</div>
+            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">{t('no_results_found')}</div>
           )}
         </div>
       )}
@@ -83,6 +85,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled }) => {
 }
 
 function Reports() {
+  const { t } = useTranslation()
   const [shops, setShops] = useState([])
   const [selectedShop, setSelectedShop] = useState(null)
   
@@ -98,7 +101,7 @@ function Reports() {
     setIsLoadingShops(true)
     adminManagerService.getShops()
       .then(res => setShops(res.data?.result || []))
-      .catch(err => setError(formatApiError(err) || "Failed to load shops"))
+      .catch(err => setError(formatApiError(err) || t('failed_to_load_shops')))
       .finally(() => setIsLoadingShops(false))
   }, [])
 
@@ -125,7 +128,7 @@ function Reports() {
       .then((response) => setReportData(response.data.result))
       .catch((loadError) => {
         if (loadError?.response?.status !== 401) {
-          setError(formatApiError(loadError) || "Unable to load reports")
+          setError(formatApiError(loadError) || t('unable_to_load_reports'))
         }
       })
       .finally(() => setIsLoadingReports(false))
@@ -136,13 +139,13 @@ function Reports() {
     downloadCsv(
       `${selectedShop?.code || 'shop'}-report-${period}.csv`,
       [
-        { label: "Sale Code", value: (row) => row.saleCode },
-        { label: "Cashier", value: (row) => row.cashierName },
-        { label: "Customer", value: (row) => row.customerName },
-        { label: "Payment", value: (row) => row.paymentMethod },
-        { label: "Total", value: (row) => Number(row.total || 0) },
-        { label: "Status", value: (row) => row.status },
-        { label: "Date", value: (row) => formatDate(row.createdAt, "MMM DD, YYYY HH:mm") },
+        { label: t('sale_code'), value: (row) => row.saleCode },
+        { label: t('cashier'), value: (row) => row.cashierName },
+        { label: t('customer'), value: (row) => row.customerName },
+        { label: t('payment'), value: (row) => row.paymentMethod },
+        { label: t('total'), value: (row) => Number(row.total || 0) },
+        { label: t('status'), value: (row) => row.status },
+        { label: t('date'), value: (row) => formatDate(row.createdAt, "MMM DD, YYYY HH:mm") },
       ],
       reportData.recentSales || []
     )
@@ -162,37 +165,37 @@ function Reports() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="flex-1 w-full flex flex-col md:flex-row gap-4">
           <label className="block w-full max-w-[280px]">
-            <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Select Shop</span>
+            <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('select_shop')}</span>
             <Combobox
               valueObj={selectedShop}
               onChange={setSelectedShop}
               options={shops}
-              placeholder={isLoadingShops ? "Loading shops..." : "Search or select mini market..."}
+              placeholder={isLoadingShops ? t('loading_shops') : t('search_select_mini_market')}
               disabled={isLoadingShops}
             />
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
             <label className="block w-full sm:w-[160px]">
-              <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Date Range</span>
+              <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('date_range')}</span>
               <select 
                 className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4] appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M7%2010L12%2015L17%2010%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:24px] bg-[right_8px_center] bg-no-repeat" 
                 value={period} 
                 onChange={(e) => setPeriod(e.target.value)}
               >
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="custom">Custom</option>
+                <option value="today">{t('today')}</option>
+                <option value="week">{t('this_week')}</option>
+                <option value="month">{t('this_month')}</option>
+                <option value="custom">{t('custom')}</option>
               </select>
             </label>
             {period === 'custom' && (
               <>
                 <label className="block w-full sm:w-[140px]">
-                  <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Start Date</span>
+                  <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('start_date')}</span>
                   <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]" value={dateRange.startDate} onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})} />
                 </label>
                 <label className="block w-full sm:w-[140px]">
-                  <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">End Date</span>
+                  <span className="mb-1.5 block text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('end_date')}</span>
                   <input type="date" className="h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#ffffff] dark:bg-[#111113] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-colors focus:border-[#06b6d4]" value={dateRange.endDate} onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})} />
                 </label>
               </>
@@ -204,7 +207,7 @@ function Reports() {
           disabled={!reportData || reportData.recentSales?.length === 0}
           className="h-10 px-4 bg-[#ffffff] dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] text-[#020617] dark:text-[#f8fafc] text-sm font-semibold rounded-lg hover:bg-[#f8fafc] dark:hover:bg-[#09090b] transition-colors shadow-sm inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <FaDownload className="text-[#64748b] dark:text-[#a1a1aa]" /> Export
+          <FaDownload className="text-[#64748b] dark:text-[#a1a1aa]" /> {t('export')}
         </button>
       </div>
 
@@ -217,7 +220,7 @@ function Reports() {
       {!selectedShop ? (
         <div className="flex flex-col items-center justify-center py-24 border border-dashed border-[#e5e7eb] dark:border-[#27272a] rounded-xl bg-[#f8fafc]/50 dark:bg-[#09090b]/50">
           <FaStore className="text-4xl text-[#cbd5e1] dark:text-[#334155] mb-4" />
-          <p className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">Select a shop to view report</p>
+          <p className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('select_shop_to_view_report')}</p>
         </div>
       ) : isLoadingReports && !reportData ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
@@ -226,16 +229,16 @@ function Reports() {
       ) : reportData?.summary?.totalSales === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 border border-dashed border-[#e5e7eb] dark:border-[#27272a] rounded-xl bg-[#f8fafc]/50 dark:bg-[#09090b]/50">
           <FaChartBar className="text-4xl text-[#cbd5e1] dark:text-[#334155] mb-4" />
-          <p className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">No report data for this period.</p>
+          <p className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('no_report_data_period')}</p>
         </div>
       ) : (
         <>
           {/* Metric Cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             {[
-              { label: "Total Revenue", value: formatRiel(reportData?.summary?.totalRevenue), sub: "Selected period", icon: FaMoneyBillWave, color: "text-[#10b981]" },
-              { label: "Total Sales", value: (reportData?.summary?.totalSales || 0).toLocaleString(), sub: "Total transactions", icon: FaChartLine, color: "text-[#3b82f6]" },
-              { label: "Average Sale", value: formatRiel(reportData?.summary?.averageSale), sub: "Revenue per bill", icon: FaChartBar, color: "text-[#8b5cf6]" },
+              { label: t('total_revenue'), value: formatRiel(reportData?.summary?.totalRevenue), sub: t('selected_period'), icon: FaMoneyBillWave, color: "text-[#10b981]" },
+              { label: t('total_sales'), value: (reportData?.summary?.totalSales || 0).toLocaleString(), sub: t('total_transactions'), icon: FaChartLine, color: "text-[#3b82f6]" },
+              { label: t('average_sale'), value: formatRiel(reportData?.summary?.averageSale), sub: t('revenue_per_bill'), icon: FaChartBar, color: "text-[#8b5cf6]" },
             ].map((card, i) => (
               <div key={i} className="bg-[#ffffff] dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-5 flex flex-col justify-between h-[120px] shadow-sm">
                 <div className="flex justify-between items-start">
@@ -261,7 +264,7 @@ function Reports() {
                 <div>
                   <h3 className="text-lg font-bold tracking-tight truncate" title={reportData?.shop?.name}>{reportData?.shop?.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                     <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">Status:</span>
+                     <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">{t('status')}</span>
                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${reportData?.shop?.status === 'ACTIVE' ? 'bg-[#10b981]/10 text-[#10b981]' : 'bg-[#ef4444]/10 text-[#ef4444]'}`}>
                         {reportData?.shop?.status}
                      </span>
@@ -276,8 +279,8 @@ function Reports() {
             {/* Revenue Trend Line Chart */}
             <div className="bg-[#ffffff] dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6 shadow-sm flex flex-col h-[420px]">
               <div className="mb-6 h-[48px] shrink-0">
-                <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Revenue Trend</h3>
-                <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Sales performance over selected period</p>
+                <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('revenue_trend')}</h3>
+                <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('sales_performance_period')}</p>
               </div>
               
               <div className="flex-1 w-full min-h-0">
@@ -289,14 +292,14 @@ function Reports() {
                       <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(val) => `$${val >= 1000 ? (val/1000)+'k' : val}`} />
                       <Tooltip 
                         contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        formatter={(value, name, props) => [`${formatRiel(value)} (${props.payload.sales} sales)`, 'Revenue']}
+                        formatter={(value, name, props) => [`${formatRiel(value)} (${props.payload.sales} ${t('sales_count')})`, t('revenue')]}
                       />
                       <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
-                      <Line type="monotone" name="Revenue" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                      <Line type="monotone" name={t('revenue')} dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sm text-[#94a3b8] dark:text-[#64748b]">No trend data</div>
+                  <div className="w-full h-full flex items-center justify-center text-sm text-[#94a3b8] dark:text-[#64748b]">{t('no_trend_data')}</div>
                 )}
               </div>
             </div>
@@ -304,8 +307,8 @@ function Reports() {
             {/* Sales by Category Bar Chart */}
             <div className="bg-[#ffffff] dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl p-6 shadow-sm flex flex-col h-[420px]">
               <div className="mb-6 h-[48px] shrink-0">
-                <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Sales by Category</h3>
-                <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Top product categories</p>
+                <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('sales_by_category')}</h3>
+                <p className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('top_product_categories')}</p>
               </div>
               
               <div className="flex-1 w-full min-h-0">
@@ -319,7 +322,7 @@ function Reports() {
                         cursor={{ fill: '#f8fafc' }}
                         contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
-                      <Bar dataKey="value" name="Products Sold" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                      <Bar dataKey="value" name={t('products_sold')} radius={[4, 4, 0, 0]} maxBarSize={60}>
                         {categories.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                         ))}
@@ -327,7 +330,7 @@ function Reports() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sm text-[#94a3b8] dark:text-[#64748b]">No category data available</div>
+                  <div className="w-full h-full flex items-center justify-center text-sm text-[#94a3b8] dark:text-[#64748b]">{t('no_category_data_available')}</div>
                 )}
               </div>
             </div>
@@ -336,20 +339,20 @@ function Reports() {
           {/* Recent Sales Table */}
           <div className="bg-[#ffffff] dark:bg-[#111113] border border-[#e5e7eb] dark:border-[#27272a] rounded-xl shadow-sm overflow-hidden flex flex-col">
             <div className="p-5 border-b border-[#e5e7eb] dark:border-[#27272a] flex justify-between items-center bg-[#ffffff] dark:bg-[#111113]">
-              <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Recent Sales</h3>
-              <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] flex items-center gap-1"><FaClock /> Showing up to 100 records</p>
+              <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('recent_sales')}</h3>
+              <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] flex items-center gap-1"><FaClock /> {t('showing_up_to_100_records')}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-[#f8fafc] dark:bg-[#09090b] border-b border-[#e5e7eb] dark:border-[#27272a]">
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Sale Code</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Cashier</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Customer</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Payment</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Status</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">Date</th>
-                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider text-right">Total</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('sale_code')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('cashier')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('customer')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('payment')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('status')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider">{t('date')}</th>
+                    <th className="px-5 py-3 text-[11px] font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider text-right">{t('total')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
@@ -374,7 +377,7 @@ function Reports() {
                   ))}
                   {reportData?.recentSales?.length === 0 && (
                     <tr>
-                      <td colSpan="7" className="px-5 py-8 text-center text-[#94a3b8] dark:text-[#64748b] text-sm">No recent sales</td>
+                      <td colSpan="7" className="px-5 py-8 text-center text-[#94a3b8] dark:text-[#64748b] text-sm">{t('no_recent_sales')}</td>
                     </tr>
                   )}
                 </tbody>

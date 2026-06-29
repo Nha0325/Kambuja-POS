@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { adminManagerService } from "../../../services/users/adminManager.service"
 import { formatApiError } from "../../../utils/formatters/formatApiError"
 import { cambodiaAddress } from "../../../utils/data/cambodiaAddress"
+import { useTranslation } from "react-i18next"
 
 const createInitialForm = () => ({
   name: "",
@@ -112,7 +113,7 @@ const Combobox = ({ valueObj, onChange, options, placeholder, disabled, required
               </div>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">No results found</div>
+            <div className="px-3 py-2 text-sm text-[#64748b] dark:text-[#a1a1aa] italic">{placeholder === 'No results found' ? placeholder : 'No results found'}</div>
           )}
         </div>
       )}
@@ -128,6 +129,7 @@ function ShopForm() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
+  const { t } = useTranslation()
 
   useEffect(() => {
     let isMounted = true
@@ -175,7 +177,7 @@ function ShopForm() {
         }
       } catch (loadError) {
         if (isMounted) {
-          setError(loadError.response?.data?.error || "Unable to load shop form")
+          setError(loadError.response?.data?.error || t('unable_to_load_shop_form'))
         }
       } finally {
         if (isMounted) setIsLoading(false)
@@ -193,7 +195,7 @@ function ShopForm() {
     setError("")
 
     if (!form.name.trim() || !form.ownerAdminId || !form.provinceKh.trim() || !form.districtKh.trim()) {
-      setError("Shop name, Owner Admin, Province, and District are required.")
+      setError(t('shop_form_required_fields'))
       return
     }
 
@@ -238,16 +240,16 @@ function ShopForm() {
 
       if (id) {
         await adminManagerService.updateShop(id, payload)
-        toast.success("Shop updated")
+        toast.success(t('shop_updated'))
       } else {
         await adminManagerService.createShop(payload)
-        toast.success("Shop created successfully. Create first location.")
+        toast.success(t('shop_created_successfully'))
       }
       window.dispatchEvent(new Event("refetchNotifications"))
       navigate("/admin-manager/shops")
     } catch (submitError) {
       if (submitError?.response?.status === 401) return
-      const message = formatApiError(submitError) || "Unable to save shop"
+      const message = formatApiError(submitError) || t('unable_to_save_shop')
       setError(message)
       toast.error(message)
     } finally {
@@ -259,8 +261,8 @@ function ShopForm() {
     return (
       <section className="mx-auto w-full max-w-4xl min-w-0 pb-10">
         <div className="w-full">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? "Edit Shop" : "Create Shop"}</h1>
-          <div className="mt-6 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-10 text-sm text-[#64748b] dark:text-[#a1a1aa]">Loading shop form...</div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? t('edit_shop') : t('create_shop')}</h1>
+          <div className="mt-6 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] p-10 text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('loading_shop_form')}</div>
         </div>
       </section>
     )
@@ -278,11 +280,16 @@ function ShopForm() {
   return (
     <section className="mx-auto w-full max-w-4xl min-w-0 pb-10">
       <div className="w-full">
+        <nav className="mb-4 flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
+          <Link to="/admin-manager/shops" className="hover:text-[#06b6d4]">{t('all_shops')}</Link>
+          <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
+          <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? t('edit_shop') : t('create_shop')}</span>
+        </nav>
         <div className="mb-6">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#06b6d4]">Kambuja POS</p>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? "Edit Shop" : "Create Shop"}</h1>
+          <h1 className="mt-1 text-2xl sm:text-3xl font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? t('edit_shop') : t('create_shop')}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-            Configure business account and location details.
+            {t('shop_form_desc')}
           </p>
         </div>
 
@@ -294,62 +301,62 @@ function ShopForm() {
           )}
 
           <section>
-            <SectionTitle>Shop / Business Account</SectionTitle>
+            <SectionTitle>{t('shop_business_account')}</SectionTitle>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <label className="space-y-2">
-                <span className={labelClass}>Shop Name *</span>
-                <input required className={inputClass} placeholder="Enter shop name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <span className={labelClass}>{t('shop_name_req')}</span>
+                <input required className={inputClass} placeholder={t('enter_shop_name')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Auto Shop Code</span>
-                <input readOnly className={readOnlyInputClass} value={form.code} placeholder="Auto generated by backend" />
+                <span className={labelClass}>{t('auto_shop_code')}</span>
+                <input readOnly className={readOnlyInputClass} value={form.code} placeholder={t('auto_generated_code')} />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Owner Admin *</span>
+                <span className={labelClass}>{t('owner_admin_req')}</span>
                 <select required disabled={noOwnerAdmin} className={selectClass} value={form.ownerAdminId} onChange={(e) => setForm({ ...form, ownerAdminId: e.target.value })}>
-                  <option value="">Select admin owner</option>
+                  <option value="">{t('select_admin_owner')}</option>
                   {admins.map((admin) => (
                     <option key={admin._id} value={admin._id}>{admin.username} ({admin.email})</option>
                   ))}
                 </select>
                 {noOwnerAdmin && (
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                    <span className="text-[#64748b] dark:text-[#a1a1aa]">No available admins.</span>
-                    <Link className="font-bold text-[#06b6d4] underline underline-offset-2 hover:opacity-80 transition-opacity" to="/admin-manager/admin-owners/create">Create Admin Owner</Link>
+                    <span className="text-[#64748b] dark:text-[#a1a1aa]">{t('no_available_admins')}</span>
+                    <Link className="font-bold text-[#06b6d4] underline underline-offset-2 hover:opacity-80 transition-opacity" to="/admin-manager/admin-owners/create">{t('create_admin_owner')}</Link>
                   </div>
                 )}
               </label>
 
 
               <label className="space-y-2">
-                <span className={labelClass}>Billing Email</span>
+                <span className={labelClass}>{t('billing_email')}</span>
                 <input type="email" className={inputClass} placeholder="billing@company.com" value={form.billingEmail} onChange={(e) => setForm({ ...form, billingEmail: e.target.value })} />
               </label>
               
               <label className="space-y-2">
-                <span className={labelClass}>Subscription Plan</span>
+                <span className={labelClass}>{t('subscription_plan')}</span>
                 <select className={selectClass} value={form.subscriptionPlan} onChange={(e) => setForm({ ...form, subscriptionPlan: e.target.value })}>
-                  <option value="Free">Free</option>
-                  <option value="Basic">Basic</option>
-                  <option value="Pro">Pro</option>
+                  <option value="Free">{t('free')}</option>
+                  <option value="Basic">{t('basic')}</option>
+                  <option value="Pro">{t('pro')}</option>
                 </select>
               </label>
               
               <label className="space-y-2">
-                <span className={labelClass}>Shop Status</span>
+                <span className={labelClass}>{t('shop_status')}</span>
                 <select className={selectClass} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                  <option value="ACTIVE">Active</option>
-                  <option value="LOCKED">Locked</option>
-                  <option value="SUSPENDED">Suspended</option>
-                  <option value="EXPIRED">Expired</option>
+                  <option value="ACTIVE">{t('active')}</option>
+                  <option value="LOCKED">{t('locked')}</option>
+                  <option value="SUSPENDED">{t('suspended')}</option>
+                  <option value="EXPIRED">{t('expired')}</option>
                 </select>
               </label>
 
 
               <label className="space-y-2">
-                <span className={labelClass}>Default Currency</span>
+                <span className={labelClass}>{t('default_currency')}</span>
                 <select className={selectClass} value={form.defaultCurrency} onChange={(e) => setForm({ ...form, defaultCurrency: e.target.value })}>
                   <option value="USD">USD</option>
                   <option value="KHR">KHR</option>
@@ -357,7 +364,7 @@ function ShopForm() {
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Default Tax (%)</span>
+                <span className={labelClass}>{t('default_tax')}</span>
                 <input type="number" min="0" step="0.1" className={inputClass} value={form.defaultTax} onChange={(e) => setForm({ ...form, defaultTax: e.target.value })} />
               </label>
             </div>
@@ -366,10 +373,10 @@ function ShopForm() {
           </section>
 
           <section>
-            <SectionTitle>Shop Address</SectionTitle>
+            <SectionTitle>{t('shop_address')}</SectionTitle>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <label className="space-y-2">
-                <span className={labelClass}>Province / Capital *</span>
+                <span className={labelClass}>{t('province_req')}</span>
                 <Combobox
                   valueObj={selectedProv}
                   onChange={(opt) => setForm({ 
@@ -380,13 +387,13 @@ function ShopForm() {
                     village: "" 
                   })}
                   options={cambodiaAddress}
-                  placeholder="Select Province / Capital"
+                  placeholder={t('select_province')}
                   required
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>District / Khan *</span>
+                <span className={labelClass}>{t('district_req')}</span>
                 <Combobox
                   valueObj={selectedDist}
                   onChange={(opt) => setForm({ 
@@ -396,14 +403,14 @@ function ShopForm() {
                     village: "" 
                   })}
                   options={availableDistricts}
-                  placeholder="Select District / Khan"
+                  placeholder={t('select_district')}
                   disabled={!form.provinceKh}
                   required
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Commune / Sangkat</span>
+                <span className={labelClass}>{t('commune_opt')}</span>
                 <Combobox
                   valueObj={selectedComm}
                   onChange={(opt) => setForm({ 
@@ -412,31 +419,31 @@ function ShopForm() {
                     village: "" 
                   })}
                   options={availableCommunes}
-                  placeholder="Select Commune / Sangkat"
+                  placeholder={t('select_commune')}
                   disabled={!form.districtKh}
                 />
               </label>
 
               <label className="space-y-2">
-                <span className={labelClass}>Village</span>
-                <input className={inputClass} placeholder="Village name (Optional)" value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })} />
+                <span className={labelClass}>{t('village')}</span>
+                <input className={inputClass} placeholder={t('village_placeholder')} value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })} />
               </label>
 
               <label className="space-y-2 md:col-span-2">
-                <span className={labelClass}>Detailed Address</span>
-                <input className={inputClass} placeholder="House number, street, market name, nearby landmark..." value={form.addressDetail} onChange={(e) => setForm({ ...form, addressDetail: e.target.value })} />
+                <span className={labelClass}>{t('detailed_address')}</span>
+                <input className={inputClass} placeholder={t('address_placeholder')} value={form.addressDetail} onChange={(e) => setForm({ ...form, addressDetail: e.target.value })} />
               </label>
             </div>
           </section>
 
           <div className="flex flex-col-reverse gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] pt-8 sm:flex-row sm:items-center sm:justify-end">
-            <Link className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center w-full sm:w-auto" to="/admin-manager/shops">Cancel</Link>
+            <Link className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center w-full sm:w-auto" to="/admin-manager/shops">{t('cancel')}</Link>
             <button
               className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center w-full sm:w-auto"
               type="submit"
               disabled={isSaving || noOwnerAdmin}
             >
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? t('saving') : t('save')}
             </button>
           </div>
         </form>

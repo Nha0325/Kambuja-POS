@@ -3,12 +3,14 @@ import useFetchOne from "../../../hooks/common/useFetchOne";
 import Modal from "../../../components/ui/Modal";
 import useAddPaymentPurchase from "../../../hooks/purchase/useAddPaymentPurchase";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 function PurchasePaymentModal({ open, editId, onClose }) {
   const { data, isLoading } = useFetchOne("purchases", editId);
   const [paidAmount, setPaidAmount] = useState("");
   const [changeAmount, setChangeAmount] = useState(0);
   const { addPayment, isLoading: isSaving } = useAddPaymentPurchase();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -20,7 +22,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!editId) {
-      toast.error("Purchase ID is missing. Cannot add payment.");
+      toast.error(t('purchase_id_missing'));
       return;
     }
     if (!data || isLoading || isSaving) {
@@ -29,7 +31,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
 
     const amount = Math.round(parseFloat(paidAmount));
     if (!amount || isNaN(amount) || amount <= 0) {
-      toast.error("Please enter a valid positive amount to pay.");
+      toast.error(t('enter_valid_amount'));
       return;
     }
 
@@ -38,7 +40,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
         paidAmount: amount,
       });
       if (res) {
-        toast.success("Add payment successfully!");
+        toast.success(t('add_payment_success'));
         setPaidAmount("");
         onClose();
       }
@@ -63,7 +65,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
     <div>
       <Modal
         size="md"
-        title="Add Payment"
+        title={t('add_payment')}
         open={open}
         onClose={() => {
           setPaidAmount("");
@@ -76,13 +78,13 @@ function PurchasePaymentModal({ open, editId, onClose }) {
         ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2">Paid Amount ($)</label>
+            <label className="block text-xs font-semibold uppercase tracking-[0.04em] text-[#64748b] dark:text-[#a1a1aa] mb-2">{t('paid_amount_usd')}</label>
             <input
               onChange={(e) => setPaidAmount(e.target.value)}
               value={paidAmount}
               type="number"
               className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-              placeholder="Enter amount in $"
+              placeholder={t('enter_amount_usd')}
             />
           </div>
           
@@ -93,19 +95,19 @@ function PurchasePaymentModal({ open, editId, onClose }) {
               disabled={isSaving}
               className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm"
             >
-              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Due Amount:</span>
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">{t('due_amount_label')}</span>
               <span className="text-red-500 font-bold">${Number(data?.dueAmount || 0).toFixed(2)}</span>
             </button>
             
             <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] text-sm">
-              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Remaining Due:</span>
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">{t('remaining_due_label')}</span>
               <span className="text-orange-500 font-bold">
                 ${Math.max(0, (data?.totalCost || 0) - ((data?.paidAmount || 0) + Number(paidAmount || 0))).toFixed(2)}
               </span>
             </div>
 
             <div className="flex justify-between items-center w-full px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] text-sm">
-              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">Change Amount:</span>
+              <span className="text-[#64748b] dark:text-[#a1a1aa] font-medium">{t('change_amount_label')}</span>
               <span className="text-green-500 font-bold">
                 ${Number(changeAmount || 0).toFixed(2)}
               </span>
@@ -113,7 +115,7 @@ function PurchasePaymentModal({ open, editId, onClose }) {
           </div>
           
           <button type="submit" disabled={isSaving} className="mt-4 bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full">
-            {isSaving ? "Saving..." : "Save Payment"}
+            {isSaving ? t('saving') : t('save_payment')}
           </button>
         </form>
         )}

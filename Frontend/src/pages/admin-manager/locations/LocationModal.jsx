@@ -2,8 +2,10 @@ import { useState, useEffect } from "react"
 import { FaXmark } from "react-icons/fa6"
 import { locationService } from "../../../services/system/location.service"
 import { api } from "../../../utils/config/api"
+import { useTranslation } from "react-i18next"
 
 export default function LocationModal({ isOpen, onClose, onSuccess, initialData }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     province: "",
     district: "",
@@ -63,7 +65,7 @@ export default function LocationModal({ isOpen, onClose, onSuccess, initialData 
       }
       onSuccess()
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || "Something went wrong")
+      setError(err.response?.data?.message || err.response?.data?.error || t('unable_to_save_location'))
     } finally {
       setLoading(false)
     }
@@ -76,7 +78,7 @@ export default function LocationModal({ isOpen, onClose, onSuccess, initialData 
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] text-[#020617] dark:text-[#f8fafc] shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#e5e7eb] dark:border-[#27272a] px-6 py-4">
-          <h2 className="text-lg font-bold">{initialData ? "Edit Location" : "Create Location"}</h2>
+          <h2 className="text-lg font-bold">{initialData ? t('edit_location') : t('create_location')}</h2>
           <button onClick={onClose} className="rounded-lg p-2 hover:bg-slate-50 dark:hover:bg-white/5 text-[#64748b] dark:text-[#a1a1aa] transition-colors">
             <FaXmark className="h-5 w-5" />
           </button>
@@ -91,23 +93,23 @@ export default function LocationModal({ isOpen, onClose, onSuccess, initialData 
 
           <div className="grid grid-cols-2 gap-4">
             <label className="col-span-2">
-              <span className={labelClass}>Province / City</span>
+              <span className={labelClass}>{t('province_city')}</span>
               <input type="text" required className={inputClass} value={formData.province} onChange={e => setFormData({ ...formData, province: e.target.value })} />
             </label>
             <label>
-              <span className={labelClass}>District / Khan</span>
+              <span className={labelClass}>{t('district_khan')}</span>
               <input type="text" required className={inputClass} value={formData.district} onChange={e => setFormData({ ...formData, district: e.target.value })} />
             </label>
             <label>
-              <span className={labelClass}>Commune / Sangkat</span>
+              <span className={labelClass}>{t('commune_sangkat')}</span>
               <input type="text" className={inputClass} value={formData.commune} onChange={e => setFormData({ ...formData, commune: e.target.value })} />
             </label>
             <label>
-              <span className={labelClass}>Village</span>
+              <span className={labelClass}>{t('village')}</span>
               <input type="text" className={inputClass} value={formData.village} onChange={e => setFormData({ ...formData, village: e.target.value })} />
             </label>
             <label>
-              <span className={labelClass}>Status</span>
+              <span className={labelClass}>{t('status')}</span>
               <select required className={inputClass} value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                 <option value="ACTIVE">ACTIVE</option>
                 <option value="INACTIVE">INACTIVE</option>
@@ -116,14 +118,14 @@ export default function LocationModal({ isOpen, onClose, onSuccess, initialData 
           </div>
 
           <label className="mt-4 block">
-            <span className={labelClass}>Address Detail</span>
+            <span className={labelClass}>{t('address_detail')}</span>
             <textarea className={`${inputClass} min-h-[60px] py-2`} value={formData.addressDetail} onChange={e => setFormData({ ...formData, addressDetail: e.target.value })} />
           </label>
 
           <label className="mt-4 block">
-            <span className={labelClass}>Assigned Shop (Optional)</span>
+            <span className={labelClass}>{t('shop_assignment')}</span>
             <select className={inputClass} value={formData.shop} onChange={e => setFormData({ ...formData, shop: e.target.value })}>
-              <option value="">No Shop Assigned</option>
+              <option value="">{t('select_a_shop')}</option>
               {shops.map(shop => (
                 <option key={shop._id} value={shop._id}>{shop.name} ({shop.code})</option>
               ))}
@@ -132,10 +134,10 @@ export default function LocationModal({ isOpen, onClose, onSuccess, initialData 
 
           <div className="mt-8 flex items-center justify-end gap-3">
             <button type="button" onClick={onClose} className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors">
-              Cancel
+              {t('cancel')}
             </button>
             <button type="submit" disabled={loading} className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors">
-              {loading ? "Saving..." : "Save Location"}
+              {loading ? t('saving') : t('save_location')}
             </button>
           </div>
         </form>

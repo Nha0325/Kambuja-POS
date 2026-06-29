@@ -5,6 +5,7 @@ import { FaCircleInfo, FaStore, FaShieldHalved, FaCheck } from "react-icons/fa6"
 import { locationService } from "../../../services/system/location.service"
 import { api } from "../../../utils/config/api"
 import { formatApiError } from "../../../utils/formatters/formatApiError"
+import { useTranslation } from "react-i18next"
 
 const createInitialForm = () => ({
   name: "",
@@ -24,6 +25,7 @@ const inputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3
 const selectClass = `${inputClass} appearance-none cursor-pointer`
 
 function LocationForm() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const [form, setForm] = useState(createInitialForm)
@@ -61,7 +63,7 @@ function LocationForm() {
           })
         }
       } catch (loadError) {
-        if (isMounted) setError(loadError.response?.data?.message || loadError.response?.data?.error || "Unable to load location form")
+        if (isMounted) setError(loadError.response?.data?.message || loadError.response?.data?.error || t('unable_to_load_location_form'))
       } finally {
         if (isMounted) setIsLoading(false)
       }
@@ -75,7 +77,7 @@ function LocationForm() {
     setError("")
 
     if (!form.name || !form.shop) {
-      setError("Please fill all required fields (Name, Shop).")
+      setError(t('fill_required_fields_location'))
       return
     }
 
@@ -87,11 +89,11 @@ function LocationForm() {
       if (id) await locationService.update(id, payload)
       else await locationService.create(payload)
       
-      toast.success(id ? "Location updated" : "Location created")
+      toast.success(id ? t('location_updated') : t('location_created'))
       navigate("/admin-manager/locations")
     } catch (submitError) {
       if (submitError?.response?.status === 401) return
-      const message = submitError.response?.data?.message || formatApiError(submitError) || "Unable to save location"
+      const message = submitError.response?.data?.message || formatApiError(submitError) || t('unable_to_save_location')
       setError(message)
       toast.error(message)
     } finally {
@@ -102,7 +104,7 @@ function LocationForm() {
   if (isLoading) {
     return (
       <div className="p-4 md:p-8 max-w-5xl mx-auto w-full">
-        <h2 className="font-semibold text-3xl text-[#020617] dark:text-[#f8fafc] mb-6">Loading form...</h2>
+        <h2 className="font-semibold text-3xl text-[#020617] dark:text-[#f8fafc] mb-6">{t('loading_form')}</h2>
       </div>
     )
   }
@@ -113,18 +115,18 @@ function LocationForm() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <nav className="flex gap-2 text-xs font-medium text-[#64748b] dark:text-[#a1a1aa] mb-2 items-center">
-            <Link to="/admin-manager" className="hover:text-[#06b6d4] transition-colors">Admin Manager</Link>
+            <Link to="/admin-manager" className="hover:text-[#06b6d4] transition-colors">{t('admin_manager')}</Link>
             <span>/</span>
-            <Link to="/admin-manager/locations" className="hover:text-[#06b6d4] transition-colors">Locations</Link>
+            <Link to="/admin-manager/locations" className="hover:text-[#06b6d4] transition-colors">{t('locations')}</Link>
             <span>/</span>
-            <span className="text-[#06b6d4] font-bold">{id ? "Edit" : "Create"}</span>
+            <span className="text-[#06b6d4] font-bold">{id ? t('edit') : t('create')}</span>
           </nav>
-          <h2 className="font-semibold text-2xl sm:text-3xl text-[#020617] dark:text-[#f8fafc] tracking-tight">{id ? "Edit Location" : "Create Location"}</h2>
-          <p className="text-[#64748b] dark:text-[#a1a1aa] mt-1 text-sm">Register a new physical outlet or management hub to the enterprise system.</p>
+          <h2 className="font-semibold text-2xl sm:text-3xl text-[#020617] dark:text-[#f8fafc] tracking-tight">{id ? t('edit_location') : t('create_location')}</h2>
+          <p className="text-[#64748b] dark:text-[#a1a1aa] mt-1 text-sm">{t('register_location_desc')}</p>
         </div>
         <div className="flex gap-3">
           <Link to="/admin-manager/locations" className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center">
-            Cancel
+            {t('cancel')}
           </Link>
           <button 
             type="submit" 
@@ -133,7 +135,7 @@ function LocationForm() {
             className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center gap-2"
           >
             <FaCheck />
-            {isSaving ? "Saving..." : "Save Location"}
+            {isSaving ? t('saving') : t('save_location')}
           </button>
         </div>
       </div>
@@ -153,90 +155,90 @@ function LocationForm() {
             <div className="w-10 h-10 rounded-full bg-[#06b6d4]/10 flex items-center justify-center text-[#06b6d4]">
               <FaCircleInfo className="text-lg" />
             </div>
-            <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">Location Details</h3>
+            <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">{t('location_details')}</h3>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="sm:col-span-2">
-              <label className={labelClass}>Location Name *</label>
+              <label className={labelClass}>{t('location_name_req')}</label>
               <input
                 required
                 className={inputClass}
-                placeholder="e.g. Toul Kork Branch"
+                placeholder={t('eg_location_name')}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={labelClass}>Location Code</label>
+              <label className={labelClass}>{t('location_code')}</label>
               <input
                 className={inputClass}
-                placeholder="e.g. BR-001"
+                placeholder={t('eg_location_code')}
                 value={form.code}
                 onChange={(e) => setForm({ ...form, code: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={labelClass}>Type</label>
+              <label className={labelClass}>{t('type')}</label>
               <select
                 className={selectClass}
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
               >
-                <option value="Branch">Branch</option>
-                <option value="Warehouse">Warehouse</option>
-                <option value="Store">Store</option>
+                <option value="Branch">{t('branch')}</option>
+                <option value="Warehouse">{t('warehouse')}</option>
+                <option value="Store">{t('store')}</option>
               </select>
             </div>
 
             <div>
-              <label className={labelClass}>Province/City</label>
+              <label className={labelClass}>{t('province_city')}</label>
               <input
                 className={inputClass}
-                placeholder="e.g. Phnom Penh"
+                placeholder={t('eg_province')}
                 value={form.province}
                 onChange={(e) => setForm({ ...form, province: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={labelClass}>District/Khan</label>
+              <label className={labelClass}>{t('district_khan')}</label>
               <input
                 className={inputClass}
-                placeholder="e.g. Chamkar Mon"
+                placeholder={t('eg_district')}
                 value={form.district}
                 onChange={(e) => setForm({ ...form, district: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={labelClass}>Commune/Sangkat</label>
+              <label className={labelClass}>{t('commune_sangkat')}</label>
               <input
                 className={inputClass}
-                placeholder="e.g. Boeng Keng Kang I"
+                placeholder={t('eg_commune')}
                 value={form.commune}
                 onChange={(e) => setForm({ ...form, commune: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={labelClass}>Village</label>
+              <label className={labelClass}>{t('village')}</label>
               <input
                 className={inputClass}
-                placeholder="e.g. Phum 1"
+                placeholder={t('eg_village')}
                 value={form.village}
                 onChange={(e) => setForm({ ...form, village: e.target.value })}
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className={labelClass}>Address Detail</label>
+              <label className={labelClass}>{t('address_detail')}</label>
               <textarea
                 className={`${inputClass} h-auto py-3 resize-none`}
                 rows="3"
-                placeholder="Enter specific house number, street name, and landmarks..."
+                placeholder={t('address_placeholder')}
                 value={form.addressDetail}
                 onChange={(e) => setForm({ ...form, addressDetail: e.target.value })}
               />
@@ -253,19 +255,19 @@ function LocationForm() {
               <div className="w-10 h-10 rounded-full bg-[#06b6d4]/10 flex items-center justify-center text-[#06b6d4]">
                 <FaStore className="text-lg" />
               </div>
-              <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">Shop Assignment</h3>
+              <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">{t('shop_assignment')}</h3>
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>Assign to Shop *</label>
+                <label className={labelClass}>{t('assign_to_shop_req')}</label>
                 <select
                   required
                   className={selectClass}
                   value={form.shop}
                   onChange={(e) => setForm({ ...form, shop: e.target.value })}
                 >
-                  <option value="">Select a Shop</option>
+                  <option value="">{t('select_a_shop')}</option>
                   {shops.map((shop) => (
                     <option key={shop._id} value={shop._id}>
                       {shop.name} ({shop.code})
@@ -274,7 +276,7 @@ function LocationForm() {
                 </select>
               </div>
               <div className="p-4 bg-[#06b6d4]/5 rounded-xl border border-[#06b6d4]/10">
-                <p className="text-xs text-[#06b6d4] leading-relaxed font-medium">Assigning a location to a shop allows managers to track inventory and sales data specifically for this physical space.</p>
+                <p className="text-xs text-[#06b6d4] leading-relaxed font-medium">{t('shop_assignment_desc')}</p>
               </div>
             </div>
           </div>
@@ -286,7 +288,7 @@ function LocationForm() {
                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                   <FaShieldHalved className="text-lg" />
                 </div>
-                <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">Status</h3>
+                <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc]">{t('status')}</h3>
               </div>
               <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
                 form.status === 'ACTIVE' 
@@ -307,7 +309,7 @@ function LocationForm() {
                     : "border-transparent bg-slate-50 dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
-                Active
+                {t('active')}
               </button>
               <button 
                 type="button"
@@ -318,7 +320,7 @@ function LocationForm() {
                     : "border-transparent bg-slate-50 dark:bg-[#09090b] text-[#64748b] dark:text-[#a1a1aa] hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
-                Inactive
+                {t('inactive')}
               </button>
             </div>
           </div>

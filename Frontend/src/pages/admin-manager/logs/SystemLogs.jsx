@@ -23,12 +23,14 @@ import {
   tableHeadClass,
 } from "../adminManagerUi"
 import { PageHeader, TableEmpty } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 const dateFormat = "DD/MMM/YYYY"
 const timeFormat = "HH:mm"
 const dateTimeFormat = `${dateFormat} ${timeFormat}`
 
 function SystemLogs() {
+  const { t } = useTranslation()
   const [logs, setLogs] = useState([])
   const [stats, setStats] = useState({ total: 0, actionTypesCount: 0, latestTime: null })
   const [isLoading, setIsLoading] = useState(true)
@@ -56,7 +58,7 @@ function SystemLogs() {
       setStats(statsData.data || { total: 0, actionTypesCount: 0, latestTime: null })
     } catch (loadError) {
       if (loadError?.response?.status !== 401) {
-        setError(formatApiError(loadError) || "Failed to load system logs")
+        setError(formatApiError(loadError) || t('failed_to_load_system_logs'))
       }
     } finally {
       setIsLoading(false)
@@ -74,15 +76,15 @@ function SystemLogs() {
     downloadCsv(
       "admin-manager-system-logs.csv",
       [
-        { label: "Date", value: (log) => formatDate(log.createdAt, dateFormat) },
-        { label: "Time", value: (log) => formatDate(log.createdAt, timeFormat) },
-        { label: "User", value: (log) => log.userName || "System" },
-        { label: "User Email", value: (log) => log.userEmail || "" },
-        { label: "Shop", value: (log) => log.shopName || "Platform" },
-        { label: "Action", value: (log) => log.action || "" },
-        { label: "Entity", value: (log) => log.entity || "" },
-        { label: "Message", value: (log) => log.message || "" },
-        { label: "IP Address", value: (log) => log.ipAddress || "" }
+        { label: t('date'), value: (log) => formatDate(log.createdAt, dateFormat) },
+        { label: t('time'), value: (log) => formatDate(log.createdAt, timeFormat) },
+        { label: t('user'), value: (log) => log.userName || t('system_user') },
+        { label: t('user_email'), value: (log) => log.userEmail || "" },
+        { label: t('shop'), value: (log) => log.shopName || t('platform') },
+        { label: t('action'), value: (log) => log.action || "" },
+        { label: t('entity'), value: (log) => log.entity || "" },
+        { label: t('message'), value: (log) => log.message || "" },
+        { label: t('ip_address'), value: (log) => log.ipAddress || "" }
       ],
       logs
     )
@@ -90,12 +92,12 @@ function SystemLogs() {
 
   const latestLog = logs[0]
   const summaryCards = [
-    { label: "Audit Events", value: stats.total.toLocaleString(), icon: FaListCheck },
-    { label: "Matching Results", value: logs.length.toLocaleString(), icon: FaFilter },
-    { label: "Action Types", value: stats.actionTypesCount.toLocaleString(), icon: FaLayerGroup },
+    { label: t('audit_events'), value: stats.total.toLocaleString(), icon: FaListCheck },
+    { label: t('matching_results'), value: logs.length.toLocaleString(), icon: FaFilter },
+    { label: t('action_types'), value: stats.actionTypesCount.toLocaleString(), icon: FaLayerGroup },
     {
-      label: "Latest Time",
-      value: stats.latestTime ? formatDate(stats.latestTime, dateTimeFormat) : "No audit log yet",
+      label: t('latest_time'),
+      value: stats.latestTime ? formatDate(stats.latestTime, dateTimeFormat) : t('no_audit_log_yet'),
       icon: FaClock,
       dark: true,
     },
@@ -104,17 +106,17 @@ function SystemLogs() {
   return (
     <section>
       <PageHeader
-        title="System Logs"
-        description="Review recent platform audit events and administrative actions."
+        title={t('system_logs')}
+        description={t('system_logs_desc')}
         action={(
           <div className="flex flex-wrap gap-3">
             <button className={secondaryButtonClass} type="button" onClick={loadLogs} disabled={isLoading}>
               <FaArrowsRotate />
-              {isLoading ? "Loading..." : "Refresh"}
+              {isLoading ? t('loading') : t('refresh')}
             </button>
             <button className={secondaryButtonClass} type="button" onClick={exportLogs} disabled={logs.length === 0}>
               <FaDownload />
-              Export
+              {t('export')}
             </button>
           </div>
         )}
@@ -153,7 +155,7 @@ function SystemLogs() {
             <FaMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]" />
             <input
               className={`${inputClass} pl-10`}
-              placeholder="Search by user, shop, action, or entity..."
+              placeholder={t('search_logs_placeholder')}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
@@ -166,7 +168,7 @@ function SystemLogs() {
                 value={actionFilter}
                 onChange={(event) => setActionFilter(event.target.value)}
               >
-                <option value="ALL">All Actions</option>
+                <option value="ALL">{t('all_actions')}</option>
                 {[ "LOGIN", "LOGIN_FAILED", "STOCK_IN", "STOCK_OUT", "CREATE", "UPDATE", "DELETE", "SALE_CREATE", "PURCHASE_CREATE", "RESTORE" ].map((action) => (
                   <option key={action} value={action}>{action}</option>
                 ))}
@@ -174,7 +176,7 @@ function SystemLogs() {
             </label>
             <button className={secondaryButtonClass} type="button" onClick={exportLogs} disabled={logs.length === 0}>
               <FaDownload />
-              Export
+              {t('export')}
             </button>
           </div>
         </div>
@@ -183,33 +185,33 @@ function SystemLogs() {
       <div className={`${cardClass} overflow-hidden flex flex-col`}>
         <div className="flex flex-col gap-3 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-base font-semibold text-[#020617] dark:text-[#f8fafc]">Audit Log Entries</h3>
+            <h3 className="text-base font-semibold text-[#020617] dark:text-[#f8fafc]">{t('audit_log_entries')}</h3>
             <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-              {latestLog ? `Latest event: ${latestLog.action || "Unknown"} at ${formatDate(latestLog.createdAt, dateTimeFormat)}` : "Waiting for audit events."}
+              {latestLog ? `${t('latest_event')} ${latestLog.action || t('unknown')} at ${formatDate(latestLog.createdAt, dateTimeFormat)}` : t('waiting_for_audit_events')}
             </p>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#06b6d4]">
             <FaTerminal />
-            {logs.length.toLocaleString()} rows
+            {logs.length.toLocaleString()} {t('rows')}
           </span>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-[980px] w-full border-collapse">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Date</th>
-                <th className={tableHeadCellClass}>Time</th>
-                <th className={tableHeadCellClass}>User</th>
-                <th className={tableHeadCellClass}>Shop</th>
-                <th className={tableHeadCellClass}>Action</th>
-                <th className={tableHeadCellClass}>Entity</th>
-                <th className={tableHeadCellClass}>Message</th>
-                <th className={tableHeadCellClass}>IP Address</th>
+                <th className={tableHeadCellClass}>{t('date')}</th>
+                <th className={tableHeadCellClass}>{t('time')}</th>
+                <th className={tableHeadCellClass}>{t('user')}</th>
+                <th className={tableHeadCellClass}>{t('shop')}</th>
+                <th className={tableHeadCellClass}>{t('action')}</th>
+                <th className={tableHeadCellClass}>{t('entity')}</th>
+                <th className={tableHeadCellClass}>{t('message')}</th>
+                <th className={tableHeadCellClass}>{t('ip_address')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {isLoading ? (
-                <TableEmpty colSpan="8">Loading system logs...</TableEmpty>
+                <TableEmpty colSpan="8">{t('loading_system_logs')}</TableEmpty>
               ) : logs.map((log) => (
                 <tr key={log._id} className="transition-colors hover:bg-[#f8fafc] dark:hover:bg-[#09090b]">
                   <td className={tableCellClass}>
@@ -226,11 +228,11 @@ function SystemLogs() {
                   </td>
                   <td className={tableCellClass}>
                     <div>
-                      <p className="font-semibold text-[#020617] dark:text-[#f8fafc]">{log.userName || "System"}</p>
+                      <p className="font-semibold text-[#020617] dark:text-[#f8fafc]">{log.userName || t('system_user')}</p>
                       {log.userEmail && <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">{log.userEmail}</p>}
                     </div>
                   </td>
-                  <td className={tableCellClass}>{log.shopName || "Platform"}</td>
+                  <td className={tableCellClass}>{log.shopName || t('platform')}</td>
                   <td className={tableCellClass}>
                     <span className="inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/10 dark:bg-[#06b6d4]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.05em] text-[#06b6d4]">
                       <FaListCheck />
@@ -242,7 +244,7 @@ function SystemLogs() {
                   <td className={tableCellClass}>{log.ipAddress || "-"}</td>
                 </tr>
               ))}
-              {!isLoading && logs.length === 0 && <TableEmpty colSpan="8">No system logs found</TableEmpty>}
+              {!isLoading && logs.length === 0 && <TableEmpty colSpan="8">{t('no_system_logs_found')}</TableEmpty>}
             </tbody>
           </table>
         </div>

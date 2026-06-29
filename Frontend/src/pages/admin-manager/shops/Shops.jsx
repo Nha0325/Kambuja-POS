@@ -18,6 +18,7 @@ import {
   modalClass
 } from "../adminManagerUi"
 import { PageHeader, TableEmpty, StatusBadge } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 function Shops() {
   const [search, setSearch] = useState("")
@@ -27,6 +28,7 @@ function Shops() {
   const [modalType, setModalType] = useState(null) // "archive" | "delete" | null
   const [selectedShop, setSelectedShop] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const { t } = useTranslation()
 
   const fetchShops = async () => {
     try {
@@ -69,12 +71,12 @@ function Shops() {
         setShops(shops.map(s => s._id === selectedShop._id ? { ...s, status: 'ACTIVE', isDeleted: false } : s));
         setModalType(null);
         setSelectedShop(null);
-        toast.success("Shop restored successfully");
+        toast.success(t('shop_restored_successfully'));
         window.dispatchEvent(new Event("refetchNotifications"));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to restore shop");
+      toast.error(t('failed_to_restore_shop'));
     } finally {
       setIsProcessing(false);
     }
@@ -89,12 +91,12 @@ function Shops() {
         setShops(shops.map(s => s._id === selectedShop._id ? { ...s, status: 'ARCHIVED', isDeleted: true } : s));
         setModalType(null);
         setSelectedShop(null);
-        toast.success("Shop archived successfully");
+        toast.success(t('shop_archived_successfully'));
         window.dispatchEvent(new Event("refetchNotifications"));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to archive shop");
+      toast.error(t('failed_to_archive_shop'));
     } finally {
       setIsProcessing(false);
     }
@@ -118,15 +120,15 @@ function Shops() {
   return (
     <div className="mx-auto w-full max-w-full min-w-0">
       <PageHeader 
-        title="Shops Directory" 
-        description="Manage business accounts, tenants, and their platform access."
+        title={t('shops_directory')} 
+        description={t('shops_directory_desc')}
         action={
           <Link
             className={primaryButtonClass}
             to="/admin-manager/shops/create"
           >
             <span className="material-symbols-outlined text-[20px]">add</span>
-            Create Shop
+            {t('create_shop')}
           </Link>
         }
       />
@@ -138,7 +140,7 @@ function Shops() {
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa] text-[20px]">search</span>
           <input
             className={`${inputClass} pl-10`}
-            placeholder="Search by Shop Name, Code, or Owner..."
+            placeholder={t('search_shops_placeholder')}
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -152,10 +154,10 @@ function Shops() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="LOCKED">Locked/Inactive</option>
-              <option value="ARCHIVED">Archived</option>
+              <option value="ALL">{t('all_status')}</option>
+              <option value="ACTIVE">{t('active')}</option>
+              <option value="LOCKED">{t('locked_inactive')}</option>
+              <option value="ARCHIVED">{t('archived')}</option>
             </select>
           </div>
           <button
@@ -163,7 +165,7 @@ function Shops() {
             type="button"
             disabled={displayedShops.length === 0}
           >
-            <span className="material-symbols-outlined text-[18px]">download</span> Export
+            <span className="material-symbols-outlined text-[18px]">download</span> {t('export')}
           </button>
         </div>
       </div>
@@ -174,24 +176,24 @@ function Shops() {
           <table className="w-full min-w-[1100px] table-auto text-left border-collapse">
             <thead className={tableHeadClass}>
               <tr>
-                <th className={tableHeadCellClass}>Shop Code</th>
-                <th className={tableHeadCellClass}>Shop Name</th>
-                <th className={tableHeadCellClass}>Owner / Admin</th>
-                <th className={`${tableHeadCellClass} text-center`}>Plan</th>
-                <th className={`${tableHeadCellClass} text-center`} title="Cashiers">Cashiers</th>
-                <th className={`${tableHeadCellClass} text-center`} title="Products">Products</th>
-                <th className={`${tableHeadCellClass} text-center`} title="Category">Category</th>
-                <th className={`${tableHeadCellClass} text-center`}>Status</th>
-                <th className={`${tableHeadCellClass} text-right`}>Created Date</th>
-                <th className={`${tableHeadCellClass} text-right`}>Actions</th>
+                <th className={tableHeadCellClass}>{t('shop_code')}</th>
+                <th className={tableHeadCellClass}>{t('shop_name')}</th>
+                <th className={tableHeadCellClass}>{t('owner_admin')}</th>
+                <th className={`${tableHeadCellClass} text-center`}>{t('plan')}</th>
+                <th className={`${tableHeadCellClass} text-center`} title={t('cashiers')}>{t('cashiers')}</th>
+                <th className={`${tableHeadCellClass} text-center`} title={t('products')}>{t('products')}</th>
+                <th className={`${tableHeadCellClass} text-center`} title={t('category')}>{t('category')}</th>
+                <th className={`${tableHeadCellClass} text-center`}>{t('status')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('created_date')}</th>
+                <th className={`${tableHeadCellClass} text-right`}>{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e5e7eb] dark:divide-[#27272a]">
               {displayedShops.length === 0 ? (
-                <TableEmpty colSpan="10">No shops found matching your search.</TableEmpty>
+                <TableEmpty colSpan="10">{t('no_shops_found')}</TableEmpty>
               ) : (
                 displayedShops.map((shop) => {
-                  const ownerName = shop.ownerAdminId?.username || "Unknown"
+                  const ownerName = shop.ownerAdminId?.username || t('unknown')
                   return (
                     <tr key={shop._id} className={`group transition-colors ${shop.status === 'LOCKED' ? 'bg-[#f8fafc] dark:bg-[#09090b]' : 'hover:bg-[#f8fafc] dark:hover:bg-[#09090b]'}`}>
                       <td className={`${tableCellClass} font-mono text-[#06b6d4]`}>{shop.code}</td>
@@ -213,23 +215,23 @@ function Shops() {
                       </td>
                       <td className={`${tableCellClass} text-center`}>
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-[#f8fafc] dark:bg-[#09090b] border border-[#e5e7eb] dark:border-[#27272a] text-[#64748b] dark:text-[#a1a1aa]">
-                          {shop.subscriptionPlan || "Free"}
+                          {shop.subscriptionPlan || t('free')}
                         </span>
                       </td>
 
-                      <td className={`${tableCellClass} text-center`} title="Cashiers">
+                      <td className={`${tableCellClass} text-center`} title={t('cashiers')}>
                         <div className="flex flex-col items-center">
                           <span className="material-symbols-outlined text-[16px] mb-0.5">point_of_sale</span>
                           <span>{shop.cashierCount || 0}</span>
                         </div>
                       </td>
-                      <td className={`${tableCellClass} text-center`} title="Products">
+                      <td className={`${tableCellClass} text-center`} title={t('products')}>
                         <div className="flex flex-col items-center">
                           <span className="material-symbols-outlined text-[16px] mb-0.5">inventory_2</span>
                           <span>{shop.productCount || 0}</span>
                         </div>
                       </td>
-                      <td className={`${tableCellClass} text-center`} title="Category">
+                      <td className={`${tableCellClass} text-center`} title={t('category')}>
                         <div className="flex flex-col items-center">
                           <span className="material-symbols-outlined text-[16px] mb-0.5">category</span>
                           <span>{shop.categoryCount || shop.categoriesCount || shop.categories?.length || 0}</span>
@@ -244,7 +246,7 @@ function Shops() {
                           <button 
                             onClick={() => { setSelectedShop(shop); setModalType('view'); }}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-blue-600 hover:bg-blue-600/10 transition-colors" 
-                            title="View Shop"
+                            title={t('view_shop')}
                           >
                             <span className="material-symbols-outlined text-[18px]">visibility</span>
                           </button>
@@ -252,26 +254,26 @@ function Shops() {
                             <button
                               onClick={() => { setSelectedShop(shop); setModalType('restore'); }}
                               className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-[#64748b] dark:text-[#a1a1aa] hover:text-green-600 hover:bg-green-600/10"
-                              title="Restore Shop"
+                              title={t('restore_shop_btn')}
                             >
                               <span className="material-symbols-outlined text-[18px]">restore</span>
                             </button>
                           ) : (
                             <>
-                              <Link to={`/admin-manager/shops/${shop._id}/edit`} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors" title="Edit Shop">
+                              <Link to={`/admin-manager/shops/${shop._id}/edit`} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 dark:hover:bg-[#06b6d4]/20 transition-colors" title={t('edit_shop')}>
                                 <span className="material-symbols-outlined text-[18px]">edit</span>
                               </Link>
                               <button
                                 onClick={() => toggleShopStatus(shop._id, shop.status)}
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${shop.status === 'ACTIVE' ? 'text-[#64748b] dark:text-[#a1a1aa] hover:text-orange-500 hover:bg-orange-500/10' : 'text-[#64748b] dark:text-[#a1a1aa] hover:text-green-500 hover:bg-green-500/10'}`}
-                                title={shop.status === 'ACTIVE' ? 'Lock Shop' : 'Unlock Shop'}
+                                title={shop.status === 'ACTIVE' ? t('lock_shop') : t('unlock_shop')}
                               >
                                 <span className="material-symbols-outlined text-[18px]">{shop.status === 'ACTIVE' ? 'lock' : 'lock_open'}</span>
                               </button>
                               <button
                                 onClick={() => handleArchiveClick(shop)}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-[#64748b] dark:text-[#a1a1aa] hover:text-red-500 hover:bg-red-500/10"
-                                title="Archive Shop"
+                                title={t('archive_shop')}
                               >
                                 <span className="material-symbols-outlined text-[18px]">archive</span>
                               </button>
@@ -288,7 +290,7 @@ function Shops() {
         </div>
         {/* Pagination Footer */}
         <div className="bg-[#ffffff] dark:bg-[#111113] border-t border-[#e5e7eb] dark:border-[#27272a] px-6 py-4 flex items-center justify-between">
-          <span className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa]">Showing {displayedShops.length} of {shops.length} shops</span>
+          <span className="text-sm font-bold text-[#64748b] dark:text-[#a1a1aa]">{t('showing_of_shops', { current: displayedShops.length, total: shops.length })}</span>
           <div className="flex gap-1">
             <button className="w-8 h-8 rounded-md border border-[#e5e7eb] dark:border-[#27272a] flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] transition-colors disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -308,7 +310,7 @@ function Shops() {
             <div className="flex justify-between items-center p-6 border-b border-[#e5e7eb] dark:border-[#27272a]">
               <h3 className="text-xl font-bold text-[#020617] dark:text-[#f8fafc] flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#06b6d4]">storefront</span>
-                Shop Details
+                {t('shop_details')}
               </h3>
               <button 
                 onClick={() => { setModalType(null); setSelectedShop(null); }}
@@ -320,35 +322,35 @@ function Shops() {
             <div className="p-6 overflow-y-auto max-h-[70vh]">
               <div className="grid grid-cols-2 gap-y-4 gap-x-6">
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop Name</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('shop_name')}</p>
                   <p className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{selectedShop.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Shop Code</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('shop_code')}</p>
                   <p className="text-sm font-bold text-[#06b6d4] font-mono">{selectedShop.code}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Status</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('status')}</p>
                   <StatusBadge status={selectedShop.status} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Subscription Plan</p>
-                  <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.subscriptionPlan || "Free"}</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('subscription_plan')}</p>
+                  <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.subscriptionPlan || t('free')}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Owner Admin</p>
-                  <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.ownerAdminId?.username || "Unknown"}</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('owner_admin_detail')}</p>
+                  <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.ownerAdminId?.username || t('unknown')}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Owner Email</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('owner_email')}</p>
                   <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{selectedShop.ownerAdmin?.email || selectedShop.ownerAdminId?.email || selectedShop.owner?.email || selectedShop.admin?.email || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Owner Phone</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('owner_phone')}</p>
                   <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.ownerAdminId?.phone || selectedShop.billingPhone || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Created Date</p>
+                  <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('created_date')}</p>
                   <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{formatDate(selectedShop.createdAt, "MMM DD, YYYY")}</p>
                 </div>
               </div>
@@ -356,36 +358,36 @@ function Shops() {
               <div className="mt-6 pt-6 border-t border-[#e5e7eb] dark:border-[#27272a]">
                 <h4 className="text-sm font-bold text-[#020617] dark:text-[#f8fafc] mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#06b6d4] text-[20px]">location_on</span>
-                  Location / Address
+                  {t('location_address')}
                 </h4>
                 {!(selectedShop.provinceKh || selectedShop.districtKh || selectedShop.communeKh || selectedShop.village || selectedShop.addressDetail || selectedShop.fullAddressKh) ? (
                   <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] italic bg-[#f8fafc] dark:bg-[#09090b] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a] text-center">
-                    No address added
+                    {t('no_address_added')}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 bg-[#f8fafc] dark:bg-[#09090b] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#27272a]">
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">ខេត្ត / Province</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('province')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.provinceKh ? `${selectedShop.provinceKh} / ${selectedShop.provinceEn}` : "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">ស្រុក-ក្រុង / District</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('district')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.districtKh ? `${selectedShop.districtKh} / ${selectedShop.districtEn}` : "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">ឃុំ-សង្កាត់ / Commune</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('commune')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.communeKh ? `${selectedShop.communeKh} / ${selectedShop.communeEn}` : "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">ភូមិ / Village</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('village')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.village || "-"}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">អាសយដ្ឋានលម្អិត / Detailed Address</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('detailed_address')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc]">{selectedShop.addressDetail || "-"}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">អាសយដ្ឋានពេញលេញ / Full Address</p>
+                      <p className="text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">{t('full_address')}</p>
                       <p className="text-sm font-medium text-[#020617] dark:text-[#f8fafc] leading-relaxed">
                         {selectedShop.fullAddressKh ? (
                           <>
@@ -407,7 +409,7 @@ function Shops() {
                 onClick={() => { setModalType(null); setSelectedShop(null); }}
                 className={secondaryButtonClass}
               >
-                Close
+                {t('close')}
               </button>
             </div>
           </div>
@@ -422,9 +424,9 @@ function Shops() {
               <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 mx-auto border border-red-200 dark:border-red-900/50">
                 <span className="material-symbols-outlined text-red-600 dark:text-red-400 text-2xl">archive</span>
               </div>
-              <h3 className="text-xl font-bold text-center text-[#020617] dark:text-[#f8fafc] mb-2">Archive Shop</h3>
+              <h3 className="text-xl font-bold text-center text-[#020617] dark:text-[#f8fafc] mb-2">{t('archive_shop_title')}</h3>
               <p className="text-[#64748b] dark:text-[#a1a1aa] text-center mb-6">
-                This shop has business data. It will be archived, not permanently deleted.
+                {t('archive_shop_desc')}
               </p>
               <div className="flex gap-3">
                 <button
@@ -433,7 +435,7 @@ function Shops() {
                   className={secondaryButtonClass}
                   disabled={isProcessing}
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="button"
@@ -441,7 +443,7 @@ function Shops() {
                   className="flex-1 h-11 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Archiving..." : "Archive Shop"}
+                  {isProcessing ? t('archiving') : t('archive_shop_title')}
                 </button>
               </div>
             </div>
@@ -457,9 +459,9 @@ function Shops() {
               <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 mx-auto border border-green-200 dark:border-green-900/50">
                 <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-2xl">restore</span>
               </div>
-              <h3 className="text-xl font-bold text-center text-[#020617] dark:text-[#f8fafc] mb-2">Restore Shop</h3>
+              <h3 className="text-xl font-bold text-center text-[#020617] dark:text-[#f8fafc] mb-2">{t('restore_shop_title')}</h3>
               <p className="text-[#64748b] dark:text-[#a1a1aa] text-center mb-6">
-                This shop will become active again and can use the system based on POS access settings.
+                {t('restore_shop_desc')}
               </p>
               <div className="flex gap-3">
                 <button
@@ -468,7 +470,7 @@ function Shops() {
                   className={secondaryButtonClass}
                   disabled={isProcessing}
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="button"
@@ -476,7 +478,7 @@ function Shops() {
                   className="flex-1 h-11 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Restoring..." : "Restore Shop"}
+                  {isProcessing ? t('restoring') : t('restore_shop_title')}
                 </button>
               </div>
             </div>

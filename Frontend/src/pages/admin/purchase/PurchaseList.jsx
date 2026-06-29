@@ -8,6 +8,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import PurchaseStatusModal from "./PurchaseStatusModal";
 import { adminSurface } from "../adminPageUi";
 import AdminPagination from "../../../components/admin/AdminPagination";
+import { useTranslation } from "react-i18next";
 
 function Purchase() {
   const [search, setSearch] = useState("");
@@ -17,6 +18,7 @@ function Purchase() {
   const [editId, setEditId] = useState("");
   const [openStatus, setOpenStatus] = useState(false);
   const [refetch, setRefetch] = useState(false);
+  const { t } = useTranslation();
 
   const { data, totalPage, isLoading } = useFetchData("purchases", page, limit, search, refetch);
   const purchaseCount = data?.length || 0;
@@ -30,23 +32,23 @@ function Purchase() {
         {/* Top Header Controls */}
         <div className={adminSurface.header}>
           <div>
-            <p className={adminSurface.eyebrow}>Procurement</p>
-            <h1 className={adminSurface.title}>Purchases</h1>
+            <p className={adminSurface.eyebrow}>{t('procurement')}</p>
+            <h1 className={adminSurface.title}>{t('purchases')}</h1>
             <p className={adminSurface.description}>
-              Track supplier purchases, payment state, receiving status, and purchase dates.
+              {t('purchases_desc')}
             </p>
           </div>
           <Link to="/admin/purchases/create" className={adminSurface.primaryButton}>
-            + New Purchase
+            {t('new_purchase')}
           </Link>
         </div>
 
         <div className={adminSurface.statGrid}>
           {[
-            ["Purchases", purchaseCount],
-            ["Total cost", `$${Number(totalCost || 0).toFixed(2)}`],
-            ["Due", dueCount],
-            ["Pending", pendingCount],
+            [t('purchases'), purchaseCount],
+            [t('total_cost'), `$${Number(totalCost || 0).toFixed(2)}`],
+            [t('due'), dueCount],
+            [t('pending'), pendingCount],
           ].map(([label, value]) => (
             <div key={label} className={adminSurface.statCard}>
               <div className={adminSurface.statIcon}>{String(label).slice(0, 1)}</div>
@@ -78,7 +80,7 @@ function Purchase() {
               <input
                 type="text"
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search purchase..."
+                placeholder={t('search_purchase')}
                 className={`${adminSurface.input} w-full`}
               />
             </fieldset>
@@ -90,29 +92,29 @@ function Purchase() {
             <table className={`${adminSurface.table} min-w-[1120px]`}>
               <thead className={adminSurface.tableHead}>
                 <tr>
-                  <th className={`${adminSurface.th} w-12 text-center`}>N.o</th>
-                  <th className={adminSurface.th}>Supplier</th>
-                  <th className={adminSurface.th}>Purchase By</th>
-                  <th className={`${adminSurface.th} text-right`}>Total Cost</th>
-                  <th className={`${adminSurface.th} text-right`}>Due Amount</th>
-                  <th className={`${adminSurface.th} text-right`}>Change Amount</th>
-                  <th className={`${adminSurface.th} text-center`}>Payment Status</th>
-                  <th className={`${adminSurface.th} text-center`}>Purchase Status</th>
-                  <th className={`${adminSurface.th} text-center`}>Purchase Date</th>
-                  <th className={`${adminSurface.th} text-center`}>Action</th>
+                  <th className={`${adminSurface.th} w-12 text-center`}>{t('no')}</th>
+                  <th className={adminSurface.th}>{t('supplier')}</th>
+                  <th className={adminSurface.th}>{t('purchase_by')}</th>
+                  <th className={`${adminSurface.th} text-right`}>{t('total_cost')}</th>
+                  <th className={`${adminSurface.th} text-right`}>{t('due_amount')}</th>
+                  <th className={`${adminSurface.th} text-right`}>{t('change_amount')}</th>
+                  <th className={`${adminSurface.th} text-center`}>{t('payment_status')}</th>
+                  <th className={`${adminSurface.th} text-center`}>{t('purchase_status')}</th>
+                  <th className={`${adminSurface.th} text-center`}>{t('purchase_date')}</th>
+                  <th className={`${adminSurface.th} text-center`}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan="10" className="p-8 text-center text-[#A9A6BB]">
-                      Loading data...
+                      {t('loading_data')}
                     </td>
                   </tr>
                 ) : data?.length === 0 ? (
                   <tr>
                     <td colSpan="10" className="p-8 text-center text-[#6B7280]">
-                      No purchases found.
+                      {t('no_purchases_found')}
                     </td>
                   </tr>
                 ) : (
@@ -152,17 +154,17 @@ function Purchase() {
                       <td className={`${adminSurface.td} text-center`}>
                         {el?.paymentStatus === "paid" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] rounded-full">
-                            Paid
+                            {t('paid')}
                           </span>
                         )}
                         {el?.paymentStatus === "due" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] rounded-full">
-                            Due
+                            {t('due')}
                           </span>
                         )}
                         {el?.paymentStatus === "partial" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] rounded-full">
-                            Partial
+                            {t('partial')}
                           </span>
                         )}
                       </td>
@@ -171,17 +173,17 @@ function Purchase() {
                       <td className={`${adminSurface.td} text-center`}>
                         {el?.purchaseStatus === "received" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] rounded-full">
-                            Received
+                            {t('received')}
                           </span>
                         )}
                         {el?.purchaseStatus === "pending" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] rounded-full">
-                            Pending
+                            {t('pending')}
                           </span>
                         )}
                         {el?.purchaseStatus === "ordered" && (
                           <span className="px-2.5 py-1 text-xs font-semibold bg-[#06b6d4]/20 border border-[#06b6d4]/50 text-[#06b6d4] rounded-full">
-                            Ordered
+                            {t('ordered')}
                           </span>
                         )}
                       </td>
@@ -196,7 +198,7 @@ function Purchase() {
                         <div className="flex items-center justify-center space-x-1.5">
                           <button
                             type="button"
-                            title="Update Payment"
+                            title={t('update_payment')}
                             onClick={() => {
                               setEditId(el?._id);
                               setOpen(true);
@@ -207,7 +209,7 @@ function Purchase() {
                           </button>
                           <button
                             type="button"
-                            title="Update Status"
+                            title={t('update_status')}
                             onClick={() => {
                               setEditId(el?._id);
                               setOpenStatus(true);

@@ -176,7 +176,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
         <div className="hidden min-w-0 items-center gap-2 sm:flex">
           {isAdminShell ? (
             <>
-              <span className="text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{isAdminManagerShell ? "Admin Manager" : "Admin"}</span>
+              <span className="text-sm font-medium text-[#64748b] dark:text-[#a1a1aa]">{isAdminManagerShell ? t('admin_manager') : t('shop_admin')}</span>
               <span className="text-sm font-medium text-[#e5e7eb] dark:text-[#27272a]">/</span>
               <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{title}</span>
             </>
@@ -198,18 +198,18 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                 setShowSearchDropdown(true);
               }}
               onFocus={() => { if(searchQuery) setShowSearchDropdown(true); }}
-              placeholder="Search products or invoices..."
+              placeholder={t('search_products_or_invoices')}
               className="h-10 w-full max-w-md rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-4 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
             />
             {showSearchDropdown && (
               <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-lg">
                 {isSearching ? (
-                  <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">Searching...</div>
+                  <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('searching')}</div>
                 ) : (
                   <div className="max-h-[400px] overflow-y-auto">
                     {searchResults.products.length > 0 && (
                       <div className="border-b border-[#e5e7eb] dark:border-[#27272a]">
-                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">PRODUCTS</div>
+                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">{t('products').toUpperCase()}</div>
                         {searchResults.products.map(p => (
                           <div 
                             key={p._id}
@@ -231,7 +231,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                     
                     {searchResults.sales.length > 0 && (
                       <div>
-                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">INVOICES</div>
+                        <div className="px-3 py-2 text-xs font-bold text-[#64748b] dark:text-[#a1a1aa] bg-slate-50 dark:bg-[#09090b]">{t('invoices')}</div>
                         {searchResults.sales.map(s => (
                           <div 
                             key={s._id}
@@ -252,7 +252,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                     )}
                     
                     {searchResults.products.length === 0 && searchResults.sales.length === 0 && (
-                      <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">No results found</div>
+                      <div className="p-4 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('no_results_found')}</div>
                     )}
                   </div>
                 )}
@@ -339,18 +339,18 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
             {isNotifOpen && (
               <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-sm">
                 <div className="flex items-center justify-between border-b border-[#e5e7eb] dark:border-[#27272a] p-4">
-                  <h3 className="font-bold text-[#020617] dark:text-[#f8fafc]">Notifications</h3>
+                  <h3 className="font-bold text-[#020617] dark:text-[#f8fafc]">{t('notifications')}</h3>
                   {unreadCount > 0 && (
                     <button onClick={handleMarkAllRead} className="text-xs font-semibold text-[#06b6d4] hover:underline">
-                      Mark all as read
+                      {t('mark_all_as_read')}
                     </button>
                   )}
                 </div>
                 <div className="max-h-[320px] overflow-y-auto">
                   {isLoadingNotifs ? (
-                    <div className="p-8 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">Loading notifications...</div>
+                    <div className="p-8 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('loading_notifications')}</div>
                   ) : notifications.length === 0 ? (
-                    <div className="p-8 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">No new notifications</div>
+                    <div className="p-8 text-center text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('no_new_notifications')}</div>
                   ) : (
                     notifications.map((n) => {
                       let sevClass = "bg-cyan-50 text-cyan-700";
@@ -379,7 +379,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
                   )}
                 </div>
                 <div className="border-t border-[#e5e7eb] dark:border-[#27272a] p-2 text-center bg-slate-50 dark:bg-[#09090b]">
-                  <button onClick={() => { setIsNotifOpen(false); navigate("/admin-manager/alerts"); }} className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa] hover:text-[#020617] dark:hover:text-[#f8fafc]">View all notifications</button>
+                  <button onClick={() => { setIsNotifOpen(false); navigate("/admin-manager/alerts"); }} className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa] hover:text-[#020617] dark:hover:text-[#f8fafc]">{t('view_all_notifications')}</button>
                 </div>
               </div>
             )}
@@ -414,7 +414,7 @@ function TopMenu({ onShowSidebar, title, isDark, onToggleTheme }) {
               {/* Mobile Language Switcher */}
               <li className={`lg:hidden border-b p-3 ${isAdminShell ? 'border-[#e5e7eb] dark:border-[#27272a]' : 'border-slate-100 dark:border-[#2A2E36]'}`}>
                 <div className="flex items-center justify-between">
-                  <span className={`text-sm font-semibold ${isAdminShell ? 'text-[#64748b] dark:text-[#a1a1aa]' : 'text-slate-500 dark:text-[#A9A6BB]'}`}>Language</span>
+                  <span className={`text-sm font-semibold ${isAdminShell ? 'text-[#64748b] dark:text-[#a1a1aa]' : 'text-slate-500 dark:text-[#A9A6BB]'}`}>{t('language')}</span>
                   <div className="flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white p-1 dark:border-[#27272a] dark:bg-[#111113]">
                     <button
                       onClick={() => {

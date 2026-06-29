@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useSignup from "../../../hooks/auth/useSignup";
+import { useTranslation } from "react-i18next";
 
 function CreateUser() {
   const [username, setUsername] = useState("");
@@ -12,6 +13,7 @@ function CreateUser() {
 
   const navigate = useNavigate();
   const { isLoading, signup } = useSignup();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,11 +26,11 @@ function CreateUser() {
         status,
       });
       if (res) {
-        toast.success("Cashier created successfully!");
+        toast.success(t('cashier_created_success'));
         navigate("/admin/cashiers");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to create cashier.");
+      toast.error(error?.response?.data?.message || t('failed_to_create_cashier'));
     }
   };
 
@@ -41,13 +43,13 @@ function CreateUser() {
             to="/admin/cashiers"
             className="flex items-center font-medium transition-colors hover:text-[#06b6d4]"
           >
-            Cashiers
+            {t('cashiers')}
           </Link>
 
           <span className="text-[#64748b] dark:text-[#a1a1aa]">›</span>
 
           <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">
-            Create New Cashier
+            {t('create_new_cashier')}
           </span>
         </nav>
 
@@ -57,10 +59,10 @@ function CreateUser() {
             {/* Card Header */}
             <div className="border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-6">
               <h1 className="text-xl font-semibold text-[#020617] dark:text-[#f8fafc]">
-                Add Cashier
+                {t('add_cashier')}
               </h1>
               <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-                Create a new user account with cashier permissions for point-of-sale access.
+                {t('create_cashier_desc')}
               </p>
             </div>
 
@@ -72,7 +74,7 @@ function CreateUser() {
                     htmlFor="username"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Username <span className="text-red-500">*</span>
+                    {t('username')} <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -83,7 +85,7 @@ function CreateUser() {
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="e.g. john_doe"
+                    placeholder={t('eg_username')}
                   />
                 </div>
 
@@ -93,7 +95,7 @@ function CreateUser() {
                     htmlFor="email"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Email <span className="text-red-500">*</span>
+                    {t('email')} <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -104,7 +106,7 @@ function CreateUser() {
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="e.g. john@kambuja.com"
+                    placeholder={t('eg_email')}
                   />
                 </div>
 
@@ -114,7 +116,7 @@ function CreateUser() {
                     htmlFor="password"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Password <span className="text-red-500">*</span>
+                    {t('password')} <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -125,7 +127,7 @@ function CreateUser() {
                     onChange={(e) => setPassword(e.target.value)}
                     type="password"
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500"
-                    placeholder="Enter secure password"
+                    placeholder={t('enter_secure_password')}
                   />
                 </div>
 
@@ -135,7 +137,7 @@ function CreateUser() {
                     htmlFor="status"
                     className="block text-sm font-semibold text-[#020617] dark:text-[#f8fafc]"
                   >
-                    Account Status <span className="text-red-500">*</span>
+                    {t('account_status')} <span className="text-red-500">*</span>
                   </label>
 
                   <select
@@ -145,8 +147,8 @@ function CreateUser() {
                     onChange={(e) => setStatus(e.target.value)}
                     className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc]"
                   >
-                    <option value="ACTIVE">Active (Can login)</option>
-                    <option value="INACTIVE">Inactive (Locked)</option>
+                    <option value="ACTIVE">{t('active_can_login')}</option>
+                    <option value="INACTIVE">{t('inactive_locked')}</option>
                   </select>
                 </div>
               </div>
@@ -157,7 +159,7 @@ function CreateUser() {
                   to="/admin/cashiers"
                   className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Link>
 
                 <button
@@ -165,7 +167,7 @@ function CreateUser() {
                   disabled={isLoading}
                   className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
-                  {isLoading ? "Saving..." : "Save Cashier"}
+                  {isLoading ? t('saving') : t('save_cashier')}
                 </button>
               </div>
             </form>

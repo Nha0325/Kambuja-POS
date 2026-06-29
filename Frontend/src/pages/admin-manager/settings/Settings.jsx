@@ -4,6 +4,7 @@ import { PageHeader } from "../../../components/admin/AdminManagerUi"
 import { cardClass } from "../adminManagerUi"
 import toast from "react-hot-toast"
 import { adminManagerService } from "../../../services/users/adminManager.service"
+import { useTranslation } from "react-i18next"
 
 const customInputClass = "h-10 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20"
 const customInputErrorClass = "h-10 w-full rounded-lg border border-red-300 dark:border-red-500/50 bg-white dark:bg-[#09090b] px-3 text-sm text-[#020617] dark:text-[#f8fafc] outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
@@ -11,17 +12,18 @@ const customSelectClass = customInputClass
 const customPrimaryButton = "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#06b6d4] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0891b2] disabled:opacity-50 disabled:cursor-not-allowed"
 
 const Badge = ({ status }) => {
+  const { t } = useTranslation()
   if (status === "Working" || status === "Auto-save") {
     return (
       <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
-        {status}
+        {status === "Working" ? t('working') : t('auto_save')}
       </span>
     )
   }
   if (status === "Needs API") {
     return (
       <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
-        Needs API
+        {t('needs_api')}
       </span>
     )
   }
@@ -29,14 +31,16 @@ const Badge = ({ status }) => {
 }
 
 const SectionStatus = ({ status }) => {
-   if (status === "Saving...") return <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa] flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>Saving...</span>
-   if (status === "Saved") return <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Saved</span>
-   if (status === "Fix errors") return <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>Fix errors</span>
-   if (status === "Error") return <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>Error</span>
+   const { t } = useTranslation()
+   if (status === "Saving...") return <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa] flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>{t('saving')}</span>
+   if (status === "Saved") return <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{t('saved')}</span>
+   if (status === "Fix errors") return <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>{t('fix_errors')}</span>
+   if (status === "Error") return <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>{t('error')}</span>
    return <span className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">-</span>
 }
 
 function Settings() {
+  const { t } = useTranslation()
   const [form, setForm] = useState(() => {
     const saved = localStorage.getItem('kambuja_admin_manager_settings')
     if (saved) {
@@ -118,11 +122,11 @@ function Settings() {
     try {
       setIsCreatingBackup(true)
       await adminManagerService.createBackup()
-      toast.success("Backup created successfully")
+      toast.success(t('backup_created_successfully'))
       fetchBackups()
     } catch (err) {
       console.error(err)
-      toast.error("Failed to create backup")
+      toast.error(t('failed_to_create_backup'))
     } finally {
       setIsCreatingBackup(false)
     }
@@ -133,20 +137,20 @@ function Settings() {
     let isValid = true
 
     if (section === 'profile') {
-      if (!currentForm.platformName || !currentForm.platformName.trim()) { errs.platformName = 'Required'; isValid = false }
+      if (!currentForm.platformName || !currentForm.platformName.trim()) { errs.platformName = t('required'); isValid = false }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (currentForm.supportEmail && !emailRegex.test(currentForm.supportEmail)) { errs.supportEmail = 'Invalid email'; isValid = false }
-      if (!currentForm.supportEmail) { errs.supportEmail = 'Required'; isValid = false }
+      if (currentForm.supportEmail && !emailRegex.test(currentForm.supportEmail)) { errs.supportEmail = t('invalid_email'); isValid = false }
+      if (!currentForm.supportEmail) { errs.supportEmail = t('required'); isValid = false }
     }
     
     if (section === 'subscription') {
-      if (Number(currentForm.defaultTrialDays) < 0 || currentForm.defaultTrialDays === '') { errs.defaultTrialDays = 'Must be >= 0'; isValid = false }
-      if (Number(currentForm.defaultMonthlyPrice) < 0 || currentForm.defaultMonthlyPrice === '') { errs.defaultMonthlyPrice = 'Must be >= 0'; isValid = false }
-      if (Number(currentForm.gracePeriodDays) < 0 || currentForm.gracePeriodDays === '') { errs.gracePeriodDays = 'Must be >= 0'; isValid = false }
+      if (Number(currentForm.defaultTrialDays) < 0 || currentForm.defaultTrialDays === '') { errs.defaultTrialDays = t('must_be_gt_0'); isValid = false }
+      if (Number(currentForm.defaultMonthlyPrice) < 0 || currentForm.defaultMonthlyPrice === '') { errs.defaultMonthlyPrice = t('must_be_gt_0'); isValid = false }
+      if (Number(currentForm.gracePeriodDays) < 0 || currentForm.gracePeriodDays === '') { errs.gracePeriodDays = t('must_be_gt_0'); isValid = false }
     }
 
     if (section === 'security') {
-      if (Number(currentForm.sessionTimeout) < 5 || currentForm.sessionTimeout === '') { errs.sessionTimeout = 'Must be >= 5'; isValid = false }
+      if (Number(currentForm.sessionTimeout) < 5 || currentForm.sessionTimeout === '') { errs.sessionTimeout = t('must_be_gt_5'); isValid = false }
     }
 
     return { isValid, errs }
@@ -233,15 +237,15 @@ function Settings() {
   return (
     <section className="max-w-7xl mx-auto pb-12 space-y-6">
       <PageHeader
-        title="Platform Settings"
-        description="Manage platform defaults, notifications, security, backup tools, and appearance."
+        title={t('platform_settings')}
+        description={t('platform_settings_desc')}
       />
       
       <div className="bg-[#06b6d4]/5 border border-[#06b6d4]/20 text-[#06b6d4] dark:text-[#a180ff] px-5 py-4 rounded-xl text-sm font-medium flex items-center gap-3">
          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#06b6d4]/10 flex items-center justify-center">
             <FaGlobe />
          </span>
-         Settings auto-save as you edit and are stored locally in this browser.
+         {t('settings_auto_save_desc')}
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -256,20 +260,20 @@ function Settings() {
                   <FaGlobe className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Platform Profile</h3>
-                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Manage global platform identity and contact information.</p>
+                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('platform_profile')}</h3>
+                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('platform_profile_desc')}</p>
                 </div>
               </div>
               <Badge status="Auto-save" />
             </div>
             
             <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mb-6 bg-[#f8fafc] dark:bg-[#09090b] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#27272a]">
-              These values are shown across the Admin Manager interface.
+              {t('platform_profile_note')}
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className={labelClass}>Platform Name</label>
+                <label className={labelClass}>{t('platform_name')}</label>
                 <input
                   className={errors.platformName ? customInputErrorClass : customInputClass}
                   value={form.platformName}
@@ -278,7 +282,7 @@ function Settings() {
                 {errors.platformName && <p className="text-xs text-red-500 mt-1">{errors.platformName}</p>}
               </div>
               <div>
-                <label className={labelClass}>Support Email</label>
+                <label className={labelClass}>{t('support_email')}</label>
                 <input
                   type="email"
                   className={errors.supportEmail ? customInputErrorClass : customInputClass}
@@ -288,7 +292,7 @@ function Settings() {
                 {errors.supportEmail && <p className="text-xs text-red-500 mt-1">{errors.supportEmail}</p>}
               </div>
               <div>
-                <label className={labelClass}>Support Phone</label>
+                <label className={labelClass}>{t('support_phone')}</label>
                 <input
                   className={customInputClass}
                   value={form.supportPhone}
@@ -296,7 +300,7 @@ function Settings() {
                 />
               </div>
               <div>
-                <label className={labelClass}>Address / Description</label>
+                <label className={labelClass}>{t('address_description')}</label>
                 <input
                   className={customInputClass}
                   value={form.address}
@@ -317,20 +321,20 @@ function Settings() {
                   <FaCreditCard className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Subscription Defaults</h3>
-                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Configure default pricing and trial periods for new shops.</p>
+                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('subscription_defaults')}</h3>
+                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('subscription_defaults_desc')}</p>
                 </div>
               </div>
               <Badge status="Auto-save" />
             </div>
             
             <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mb-6 bg-[#f8fafc] dark:bg-[#09090b] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#27272a]">
-              These values are used when creating or renewing shop subscriptions.
+              {t('subscription_defaults_note')}
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className={labelClass}>Default Trial Days</label>
+                <label className={labelClass}>{t('default_trial_days')}</label>
                 <input
                   type="number"
                   min="0"
@@ -341,7 +345,7 @@ function Settings() {
                 {errors.defaultTrialDays && <p className="text-xs text-red-500 mt-1">{errors.defaultTrialDays}</p>}
               </div>
               <div>
-                <label className={labelClass}>Default Monthly Price</label>
+                <label className={labelClass}>{t('default_monthly_price')}</label>
                 <input
                   type="number"
                   min="0"
@@ -353,7 +357,7 @@ function Settings() {
                 {errors.defaultMonthlyPrice && <p className="text-xs text-red-500 mt-1">{errors.defaultMonthlyPrice}</p>}
               </div>
               <div>
-                <label className={labelClass}>Currency</label>
+                <label className={labelClass}>{t('currency')}</label>
                 <select
                   className={customSelectClass}
                   value={form.currency}
@@ -364,7 +368,7 @@ function Settings() {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Grace Period Days</label>
+                <label className={labelClass}>{t('grace_period_days')}</label>
                 <input
                   type="number"
                   min="0"
@@ -388,8 +392,8 @@ function Settings() {
                   <FaDatabase className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Backup / Maintenance</h3>
-                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Manage system backups and maintenance operations.</p>
+                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('backup_maintenance')}</h3>
+                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('backup_maintenance_desc')}</p>
                 </div>
               </div>
               <Badge status="Working" />
@@ -398,7 +402,7 @@ function Settings() {
             <div className="space-y-6">
               <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
                 <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
-                  {loadingBackups ? "Loading backup info..." : (backups.length > 0 ? `Latest Backup: ${backups[0].name || backups[0].id || 'Success'}` : "Backup tools are ready. No backups found yet.")}
+                  {loadingBackups ? t('loading_backup_info') : (backups.length > 0 ? `${t('latest_backup')} ${backups[0].name || backups[0].id || 'Success'}` : t('no_backups_found'))}
                 </p>
               </div>
               <div>
@@ -407,7 +411,7 @@ function Settings() {
                   disabled={isCreatingBackup || loadingBackups}
                   className={customPrimaryButton}
                 >
-                  {isCreatingBackup ? "Creating..." : "Create Backup"}
+                  {isCreatingBackup ? t('creating') : t('create_backup')}
                 </button>
               </div>
             </div>
@@ -426,8 +430,8 @@ function Settings() {
                   <FaBell className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Notifications</h3>
-                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Configure platform-wide alert routing.</p>
+                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('notifications_title')}</h3>
+                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('notifications_desc')}</p>
                 </div>
               </div>
               <Badge status="Auto-save" />
@@ -435,10 +439,10 @@ function Settings() {
             
             <div className="space-y-6 mb-6">
               {[
-                { id: "enableTelegramAlerts", label: "Telegram alerts", desc: "Send important platform alerts to the connected Telegram account." },
-                { id: "enableLowStockAlerts", label: "Low stock alerts", desc: "Notify admins when product stock is below minimum level." },
-                { id: "enableSubscriptionExpiryAlerts", label: "Subscription expiry alerts", desc: "Send warnings before shop subscriptions expire." },
-                { id: "enableAdminActivityAlerts", label: "Admin activity alerts", desc: "Notify system owner about critical admin actions." },
+                { id: "enableTelegramAlerts", label: t('telegram_alerts'), desc: t('telegram_alerts_desc') },
+                { id: "enableLowStockAlerts", label: t('low_stock_alerts'), desc: t('low_stock_alerts_desc') },
+                { id: "enableSubscriptionExpiryAlerts", label: t('subscription_expiry_alerts'), desc: t('subscription_expiry_alerts_desc') },
+                { id: "enableAdminActivityAlerts", label: t('admin_activity_alerts'), desc: t('admin_activity_alerts_desc') },
               ].map(item => (
                 <div key={item.id} className="flex items-start justify-between gap-4">
                   <div>
@@ -470,8 +474,8 @@ function Settings() {
                   <FaShieldHalved className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">Security Settings</h3>
-                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Manage global security policies and session timeouts.</p>
+                  <h3 className="text-lg font-bold text-[#020617] dark:text-[#f8fafc]">{t('security_settings')}</h3>
+                  <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">{t('security_settings_desc')}</p>
                 </div>
               </div>
               <Badge status="Auto-save" />
@@ -481,7 +485,7 @@ function Settings() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <label htmlFor="requireStrongPassword" className="text-sm font-bold text-[#020617] dark:text-[#f8fafc] cursor-pointer block mb-1">
-                    Require strong password
+                    {t('require_strong_password')}
                   </label>
                 </div>
                 <input
@@ -495,7 +499,7 @@ function Settings() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <label htmlFor="loginAlertToggle" className="text-sm font-bold text-[#020617] dark:text-[#f8fafc] cursor-pointer block mb-1">
-                    Login alert toggle
+                    {t('login_alert_toggle')}
                   </label>
                 </div>
                 <input
@@ -507,7 +511,7 @@ function Settings() {
                 />
               </div>
               <div className="pt-2">
-                <label className={labelClass}>Session Timeout (minutes)</label>
+                <label className={labelClass}>{t('session_timeout')}</label>
                 <input
                   type="number"
                   min="5"
@@ -516,7 +520,7 @@ function Settings() {
                   onChange={(e) => handleChange({ sessionTimeout: e.target.value }, 'security')}
                 />
                 {errors.sessionTimeout && <p className="text-xs text-red-500 mt-1">{errors.sessionTimeout}</p>}
-                {!errors.sessionTimeout && <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">Automatically sign out inactive users after this time.</p>}
+                {!errors.sessionTimeout && <p className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">{t('session_timeout_desc')}</p>}
               </div>
             </div>
             <div className="flex items-center gap-2 pt-4 border-t border-[#e5e7eb] dark:border-[#27272a]">

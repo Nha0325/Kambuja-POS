@@ -11,6 +11,7 @@ import {
 } from "react-icons/io5";
 import { useCollection } from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const inputClass =
   "h-10 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm text-[#020617] placeholder:text-slate-400 outline-none transition focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#27272a] dark:bg-[#09090b] dark:text-[#f8fafc] dark:placeholder:text-zinc-500";
@@ -34,6 +35,7 @@ function CreateSupplier() {
   
   const { create, isLoading } = useCollection("suppliers");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,7 +48,7 @@ function CreateSupplier() {
     };
     const res = await create(data);
     if (res) {
-      toast.success("Insert successfully!!");
+      toast.success(t('supplier_added_success'));
       clearForm();
       navigate("/admin/suppliers");
     }
@@ -66,14 +68,14 @@ function CreateSupplier() {
         <div>
           <div className="flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
             <Link to="/admin/suppliers" className="font-medium text-[#06b6d4] hover:underline">
-              Suppliers
+              {t('suppliers')}
             </Link>
             <span>/</span>
-            <span>Create New</span>
+            <span>{t('create_new')}</span>
           </div>
-          <h1 className="mt-2 text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">Add Supplier</h1>
+          <h1 className="mt-2 text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">{t('add_supplier')}</h1>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-            Create a supplier profile for purchasing and inventory replenishment.
+            {t('add_supplier_desc')}
           </p>
         </div>
         <Link
@@ -81,7 +83,7 @@ function CreateSupplier() {
           className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center gap-2"
         >
           <IoArrowBack />
-          Back to Suppliers
+          {t('back_to_suppliers')}
         </Link>
       </div>
 
@@ -89,15 +91,15 @@ function CreateSupplier() {
         <div className="xl:col-span-8">
           <div className="overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
             <div className="flex flex-col gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-lg font-semibold text-[#020617] dark:text-[#f8fafc]">Create New Supplier</h2>
-              <span className="text-sm text-[#64748b] dark:text-[#a1a1aa]">* Required fields</span>
+              <h2 className="text-lg font-semibold text-[#020617] dark:text-[#f8fafc]">{t('create_new_supplier')}</h2>
+              <span className="text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('required_fields')}</span>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 p-5">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div className="space-y-2">
                   <label htmlFor="supplier-businessName" className={labelClass}>
-                    Business Name*
+                    {t('business_name_req')}
                   </label>
                   <div className="relative">
                     <FieldIcon>
@@ -111,14 +113,14 @@ function CreateSupplier() {
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       className={iconInputClass}
-                      placeholder="Enter business name"
+                      placeholder={t('enter_business_name')}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <label htmlFor="supplier-name" className={labelClass}>
-                    Contact Name*
+                    {t('contact_name_req')}
                   </label>
                   <div className="relative">
                     <FieldIcon>
@@ -132,7 +134,7 @@ function CreateSupplier() {
                       onChange={(e) => setName(e.target.value)}
                       type="text"
                       className={iconInputClass}
-                      placeholder="Enter supplier name"
+                      placeholder={t('enter_supplier_name')}
                     />
                   </div>
                 </div>
@@ -141,7 +143,7 @@ function CreateSupplier() {
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div className="space-y-2">
                   <label htmlFor="supplier-phone" className={labelClass}>
-                    Phone Number*
+                    {t('phone_number_req')}
                   </label>
                   <div className="relative">
                     <FieldIcon>
@@ -155,7 +157,7 @@ function CreateSupplier() {
                       type="tel"
                       required
                       className={iconInputClass}
-                      placeholder="Enter phone"
+                      placeholder={t('enter_phone')}
                     />
                   </div>
                 </div>
@@ -163,7 +165,7 @@ function CreateSupplier() {
 
               <div className="space-y-2">
                 <label htmlFor="supplier-address" className={labelClass}>
-                  Business Address
+                  {t('business_address')}
                 </label>
                 <div className="relative">
                   <TextareaIcon>
@@ -175,14 +177,14 @@ function CreateSupplier() {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className={`${iconInputClass} min-h-[100px] py-2 resize-y`}
-                    placeholder="Enter address"
+                    placeholder={t('enter_address')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="supplier-note" className={labelClass}>
-                  Internal Notes
+                  {t('internal_notes')}
                 </label>
                 <div className="relative">
                   <TextareaIcon>
@@ -194,7 +196,7 @@ function CreateSupplier() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     className={`${iconInputClass} min-h-[100px] py-2 resize-y`}
-                    placeholder="Additional details, credit terms, or delivery preferences"
+                    placeholder={t('internal_notes_placeholder')}
                   />
                 </div>
               </div>
@@ -204,7 +206,7 @@ function CreateSupplier() {
                   to="/admin/suppliers"
                   className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex h-10 items-center justify-center w-full sm:w-auto"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Link>
                 <button
                   type="submit"
@@ -214,12 +216,12 @@ function CreateSupplier() {
                   {isLoading ? (
                     <>
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                      Saving...
+                      {t('saving')}
                     </>
                   ) : (
                     <>
                       <IoSaveOutline />
-                      Save Supplier
+                      {t('save_supplier')}
                     </>
                   )}
                 </button>

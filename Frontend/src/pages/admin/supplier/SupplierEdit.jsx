@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { useCollection } from "../../../hooks/common/useCollection";
 import toast from "react-hot-toast";
 import { useFindById } from "../../../hooks/common/useFindById";
+import { useTranslation } from "react-i18next";
 
 function EditSupplier() {
   const [businessName, setBusinessName] = useState("");
@@ -15,6 +16,7 @@ function EditSupplier() {
 
   const { update, isLoading } = useCollection("suppliers");
   const { data: supplier, isLoading: isFinding } = useFindById("suppliers", route.id);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ function EditSupplier() {
     };
     const res = await update(route.id, data);
     if (res) {
-      toast.success("Update successfully!!");
+      toast.success(t('supplier_updated_success'));
       clearForm();
       navigate("/admin/suppliers");
     }
@@ -60,12 +62,12 @@ function EditSupplier() {
         <div>
           <div className="flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
             <Link to="/admin/suppliers" className="font-medium text-[#06b6d4] hover:underline">
-              Suppliers
+              {t('suppliers')}
             </Link>
             <span>/</span>
-            <span>Edit Supplier</span>
+            <span>{t('edit_supplier')}</span>
           </div>
-          <h1 className="mt-2 text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">Edit Supplier</h1>
+          <h1 className="mt-2 text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">{t('edit_supplier')}</h1>
         </div>
       </div>
 
@@ -75,7 +77,7 @@ function EditSupplier() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label htmlFor="supplier-businessName" className={labelClass}>
-                  Business Name <span className="text-red-500">*</span>
+                  {t('business_name_req')}
                 </label>
                 <input
                   id="supplier-businessName"
@@ -85,13 +87,13 @@ function EditSupplier() {
                   value={businessName} 
                   onChange={(e) => setBusinessName(e.target.value)}
                   className={inputClass}
-                  placeholder="Enter business name"
+                  placeholder={t('enter_business_name')}
                 />
               </div>
 
               <div>
                 <label htmlFor="supplier-name" className={labelClass}>
-                  Contact Name <span className="text-red-500">*</span>
+                  {t('contact_name_req')}
                 </label>
                 <input
                   id="supplier-name"
@@ -100,7 +102,7 @@ function EditSupplier() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={inputClass}
-                  placeholder="Enter contact name"
+                  placeholder={t('enter_supplier_name')}
                   required
                 />
               </div>
@@ -108,7 +110,7 @@ function EditSupplier() {
 
             <div>
               <label htmlFor="supplier-phone" className={labelClass}>
-                Phone <span className="text-red-500">*</span>
+                {t('phone_number_req')}
               </label>
               <input
                 id="supplier-phone"
@@ -117,14 +119,14 @@ function EditSupplier() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className={inputClass}
-                placeholder="Enter phone"
+                placeholder={t('enter_phone')}
                 required
               />
             </div>
 
             <div>
               <label htmlFor="supplier-address" className={labelClass}>
-                Address
+                {t('business_address')}
               </label>
               <textarea
                 id="supplier-address"
@@ -132,13 +134,13 @@ function EditSupplier() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 className={`${inputClass} min-h-[100px] py-2 resize-y`}
-                placeholder="Enter address"
+                placeholder={t('enter_address')}
               ></textarea>
             </div>
 
             <div>
               <label htmlFor="supplier-note" className={labelClass}>
-                Note
+                {t('internal_notes')}
               </label>
               <textarea
                 id="supplier-note"
@@ -146,16 +148,16 @@ function EditSupplier() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 className={`${inputClass} min-h-[100px] py-2 resize-y`}
-                placeholder="Enter note"
+                placeholder={t('internal_notes_placeholder')}
               ></textarea>
             </div>
 
             <div className="pt-5 border-t border-[#e5e7eb] dark:border-[#27272a] flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <Link to="/admin/suppliers" className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center h-10 w-full sm:w-auto">
-                Cancel
+                {t('cancel')}
               </Link>
               <button type="submit" disabled={isLoading} className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-10 w-full sm:w-auto">
-                {isLoading ? "Saving..." : "Save Changes"}
+                {isLoading ? t('saving') : t('save_changes')}
               </button>
             </div>
           </form>

@@ -12,6 +12,7 @@ import {
   selectClass,
 } from "../adminManagerUi"
 import { PageHeader } from "../../../components/admin/AdminManagerUi"
+import { useTranslation } from "react-i18next"
 
 const getShopLocation = (shop) => {
   if (!shop || typeof shop !== "object") return "-"
@@ -129,6 +130,7 @@ function CreateAdmin() {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successSummary, setSuccessSummary] = useState(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     let isMounted = true
@@ -178,7 +180,7 @@ function CreateAdmin() {
       
       if (id) {
         await adminManagerService.updateAdmin(id, payload)
-        toast.success("Admin owner updated")
+        toast.success(t('admin_owner_updated'))
         navigate("/admin-manager/admin-owners")
       } else {
         const response = await adminManagerService.createAdmin(payload)
@@ -188,7 +190,7 @@ function CreateAdmin() {
           username: admin.username || form.username,
           email: admin.email || form.email,
           phone: admin.phone || form.phone,
-          assignedShop: selectedShop?.name || "Unassigned",
+          assignedShop: selectedShop?.name || t('unassigned'),
           shopLocation: getShopLocation(selectedShop),
           temporaryPassword: form.password,
           status: admin.status || form.status,
@@ -196,10 +198,10 @@ function CreateAdmin() {
           loginUrl: typeof window === "undefined" ? "/login" : `${window.location.origin}/login`,
         })
         setForm({ username: "", fullName: "", email: "", phone: "", password: "", shopId: "", status: "ACTIVE", role: "ADMIN" })
-        toast.success("Admin owner created")
+        toast.success(t('admin_owner_created'))
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || "Unable to save admin owner")
+      toast.error(error.response?.data?.error || t('unable_to_save_admin_owner'))
     } finally {
       setIsSaving(false)
     }
@@ -207,15 +209,20 @@ function CreateAdmin() {
 
   if (isLoading) {
     return (
-       <div className="p-10 text-center text-[#64748b]">Loading...</div>
+       <div className="p-10 text-center text-[#64748b]">{t('loading')}</div>
     )
   }
 
   return (
     <section>
+      <nav className="mb-4 flex items-center gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
+        <Link to="/admin-manager/admin-owners" className="hover:text-[#06b6d4]">{t('admin_management')}</Link>
+        <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
+        <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">{id ? t('edit_admin_owner') : t('create_admin_owner')}</span>
+      </nav>
       <PageHeader
-        title={id ? "Edit Admin Owner" : "Create Admin Owner"}
-        description={id ? "Update admin details and shop assignment." : "Register a shop owner admin account for the Kambuja ecosystem."}
+        title={id ? t('edit_admin_owner') : t('create_admin_owner')}
+        description={id ? t('edit_admin_desc') : t('create_admin_desc')}
       />
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
@@ -223,7 +230,7 @@ function CreateAdmin() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             
             <label className="space-y-2">
-              <span className={labelClass}>Username *</span>
+              <span className={labelClass}>{t('username_req')}</span>
               <input
                 required
                 type="text"
@@ -235,7 +242,7 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Full Name</span>
+              <span className={labelClass}>{t('full_name')}</span>
               <input
                 type="text"
                 className={inputClass}
@@ -246,7 +253,7 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Email Address *</span>
+              <span className={labelClass}>{t('email_address_req')}</span>
               <EmailAutocompleteInput
                 required
                 placeholder="example@gmail.com"
@@ -256,7 +263,7 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Phone Number</span>
+              <span className={labelClass}>{t('phone_number')}</span>
               <input
                 type="tel"
                 className={inputClass}
@@ -267,7 +274,7 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Password {id ? "(Leave blank to keep)" : "*"}</span>
+              <span className={labelClass}>Password {id ? t('leave_blank_to_keep') : "*"}</span>
               <input
                 required={!id}
                 type="password"
@@ -280,35 +287,35 @@ function CreateAdmin() {
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Assign Shop Optional</span>
+              <span className={labelClass}>{t('assign_shop_optional')}</span>
               <select className={selectClass} value={form.shopId} onChange={(event) => setForm({ ...form, shopId: event.target.value })}>
-                <option value="">Unassigned admin owner</option>
+                <option value="">{t('unassigned_admin_owner')}</option>
                 {shops.map((shop) => <option key={shop._id} value={shop._id}>{shop.name}</option>)}
               </select>
-              <span className="block text-xs leading-5 text-slate-500">Unassigned admins can be selected as a new shop owner.</span>
+              <span className="block text-xs leading-5 text-slate-500">{t('unassigned_admins_desc')}</span>
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Role *</span>
+              <span className={labelClass}>{t('role_req')}</span>
               <select className={selectClass} value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
-                <option value="ADMIN">Shop Admin (ADMIN)</option>
-                <option value="ADMIN_MANAGER">System Admin (ADMIN_MANAGER)</option>
+                <option value="ADMIN">{t('shop_admin_role')}</option>
+                <option value="ADMIN_MANAGER">{t('system_admin_role')}</option>
               </select>
             </label>
 
             <label className="space-y-2">
-              <span className={labelClass}>Status</span>
+              <span className={labelClass}>{t('status')}</span>
               <select className={selectClass} value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
+                <option value="ACTIVE">{t('active')}</option>
+                <option value="INACTIVE">{t('inactive')}</option>
               </select>
             </label>
           </div>
 
           <div className="flex flex-col-reverse gap-3 border-t border-cyan-100 pt-6 sm:flex-row sm:justify-end">
-            <Link className={`${secondaryButtonClass} w-full sm:w-auto`} to="/admin-manager/admin-owners">Cancel</Link>
+            <Link className={`${secondaryButtonClass} w-full sm:w-auto`} to="/admin-manager/admin-owners">{t('cancel')}</Link>
             <button className={`${primaryButtonClass} w-full sm:w-auto`} type="submit" disabled={isSaving}>
-              {isSaving ? "Saving..." : (id ? "Update Admin Owner" : "Save Admin Owner")}
+              {isSaving ? t('saving') : (id ? t('update_admin_owner') : t('save_admin_owner'))}
             </button>
           </div>
         </form>
@@ -316,20 +323,20 @@ function CreateAdmin() {
         <aside className="space-y-6 lg:col-span-4">
           {successSummary && (
             <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 p-6">
-              <h3 className="mb-3 text-base font-semibold text-emerald-900 dark:text-emerald-400">Admin Owner Created</h3>
+              <h3 className="mb-3 text-base font-semibold text-emerald-900 dark:text-emerald-400">{t('admin_owner_created_title')}</h3>
               <p className="mb-4 text-sm leading-6 text-emerald-700 dark:text-emerald-500/80">
-                Temporary password is shown once on this screen.
+                {t('temporary_password_desc')}
               </p>
               <dl className="space-y-3 text-sm">
                 {[
-                  ["Admin name", successSummary.adminName],
-                  ["Username", successSummary.username],
-                  ["Role", successSummary.role],
-                  ["Email", successSummary.email],
-                  ["Assigned shop", successSummary.assignedShop],
-                  ["Shop location", successSummary.shopLocation],
-                  ["Temporary password", successSummary.temporaryPassword],
-                  ["Login URL", successSummary.loginUrl],
+                  [t('admin_name'), successSummary.adminName],
+                  [t('username'), successSummary.username],
+                  [t('role'), successSummary.role],
+                  [t('email'), successSummary.email],
+                  [t('assigned_shop'), successSummary.assignedShop],
+                  [t('shop_location'), successSummary.shopLocation],
+                  [t('temporary_password'), successSummary.temporaryPassword],
+                  [t('login_url'), successSummary.loginUrl],
                 ].map(([label, value]) => (
                   <div key={label}>
                     <dt className="text-xs font-bold uppercase tracking-[0.05em] text-emerald-600 dark:text-emerald-500/60">{label}</dt>
@@ -338,7 +345,7 @@ function CreateAdmin() {
                 ))}
               </dl>
               <Link className={`${secondaryButtonClass} mt-5 w-full justify-center`} to="/admin-manager/admin-owners">
-                Back to Admin Owners
+                {t('back_to_admin_owners')}
               </Link>
             </div>
           )}
@@ -346,16 +353,16 @@ function CreateAdmin() {
           <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-slate-50 dark:bg-[#09090b] p-6">
             <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-[#020617] dark:text-[#f8fafc]">
               <FaCircleInfo className="text-[#06b6d4]" />
-              Role Permissions
+              {t('role_permissions')}
             </h3>
             <p className="mb-4 text-sm leading-6 text-[#64748b] dark:text-[#a1a1aa]">
-              <strong>ADMIN:</strong> Manage assigned shop operations, analytics, and reports.<br/>
-              <strong>ADMIN_MANAGER:</strong> Full system access across all shops.
+              <strong>{t('admin_role_desc')}</strong><br/>
+              <strong>{t('admin_manager_role_desc')}</strong>
             </p>
             <ul className="space-y-3 text-sm text-[#020617] dark:text-[#f8fafc]">
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> Manage assigned shop operations</li>
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> Review shop analytics</li>
-              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> View assigned shop reports</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> {t('manage_assigned_shop_operations')}</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> {t('review_shop_analytics')}</li>
+              <li className="flex items-start gap-3"><FaUserShield className="mt-1 text-[#06b6d4]" /> {t('view_assigned_shop_reports')}</li>
             </ul>
           </div>
         </aside>
