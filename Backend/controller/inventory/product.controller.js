@@ -211,6 +211,10 @@ exports.findAll = async (req, res, next) => {
             sortOption = "-_id"
         }
 
+        if (req.user && req.user.role === 'CASHIER') {
+            querySearch.status = "ACTIVE";
+        }
+
         const docs = await Product.find({...querySearch, ...filters, ...req.shopFilter})
           .skip(skip)
           .limit(limit)
@@ -451,6 +455,13 @@ exports.lookupProduct = async (req, res, next) => {
             return res.status(404).json({
                 success: false,
                 error: "Product not found"
+            });
+        }
+
+        if (doc.status !== "ACTIVE") {
+            return res.status(403).json({
+                success: false,
+                error: "Product is inactive"
             });
         }
         
