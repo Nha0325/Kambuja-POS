@@ -3,77 +3,70 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "=== Kambuja POS Automatic Setup ==="
+echo "========================================="
+echo "   🚀 Kambuja POS Automatic Setup 🚀   "
+echo "========================================="
 echo
 
 # 1. Setup Environment Variables
-if [ ! -f "$ROOT_DIR/.env" ]; then
-    echo "[*] Creating .env file from .env.example..."
+echo "[*] 1. Setting up Environment Variables..."
+
+# Root .env
+if [ ! -f "$ROOT_DIR/.env" ] && [ -f "$ROOT_DIR/.env.example" ]; then
+    echo "    -> Creating root .env file..."
     cp "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
 else
-    echo "[*] .env file already exists. (Skipping)"
+    echo "    -> Root .env already exists or .env.example missing. (Skipping)"
 fi
 
-# 2. Check and Install Docker
-if ! command -v docker &> /dev/null; then
-    echo "[*] Docker is missing. Installing Docker..."
-    if command -v apt &> /dev/null; then
-        sudo apt update
-        sudo apt install docker.io -y
-        sudo systemctl start docker
-        sudo systemctl enable docker
-    else
-        echo "[!] Cannot install Docker automatically. Please install Docker manually."
-        exit 1
-    fi
+# Backend .env
+if [ ! -f "$ROOT_DIR/Backend/.env" ] && [ -f "$ROOT_DIR/Backend/.env.example" ]; then
+    echo "    -> Creating Backend/.env file..."
+    cp "$ROOT_DIR/Backend/.env.example" "$ROOT_DIR/Backend/.env"
 else
-    echo "[*] Docker is already installed. (Skipping)"
+    echo "    -> Backend/.env already exists or .env.example missing. (Skipping)"
 fi
 
-# 3. Check and Start MongoDB Container
-echo "[*] Preparing MongoDB container..."
-if ! sudo docker ps -a --format '{{.Names}}' | grep -Eq "^kambuja-pos-mongo\$"; then
-    echo "    -> Creating new MongoDB container..."
-    sudo docker run -d \
-      --name kambuja-pos-mongo \
-      -p 27017:27017 \
-      -v kambuja-pos-mongo-data:/data/db \
-      mongo:7
+# Frontend .env
+if [ ! -f "$ROOT_DIR/Frontend/.env" ] && [ -f "$ROOT_DIR/Frontend/.env.example" ]; then
+    echo "    -> Creating Frontend/.env file..."
+    cp "$ROOT_DIR/Frontend/.env.example" "$ROOT_DIR/Frontend/.env"
 else
-    echo "    -> Container kambuja-pos-mongo already exists. Starting it..."
-    sudo docker start kambuja-pos-mongo
+    echo "    -> Frontend/.env already exists or .env.example missing. (Skipping)"
 fi
-
-# 4. Install Project Dependencies
-echo "[*] Installing project dependencies (Maven/NPM)..."
-if [ -x "$ROOT_DIR/scripts/sh/setup.sh" ]; then
-    "$ROOT_DIR/scripts/sh/setup.sh"
-elif [ -f "$ROOT_DIR/scripts/sh/setup.sh" ]; then
-    bash "$ROOT_DIR/scripts/sh/setup.sh"
-else
-    echo "[!] Cannot find setup.sh script."
-fi
-
-# 5. Install Additional Frontend Packages
-echo "[*] Installing additional frontend packages..."
-for APP in "apps/web-admin-manager" "apps/web-admin"; do
-    if [ -d "$ROOT_DIR/$APP" ]; then
-        echo "    -> Installing in $APP..."
-        (cd "$ROOT_DIR/$APP" && npm install react-router-dom zustand framer-motion react-icons lenis tailwindcss @tailwindcss/vite axios eslint)
-    fi
-done
-
 echo
+
+# 2. Install Backend Dependencies
+echo "[*] 2. Installing Backend Dependencies (Node.js)..."
+if [ -d "$ROOT_DIR/Backend" ]; then
+    (cd "$ROOT_DIR/Backend" && npm install)
+    echo "    -> Backend dependencies installed successfully!"
+else
+    echo "    -> [!] Backend folder not found."
+fi
+echo
+
+# 3. Install Frontend Dependencies
+echo "[*] 3. Installing Frontend Dependencies (React.js)..."
+if [ -d "$ROOT_DIR/Frontend" ]; then
+    (cd "$ROOT_DIR/Frontend" && npm install)
+    echo "    -> Frontend dependencies installed successfully!"
+else
+    echo "    -> [!] Frontend folder not found."
+fi
+echo
+
 echo "========================================="
 echo " 🎉 Setup Complete Successfully! 🎉 "
 echo "========================================="
 echo
-echo "To start all applications, run:"
-echo "   ./scripts/sh/dev.sh"
+echo "To start the application locally, open TWO terminals:"
 echo
-echo "Default URLs:"
-echo "   API:                   http://localhost:8080"
-echo "   Swagger:               http://localhost:8080/swagger-ui.html"
-echo "   Admin Manager UI:      http://localhost:5173"
-echo "   Admin and Cashier UI:  http://localhost:5174"
+echo "Terminal 1 (Backend):"
+echo "   cd Backend"
+echo "   npm run dev"
+echo
+echo "Terminal 2 (Frontend):"
+echo "   cd Frontend"
+echo "   npm run dev"
 echo "========================================="
