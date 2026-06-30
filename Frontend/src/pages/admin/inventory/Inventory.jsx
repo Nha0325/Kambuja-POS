@@ -91,15 +91,9 @@ function Inventory() {
             {t('stock_overview_desc')}
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3 sm:flex">
+        <div className="flex gap-3">
           <Link to="/admin/inventory/history" className={adminSurface.secondaryButton}>
             <LuClock size={18} /> {t('history')}
-          </Link>
-          <Link to="/admin/inventory/adjustment" className={adminSurface.secondaryButton}>
-            <LuSlidersHorizontal size={18} /> {t('adjust')}
-          </Link>
-          <Link to="/admin/inventory/stock-in" className={adminSurface.primaryButton}>
-            <LuPackagePlus size={18} /> {t('stock_in')}
           </Link>
         </div>
       </div>

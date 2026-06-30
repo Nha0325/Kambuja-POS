@@ -4,8 +4,6 @@ import {
   FaBoxOpen,
   FaTags,
   FaBoxesStacked,
-  FaArrowRightToBracket,
-  FaSliders,
   FaTruck,
   FaReceipt,
   FaChartLine,
