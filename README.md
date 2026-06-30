@@ -218,43 +218,40 @@ All routes prefixed with `/api/v1/`:
 
 ---
 
-## 🖥️ Frontend Pages
+## 🖥️ ប្រព័ន្ធទំព័រ និងមុខងារលម្អិត (Frontend Pages & Features)
 
-### Admin Pages (Shop Owner)
-- **Dashboard** — Sales overview, charts, metrics
-- **Products** — ProductList, ProductCreate, ProductEdit, PrintLabel
-- **Categories** — Category CRUD
-- **Suppliers** — Supplier CRUD
-- **Inventory** — Inventory overview, StockIn, StockAdjustment, History
-- **Purchases** — PurchaseList, PurchaseCreate, Payment/Status modals
-- **Reports** — SaleReport, StockReport
-- **Users** — Manage cashier accounts
-- **Settings** — Shop settings
-- **Notifications** — Alert management
+### 👑 Admin Manager (អ្នកគ្រប់គ្រងប្រព័ន្ធទូទៅ)
+- **ទំព័រដើម (Dashboard):** មើលទិន្នន័យរួម ទិដ្ឋភាពទូទៅនៃហាងទាំងអស់ និងចំណូលប្រព័ន្ធ។
+- **ហាង (Shops):** បង្កើត (Create), កែប្រែ (Edit), លុប (Delete) និងផ្អាក (Suspend) គណនីហាង។
+- **អ្នកគ្រប់គ្រង (Admins):** បង្កើត កែប្រែ និងកំណត់សិទ្ធិម្ចាស់ហាង (Shop Owners)។
+- **ទីតាំង (Locations):** គ្រប់គ្រងបញ្ជីទីតាំង ឬសាខានានារបស់ហាងនីមួយៗ។
+- **ការចុះឈ្មោះ (Subscriptions):** តាមដាន និងគ្រប់គ្រងកញ្ចប់សេវាកម្ម (Active/Expired) របស់ហាង។
+- **ការប្រកាសអាសន្ន (Alerts):** មើលការផ្តល់ដំណឹងបន្ទាន់ ឬបញ្ហាសំខាន់ៗក្នុងប្រព័ន្ធ។
+- **របាយការណ៍ (Reports):** ទាញយករបាយការណ៍រួមប្រចាំខែ/ឆ្នាំ ពីសកម្មភាពហាងទាំងអស់។
+- **ត្រួតពិនិត្យផលិតផល (Product Monitoring):** មើល (Read-only) បញ្ជីផលិតផលរបស់ហាងទាំងអស់ដោយមិនអាចកែប្រែបាន។
+- **ស្តុកទូទៅ (General Stock):** ត្រួតពិនិត្យរបាយការណ៍ស្តុកសរុបរបស់គ្រប់សាខា។
+- **កំណត់ហេតុប្រព័ន្ធ (System Logs):** តាមដានរាល់សកម្មភាព (Audit Trail) អ្នកប្រើប្រាស់ក្នុងប្រព័ន្ធ។
+- **សុខភាពប្រព័ន្ធ (System Health):** ត្រួតពិនិត្យស្ថានភាព Server, Database, និង Memory។
+- **ការកំណត់ (Settings):** កំណត់រចនាសម្ព័ន្ធទូទៅរបស់ Platform ទាំងមូល។
 
-### Admin Manager Pages (Platform Admin)
-- **Dashboard** — Platform-wide metrics
-- **Shops** — Manage all shops
-- **Admins** — Manage admin accounts
-- **Products** — Read-only product view across shops
-- **Stock** — Read-only stock overview
-- **Reports** — Platform reports
-- **Alerts** — System alerts
-- **Logs** — System activity logs
-- **Health** — System health monitoring
-- **Settings** — Platform settings
-- **Subscriptions** — Shop subscription management
-- **Locations** — Location management
-- **Access** — Access control
+### 🏪 Admin (ម្ចាស់ហាង)
+- **ទំព័រដើម (Dashboard):** របាយការណ៍លក់ប្រចាំថ្ងៃ ចំណេញ/ខាត និងផលិតផលលក់ដាច់ជាងគេ។
+- **ផលិតផល (Products):** បង្កើត (Create), កែប្រែ (Edit), លុប (Delete) ផលិតផល, ស្កេន Barcode, និងកំណត់ស្ថានភាព (Active/Inactive)។
+- **ប្រភេទ (Categories):** បង្កើត និងគ្រប់គ្រងប្រភេទចំណាត់ថ្នាក់ផលិតផល។
+- **ស្តុកទំនិញ (Inventory):** បញ្ចូលស្តុកថ្មី (Stock In), កែតម្រូវស្តុក (Adjustment), និងមើលប្រវត្តិស្តុក (History) ទាំងអស់ក្នុងកន្លែងតែមួយ (3-in-1)។
+- **អ្នកផ្គត់ផ្គង់ (Suppliers):** កត់ត្រា និងគ្រប់គ្រងបញ្ជីឈ្មោះអ្នកផ្គត់ផ្គង់ទំនិញ។
+- **ការបញ្ជាទិញ (Purchases):** បង្កើតវិក្កយបត្រទិញចូល (PO), កំណត់ស្ថានភាពទូទាត់ប្រាក់ (Paid/Unpaid)។
+- **របាយការណ៍លក់ (Sale Report):** មើល និងទាញយករបាយការណ៍លក់តាមកាលបរិច្ឆេទ។
+- **របាយការណ៍ស្តុក (Stock Report):** មើលរបាយការណ៍ស្តុកដែលនៅសល់ និងស្តុកដែលជិតអស់ (Low Stock)។
+- **អ្នកគិតលុយ (Cashiers):** បង្កើត, កែប្រែ, និងផ្អាកគណនីបុគ្គលិកគិតលុយ (Status: Active/Inactive)។
+- **ការជូនដំណឹង (Notifications):** ភ្ជាប់ Telegram Bot ដើម្បីទទួលសាររាល់ពេលស្តុកជិតអស់ ឬបិទបញ្ជី។
+- **ការកំណត់ហាង (Shop Settings):** កែប្រែឈ្មោះហាង អាសយដ្ឋាន លេខទូរស័ព្ទ និងស្លាកសញ្ញាលើវិក្កយបត្រ (Logo)។
 
-### Cashier Pages
-- **POS** — Point of sale checkout (scan, search, cart)
-- **Sales History** — View past sales
-- **Today's Sales** — Current day sales
-- **Held Bills** — Pause/resume bills
-- **Daily Close** — End of day closing
-- **Receipts** — Receipt lookup
-- **Stock Check/Lookup** — Check product availability
+### 👨‍💼 Cashier (អ្នកគិតលុយ)
+- **ម៉ាស៊ីនលក់ (POS):** ស្កេន Barcode ផលិតផល, គិតលុយ, ព្យួរវិក្កយបត្រ (Hold Bill), និងព្រីនវិក្កយបត្រលក់។ ផលិតផលដែលអសកម្ម (Inactive) នឹងមិនបង្ហាញនៅទីនេះទេ។
+- **ប្រវត្តិស្តុក / ប្រវត្តិលក់ (Sales/Stock History):** មើលប្រវត្តិប្រតិបត្តិការលក់ប្រចាំថ្ងៃ និងព្រីនវិក្កយបត្រឡើងវិញ។
+- **ស្តុក (Stock Lookup):** ឆែកមើលចំនួនស្តុក និងតម្លៃផលិតផលដែលមានលក់បច្ចុប្បន្ន។
+- **វេនការងារ (Daily Close / Shift):** សរុបទឹកប្រាក់ក្នុងថត (Cash Drawer) ពេលបើក និងបិទវេនការងារប្រចាំថ្ងៃ។
 
 ### Auth Pages
 - **Signin** — Login page (all roles)
