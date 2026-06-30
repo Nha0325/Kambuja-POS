@@ -17,6 +17,7 @@ function CreateProduct() {
   const [barcode, setBarcode] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [costPrice, setCostPrice] = useState("");
+  const [tax, setTax] = useState(0);
   const [note, setNote] = useState("");
   const [reorderLevel, setReorderLevel] = useState(10);
   const [status, setStatus] = useState(true);
@@ -65,6 +66,7 @@ function CreateProduct() {
 
     const cost = Number(costPrice);
     const sale = Number(salePrice);
+    const taxNum = Number(tax);
     if (!Number.isFinite(sale) || sale <= 0) {
       toast.error(t('sale_price_gt_0'));
       setIsSaving(false);
@@ -77,6 +79,11 @@ function CreateProduct() {
     }
     if (sale < cost) {
       toast.error(t('sale_price_gte_cost_price'));
+      setIsSaving(false);
+      return;
+    }
+    if (!Number.isFinite(taxNum) || taxNum < 0 || taxNum > 100) {
+      toast.error("Tax must be a valid percentage between 0 and 100");
       setIsSaving(false);
       return;
     }
@@ -102,6 +109,7 @@ function CreateProduct() {
         barcode: barcode.trim(),
         salePrice: sale,
         costPrice: cost,
+        tax: taxNum,
         lowStockThreshold: Number(reorderLevel),
         reorderLevel: Number(reorderLevel),
         note,
@@ -276,6 +284,24 @@ function CreateProduct() {
                       placeholder="0.00"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Tax (%)</label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">%</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={tax}
+                      onChange={(e) => setTax(e.target.value)}
+                      className={`${inputClass} pr-8`}
+                      placeholder="0"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">Applied during checkout</p>
                 </div>
 
                 <div className="md:col-span-2">

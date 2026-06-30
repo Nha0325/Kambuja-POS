@@ -64,6 +64,12 @@ function Invoice() {
 
       <div className="border-b border-dashed border-black my-2"></div>
 
+      {data?.totalTax > 0 && (
+        <div className="flex justify-between font-bold text-xs mb-1 p-1">
+          <span>{t('tax')}</span>
+          <span>{formatUsd(data?.totalTax)}</span>
+        </div>
+      )}
       <div className="flex justify-between font-bold text-sm bg-black text-white p-1 rounded">
         <span>{t('total')}</span>
         <span>{formatUsd(data?.totalCost)}</span>

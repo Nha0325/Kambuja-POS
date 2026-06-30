@@ -90,7 +90,7 @@ const normalizeProductPayload = (body) => {
     }
 
     // Coerce numeric fields
-    ;["costPrice", "salePrice", "lowStockThreshold", "reorderLevel"].forEach((field) => {
+    ;["costPrice", "salePrice", "lowStockThreshold", "reorderLevel", "tax"].forEach((field) => {
         if (payload[field] !== undefined) {
             payload[field] = Number(payload[field])
         }
@@ -109,6 +109,10 @@ const validateProductNumbers = (payload) => {
 
     if (payload.costPrice !== undefined && (!Number.isFinite(payload.costPrice) || payload.costPrice < 0)) {
         return "Cost price must be greater than or equal zero."
+    }
+    
+    if (payload.tax !== undefined && (!Number.isFinite(payload.tax) || payload.tax < 0 || payload.tax > 100)) {
+        return "Tax must be a valid percentage between 0 and 100."
     }
 
     const threshold = payload.lowStockThreshold ?? payload.lowStockThresholdBase ?? payload.reorderLevel
@@ -168,6 +172,22 @@ exports.create = async (req, res,next) => {
             code: newDoc.code,
             type: "SKU",
         })
+
+        try {
+            const io = require('../../config/socket').getIO();
+            const alertData = {
+                type: 'NEW_PRODUCT',
+                severity: 'INFO',
+                title: 'New Product Added',
+                message: `Product ${newDoc.name} has been added to the system.`,
+                createdAt: new Date()
+            };
+            // Alert everyone when a new product is added
+            io.to('ADMIN').to('ADMIN_MANAGER').to('CASHIER').emit('system_alert', alertData);
+        } catch(e) {
+            console.error('Socket emit failed:', e.message);
+        }
+
         res.status(201).json({
             success: true,
             result: newDoc
@@ -335,6 +355,21 @@ exports.update = async (req, res, next) => {
                 error: "Document not found with that ID!"
             })
         }
+        
+        try {
+            const io = require('../../config/socket').getIO();
+            const alertData = {
+                type: 'UPDATE_PRODUCT',
+                severity: 'INFO',
+                title: 'Product Updated',
+                message: `Product ${doc.name} has been updated.`,
+                createdAt: new Date()
+            };
+            io.to('ADMIN').to('ADMIN_MANAGER').to('CASHIER').emit('system_alert', alertData);
+        } catch(e) {
+            console.error('Socket emit failed:', e.message);
+        }
+
         res.status(200).json({
             success: true,
             result: doc
@@ -358,6 +393,21 @@ exports.remove = async (req, res, next) => {
             Inventory.deleteMany({ shopId: req.shopId, product: id }),
             ProductCode.deleteMany({ shopId: req.shopId, product: id }),
         ])
+        
+        try {
+            const io = require('../../config/socket').getIO();
+            const alertData = {
+                type: 'DELETE_PRODUCT',
+                severity: 'WARNING',
+                title: 'Product Deleted',
+                message: `Product ${doc.name} has been removed from the system.`,
+                createdAt: new Date()
+            };
+            io.to('ADMIN').to('ADMIN_MANAGER').to('CASHIER').emit('system_alert', alertData);
+        } catch(e) {
+            console.error('Socket emit failed:', e.message);
+        }
+
         res.status(200).json({
             success: true,
             result: "Deleted successfully"
@@ -425,6 +475,7 @@ exports.scanByCode = async (req, res, next) => {
                 salePrice: doc.salePrice,
                 costPrice: doc.costPrice,
                 status: doc.status,
+                tax: doc.tax || 0,
             }
         })
     } catch (error) {

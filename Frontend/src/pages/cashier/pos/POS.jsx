@@ -215,8 +215,8 @@ function POS() {
         unitPrice: Number(item.price),
         totalPrice: Number(item.lineTotal)
       })),
-      totalCost: Number(currentTotal),
-      paidAmount: Number(currentTotal)
+      totalCost: Number(currentTotal) + totalTax,
+      paidAmount: Number(currentTotal) + totalTax
     };
 
     try {
@@ -283,8 +283,18 @@ function POS() {
   };
 
   const handleRemoveItem = (id) => setCartItems(prev => prev.filter(el => el.productId !== id));
+  const [totalTax, setTotalTax] = useState(0);
+
   useEffect(() => {
-    setTotalCost(cartItems.reduce((acc, item) => acc + item.lineTotal, 0));
+    let cost = 0;
+    let tax = 0;
+    cartItems.forEach((item) => {
+      cost += item.lineTotal;
+      const taxPercentage = Number(item.productData?.tax || 0);
+      tax += (item.lineTotal * taxPercentage) / 100;
+    });
+    setTotalCost(cost);
+    setTotalTax(tax);
   }, [cartItems]);
 
   return (
@@ -436,7 +446,10 @@ function POS() {
                           )}
                         </select>
                       </h5>
-                      <p className="mt-0.5 text-xs font-semibold text-muted-foreground">{formatUsd(item.price)}</p>
+                      <p className="mt-0.5 text-xs font-semibold text-muted-foreground">
+                        {formatUsd(item.price)}
+                        {item.productData?.tax > 0 && <span className="ml-1 text-[10px] text-muted-foreground">(+ {item.productData.tax}% Tax)</span>}
+                      </p>
                     </div>
                     <button onClick={() => handleRemoveItem(item.productId)} className="ml-2 flex h-7 w-7 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10">
                       ✕
@@ -462,12 +475,12 @@ function POS() {
               <span>{formatUsd(totalCost)}</span>
             </div>
             <div className="mb-4 flex justify-between text-sm font-semibold text-muted-foreground">
-              <span>{t('tax')} (0%)</span>
-              <span>{formatUsd(0)}</span>
+              <span>{t('tax')}</span>
+              <span>{formatUsd(totalTax)}</span>
             </div>
             <div className="flex items-center justify-between border-t border-border/60 pt-3">
               <span className="text-[13px] font-black uppercase tracking-widest text-foreground">{t('total')}</span>
-              <span className="text-3xl font-black text-foreground tracking-tight">{formatUsd(totalCost)}</span>
+              <span className="text-3xl font-black text-foreground tracking-tight">{formatUsd(totalCost + totalTax)}</span>
             </div>
             <div className="mt-4 flex gap-2">
               <button

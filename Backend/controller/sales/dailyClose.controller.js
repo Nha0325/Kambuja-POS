@@ -123,6 +123,19 @@ exports.close = async (req, res, next) => {
             note
         });
 
+        try {
+            const io = require('../../config/socket').getIO();
+            io.to('ADMIN_MANAGER').to('ADMIN').emit('system_alert', {
+                type: 'SHIFT_CLOSED',
+                severity: 'INFO',
+                title: 'Shift Closed',
+                message: `Cashier ${req.user.username || req.user.email} closed shift. Expected: $${cashExpected.toLocaleString()}, Counted: $${doc.cashCounted.toLocaleString()}`,
+                createdAt: new Date()
+            });
+        } catch(e) {
+            console.error('Socket emit failed:', e.message);
+        }
+
         res.status(200).json({ success: true, result: doc });
     } catch (error) {
         next(error);

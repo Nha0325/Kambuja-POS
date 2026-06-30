@@ -35,6 +35,10 @@ const schema = new mongoose.Schema({
             },
             pricePerUnit: Number,
             profit: Number,
+            tax: {
+                type: Number,
+                default: 0
+            },
             unitPrice: {
                 type: Number,
                 required: true
@@ -49,6 +53,11 @@ const schema = new mongoose.Schema({
         type: Number,
         min: [0, "total cost can't be negative"],
         required: [true, "total cost is required"]
+    },
+    totalTax: {
+        type: Number,
+        default: 0,
+        min: [0, "Total tax can't be negative"]
     },
     paidAmount: {
         type: Number,

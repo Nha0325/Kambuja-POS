@@ -111,7 +111,9 @@ function Product() {
                 <th className={adminSurface.th}>{t('category')}</th>
                 <th className={`${adminSurface.th} text-right`}>{t('cost_price')}</th>
                 <th className={`${adminSurface.th} text-right`}>{t('sale_price')}</th>
+                <th className={`${adminSurface.th} text-right`}>Tax (%)</th>
                 <th className={`${adminSurface.th} text-center`}>{t('current_stock')}</th>
+                <th className={`${adminSurface.th} text-center`}>{t('status')}</th>
                 <th className={adminSurface.th}>{t('note')}</th>
                 <th className={`${adminSurface.th} w-28 text-center`}>{t('actions')}</th>
               </tr>
@@ -175,7 +177,17 @@ function Product() {
                       <td className={`${adminSurface.td} min-w-32 text-right font-semibold text-[#06b6d4]`}>
                         {currency}{sale.toFixed(2)}
                       </td>
+                      <td className={`${adminSurface.td} min-w-24 text-right text-slate-500 dark:text-zinc-400`}>
+                        {item?.tax || 0}%
+                      </td>
                       <td className={`${adminSurface.td} min-w-32 text-center text-slate-900 dark:text-white`}>{item?.currentStock ?? 0}</td>
+                      <td className={`${adminSurface.td} min-w-28 text-center`}>
+                        <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded ${
+                          item?.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {item?.status === 'ACTIVE' ? t('active') : t('inactive')}
+                        </span>
+                      </td>
                       <td className={`${adminSurface.td} min-w-48 max-w-xs truncate text-slate-500 dark:text-zinc-400`}>{item?.note || "-"}</td>
                       <td className={adminSurface.td}>
                         <div className="flex items-center justify-center gap-2">

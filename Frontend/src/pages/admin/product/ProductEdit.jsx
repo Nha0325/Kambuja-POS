@@ -23,6 +23,7 @@ function EditProduct() {
   const [barcode, setBarcode] = useState("");
   const [costPrice, setCostPrice] = useState("");
   const [salePrice, setSalePrice] = useState("");
+  const [tax, setTax] = useState(0);
   const [currentStock, setCurrentStock] = useState(0);
   const [note, setNote] = useState("");
   const [oldImageUrl, setOldImageUrl] = useState("");
@@ -73,6 +74,7 @@ function EditProduct() {
     try {
       const cost = Number(costPrice);
       const sale = Number(salePrice);
+      const taxNum = Number(tax);
       if (!Number.isFinite(sale) || sale <= 0) {
         toast.error("Sale price must be greater than zero.");
         setIsSaving(false);
@@ -88,6 +90,11 @@ function EditProduct() {
         setIsSaving(false);
         return;
       }
+      if (!Number.isFinite(taxNum) || taxNum < 0 || taxNum > 100) {
+        toast.error("Tax must be a valid percentage between 0 and 100.");
+        setIsSaving(false);
+        return;
+      }
 
       const data = {
         name,
@@ -96,6 +103,7 @@ function EditProduct() {
         barcode: barcode.trim(),
         costPrice: cost,
         salePrice: sale,
+        tax: taxNum,
         lowStockThreshold: Number(reorderLevel),
         reorderLevel: Number(reorderLevel),
         status: status ? "ACTIVE" : "INACTIVE",
@@ -131,6 +139,7 @@ function EditProduct() {
       setSku(product?.sku || "");
       setBarcode(product?.barcode || "");
       setCostPrice(product?.costPrice || "");
+      setTax(product?.tax || 0);
       setCurrentStock(product?.stock ?? product?.currentStock ?? 0);
       setSalePrice(product?.salePrice || "");
       setNote(product?.note || "");
@@ -315,6 +324,24 @@ function EditProduct() {
                         placeholder="0.00"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Tax (%)</label>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">%</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        value={tax}
+                        onChange={(e) => setTax(e.target.value)}
+                        className={`${inputClass} pr-8`}
+                        placeholder="0"
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">Applied during checkout</p>
                   </div>
 
                   <div className="md:col-span-2">

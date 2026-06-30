@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { api } from "../../utils/config/api"
 
 export const useFindById = (collection, id) => {
@@ -6,7 +6,7 @@ export const useFindById = (collection, id) => {
     const [data, setData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true)
         try {
             const res = await api.get(`/${collection}/${id}`)
@@ -18,11 +18,11 @@ export const useFindById = (collection, id) => {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [collection, id])
 
     useEffect(() => {
         fetchData()
-    }, [collection,id])
+    }, [fetchData])
     
         return {
             data,

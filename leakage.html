@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial & Inventory Leakage</title>
+    <style>
+        body {
+            font-family: 'Hanuman', 'Suwannaphum', sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #16a085;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background-color: #f1c40f;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .note {
+            background-color: #f9ecec;
+            border-left: 4px solid #e74c3c;
+            padding: 10px;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .case-study {
+            background-color: #e8f8f5;
+            border-left: 4px solid #1abc9c;
+            padding: 15px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Financial & Inventory Leakage </h1>
+    <h2>១. និយមន័យ</h2>
+    <p><strong>Leakage</strong> = ការបាត់បង់ធនធាន (លុយ/ទំនិញ) ដោយ <span class="highlight">មិនមាន record</span>
+        និងម្ចាស់ហាង <span class="highlight">រកមូលហេតុមិនឃើញ</span>។</p>
+    <p>វាខុសពី "ការចំណាយ" ធម្មតា — ការចំណាយយើងដឹង។ <strong>Leakage</strong> = បាត់ស្ងាត់ៗ បន្តិចម្តងៗ
+        រហូតក្លាយជាការខាតធំ។</p>
+    <h2>២. Financial Leakage </h2>
+    <h3>ក. Cash Skimming (លួចលុយសុទ្ធ)</h3>
+    <ul>
+        <li>Cashier លក់ទំនិញ ទទួលលុយ តែ មិនកត់ចូល system</li>
+        <li>លុយនោះចូលហោប៉ៅ cashier</li>
+        <li>ហាងគិតថា ទំនិញនៅ តែការពិតលក់ហើយ</li>
+    </ul>
+    <h3>ខ. Price Manipulation (កេងតម្លៃ)</h3>
+    <ul>
+        <li>ចុះតម្លៃឱ្យសាច់ញាតិ/មិត្ត ដោយគ្មានការអនុញ្ញាត</li>
+        <li>កត់តម្លៃទាបជាងពិត ហើយយកលុយលើស</li>
+    </ul>
+    <h3>គ. Refund / Void Fraud</h3>
+    <ul>
+        <li>ធ្វើ "void" ការលក់ក្លែងក្លាយ ហើយយកលុយ</li>
+        <li>Refund ឱ្យ customer បន្លំ</li>
+    </ul>
+    <h3>ឃ. Supplier Overpayment</h3>
+    <ul>
+        <li>បង់លុយ supplier ច្រើនជាងវិក្កយបត្រពិត</li>
+        <li>ទទួលទំនិញតិច តែបង់ច្រើន</li>
+    </ul>
+    <h2>៣. Inventory Leakage </h2>
+    <h3>ក. Theft (ការលួច)</h3>
+    <ul>
+        <li>Employee theft (បុគ្គលិកលួច)</li>
+        <li>Shoplifting (customer លួច)</li>
+        <li>Supplier delivery short (ដឹកមកខ្វះ)</li>
+    </ul>
+    <h3>ខ. Shrinkage (ស្តុករួញ)</h3>
+    <ul>
+        <li>ផុតកំណត់ (expired)</li>
+        <li>ខូច / បែកធ្លាក់ (damaged)</li>
+        <li>រលួយ (perishable goods)</li>
+    </ul>
+    <h3>គ. Administrative Error (កំហុសកត់ត្រា)</h3>
+    <ul>
+        <li>ទទួលស្តុកចូលខុសចំនួន</li>
+        <li>កត់ខុស unit (កេស vs ដប)</li>
+        <li>មិនបាន update system ពេលលក់</li>
+    </ul>
+    <div class="note">
+        <strong>កំណត់សម្គាល់៖</strong> តួលេខ shrinkage ជាមធ្យមនៅ retail ប្រហែល 1%–3% នៃ revenue (តួលេខអន្តរជាតិ —
+        មិនទាន់ verify សម្រាប់កម្ពុជា)។ ហាងតូចគ្មាន system អាចខ្ពស់ជាងនេះ។
+    </div>
+    <h2>៤. ហេតុអ្វីហាងតូចកម្ពុជារង Leakage ខ្លាំង?</h2>
+    <ul>
+        <li>កត់ត្រាដោយដៃ (កំណត់ហេតុលើក្រដាស ឬចាំក្នុងក្បាល)</li>
+        <li>គ្មាន receipt</li>
+        <li>ម្ចាស់ហាងមិននៅ → cashier ធ្វើតាមចិត្ត</li>
+        <li>គ្មាន stock count ទៀងទាត់</li>
+        <li>គ្មាន report → មិនដឹងថាខាតត្រង់ណា</li>
+    </ul>
+    <h2>៥. Kambuja POS ដោះស្រាយយ៉ាងម៉េច (ផ្គូផ្គងម្តងមួយ)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Leakage Point</th>
+                <th>POS Mechanism</th>
+                <th>លទ្ធផល</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cash skimming</td>
+                <td>រាល់ sale កត់ក្នុង DB + receipt</td>
+                <td>ពិបាកលួចលុយ</td>
+            </tr>
+            <tr>
+                <td>លក់មិនកាត់ស្តុក</td>
+                <td>Sale → auto stock decrease</td>
+                <td>Stock ត្រូវនឹងការពិត</td>
+            </tr>
+            <tr>
+                <td>ស្តុកបាត់មិនដឹង</td>
+                <td>Stock Movement + Adjustment log</td>
+                <td>ឃើញចលនាគ្រប់ items</td>
+            </tr>
+            <tr>
+                <td>Price manipulation</td>
+                <td>តម្លៃ lock ដោយ Admin</td>
+                <td>Cashier ប្តូរមិនបាន</td>
+            </tr>
+            <tr>
+                <td>Void/refund fraud</td>
+                <td>Audit log គ្រប់ action</td>
+                <td>តាមដានបាន</td>
+            </tr>
+            <tr>
+                <td>មិនដឹងថាខាត</td>
+                <td>Reports ពី real data</td>
+                <td>ឃើញ profit/loss ច្បាស់</td>
+            </tr>
+            <tr>
+                <td>នរណាធ្វើអ្វី</td>
+                <td>Role: Admin / Cashier</td>
+                <td>ទទួលខុសត្រូវច្បាស់</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>៦. POS Workflow ការពារ Leakage</h2>
+    <ol>
+        <li>Admin បង្កើត product (តម្លៃ lock)</li>
+        <li>Admin ទទួលស្តុក → stock កើន (កត់ត្រា)</li>
+        <li>Cashier លក់ → stock ថយ auto + receipt</li>
+        <li>ប្រព័ន្ធកត់រាល់ចលនា (audit)</li>
+        <li>Admin ធ្វើ stock count → Adjustment បើខុស</li>
+        <li>Reports បង្ហាញការពិត → គ្មានកន្លែងលាក់</li>
+    </ol>
+    <div class="case-study">
+        <h2>៧. Angle ស្រាវជ្រាវសម្រាប់ Project/Presentation</h2>
+        <ul>
+            <li><strong>Problem:</strong> ហាងតូចកម្ពុជាខាតលុយ ដោយ leakage ដោយសារគ្មាន system</li>
+            <li><strong>Cause:</strong> manual process, no tracking, no accountability</li>
+            <li><strong>Solution:</strong> POS + Inventory (Kambuja POS) ជា case study</li>
+            <li><strong>Result:</strong> real-time tracking, audit, accurate reports</li>
+            <li><strong>Demo:</strong> បង្ហាញ system ពិត</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -34,10 +34,32 @@ const notifySaleCreated = async (sale) => {
         }
         await log.save()
     }
+    
+    try {
+        const io = require('../config/socket').getIO();
+        io.to('ADMIN_MANAGER').to('ADMIN').emit('system_alert', {
+            type: 'SALE_CREATED',
+            severity: 'INFO',
+            title: 'New Sale Created',
+            message: `Sale ${sale.invoiceNumber} completed for ${Number(sale.totalCost || 0).toLocaleString()} USD`,
+            createdAt: new Date()
+        });
+    } catch(e) {
+        console.error('Socket emit failed:', e.message);
+    }
 }
 
 const notifyLogin = async (user, req) => {
     const shopId = user.shopId?._id || user.shopId;
+    
+    const roleName = user.role === 'ADMIN_MANAGER' ? 'Admin Manager' : user.role === 'ADMIN' ? 'Admin' : 'Cashier';
+    const message = [
+        `[LOGIN] ${roleName}`,
+        `${user.username || user.email} logged in.`,
+    ].join("\n")
+
+
+
     if (!shopId) return;
 
     const channel = await NotificationChannel.findOne({
@@ -45,12 +67,6 @@ const notifyLogin = async (user, req) => {
         type: "TELEGRAM",
         enabled: true,
     })
-
-    const roleName = user.role === 'ADMIN_MANAGER' ? 'Admin Manager' : user.role === 'ADMIN' ? 'Admin' : 'Cashier';
-    const message = [
-        `[LOGIN] ${roleName}`,
-        `${user.username || user.email} logged in.`,
-    ].join("\n")
 
     const log = await NotificationLog.create({
         shopId,

@@ -82,6 +82,7 @@ exports.create = async (req, res, next) => {
         const saleItems = []
         const requiredQtyByProduct = new Map()
         let totalCost = 0
+        let totalTax = 0
 
         //step 2: Validate stock and backend-owned prices for each product
         for (const item of normalizedItems) {
@@ -122,9 +123,10 @@ exports.create = async (req, res, next) => {
 
         for (const item of normalizedItems) {
             const product = productById.get(String(item.product))
-            const unitPrice = Number(product.salePrice) // Should use the frontend provided one, wait, no, frontend provides it but we override it here. Wait, what about saleUnit?
             const actualUnitPrice = Number(product.salePrice);
             const totalPrice = actualUnitPrice * item.quantity
+            const taxPercentage = Number(product.tax || 0);
+            const taxAmount = (totalPrice * taxPercentage) / 100;
 
             const costPerUnit = Number(product.costPrice || 0);
             const totalCostValue = costPerUnit * item.convertedQtyBase;
@@ -136,10 +138,12 @@ exports.create = async (req, res, next) => {
                 convertedQtyBase: item.convertedQtyBase,
                 pricePerUnit: actualUnitPrice,
                 profit,
+                tax: taxAmount,
                 unitPrice: actualUnitPrice,
                 totalPrice,
             })
-            totalCost += totalPrice
+            totalCost += (totalPrice + taxAmount)
+            totalTax += taxAmount
         }
 
         if (!Number.isFinite(totalCost) || totalCost <= 0) {
@@ -169,6 +173,7 @@ exports.create = async (req, res, next) => {
                 changeAmount: Math.max(0, paidAmount - totalCost),
                 paidAmount,
                 totalCost,
+                totalTax,
             })
             await sale.save(session ? { session } : undefined)
 

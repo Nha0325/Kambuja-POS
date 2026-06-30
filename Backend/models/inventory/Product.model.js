@@ -80,6 +80,12 @@ const schema = new mongoose.Schema({
         min: [0, "Current stock must be greater than or equal zero"],
         default: 0
     },
+    tax: {
+        type: Number,
+        min: [0, "Tax cannot be negative"],
+        max: [100, "Tax cannot exceed 100%"],
+        default: 0
+    },
     note:{
         type: String
     }

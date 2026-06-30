@@ -59,9 +59,12 @@ connectToDatabase().then(async function() {
         }
     }
 
-    app.listen(port, "0.0.0.0", function() {
+    const server = app.listen(port, "0.0.0.0", function() {
         console.log('Server is running on 0.0.0.0:' + port);
     });
+
+    // ចាប់ផ្តើម Socket ដោយហៅពី socket.js ម្តងគត់
+    require('./config/socket').init(server);
 }).catch(function(error) {
     console.error('Failed to connect to database:', error.message);
     process.exitCode = 1;

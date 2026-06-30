@@ -7,8 +7,6 @@ import {
   LuTriangleAlert,
   LuCircleX,
   LuBoxes,
-  LuPackagePlus,
-  LuSlidersHorizontal,
   LuChevronLeft,
   LuChevronRight,
   LuFilter,

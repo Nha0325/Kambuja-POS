@@ -36,6 +36,20 @@ exports.getSummary = async (req, res, next) => {
 exports.create = async (req, res, next) => {
     try {
         const location = await Location.create(req.body)
+        
+        try {
+            const io = require('../../config/socket').getIO();
+            io.to('ADMIN_MANAGER').emit('system_alert', {
+                type: 'LOCATION_CREATED',
+                severity: 'INFO',
+                title: 'New Location Created',
+                message: `Location ${location.name} has been added.`,
+                createdAt: new Date()
+            });
+        } catch(e) {
+            console.error('Socket emit failed:', e.message);
+        }
+
         res.status(201).json({ success: true, result: location })
     } catch (error) {
         next(error)

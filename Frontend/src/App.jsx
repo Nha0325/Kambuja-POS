@@ -3,6 +3,7 @@ import { BrowserRouter, useLocation, useNavigate } from "react-router-dom"
 import { Toaster } from "react-hot-toast"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import AppRoutes from "./routes"
+import SocketListener from "./components/SocketListener"
 
 function AuthInvalidRedirect() {
   const navigate = useNavigate()
@@ -33,7 +34,8 @@ function App() {
         <AppRoutes />
       </BrowserRouter>
 
-      <Toaster />
+      <Toaster position="top-center" />
+      <SocketListener />
       <SpeedInsights />
     </>
   );

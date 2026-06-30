@@ -177,8 +177,10 @@ function ProductList() {
               <th className="whitespace-nowrap px-4 py-3">{t('category')}</th>
               <th className="whitespace-nowrap px-4 py-3">{t('supplier')}</th>
               <th className="whitespace-nowrap px-4 py-3">{t('stock')}</th>
+              <th className="whitespace-nowrap px-4 py-3">{t('status')}</th>
               <th className="whitespace-nowrap px-4 py-3">{t('cost_price')}</th>
               <th className="whitespace-nowrap px-4 py-3">{t('sale_price')}</th>
+              <th className="whitespace-nowrap px-4 py-3">Tax (%)</th>
               <th className="whitespace-nowrap px-4 py-3 text-right">{t('actions')}</th>
             </tr>
           </thead>
@@ -207,11 +209,21 @@ function ProductList() {
                   <td className="whitespace-nowrap px-4 py-3 text-sm font-semibold text-[#0f172a] dark:text-[#f8fafc]">
                     {p.stock ?? p.currentStock ?? 0}
                   </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm">
+                    <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded ${
+                      p.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {p.status === 'ACTIVE' ? t('active') : t('inactive')}
+                    </span>
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-[#64748b] dark:text-[#a1a1aa] font-medium">
                     ${(p.costPrice || 0).toFixed(2)}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-green-600 dark:text-green-400 font-medium">
                     ${(p.salePrice || 0).toFixed(2)}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-[#64748b] dark:text-[#a1a1aa] font-medium">
+                    {p.tax || 0}%
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-right">
                     <Link to={`/admin-manager/products/${p._id}`} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#f8fafc] dark:bg-[#18181b] px-3 text-xs font-semibold text-[#0f172a] dark:text-[#f8fafc] transition-colors hover:bg-[#e2e8f0] dark:hover:bg-[#27272a]">
