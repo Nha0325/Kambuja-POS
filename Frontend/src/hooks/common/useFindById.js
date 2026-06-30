@@ -6,26 +6,28 @@ export const useFindById = (collection, id) => {
     const [data, setData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     
-        useEffect(() => {
-            const fetchData = async () => {
-                try {
-                    const res = await api.get(`/${collection}/${id}`)
-                    if(res.data?.success){
-                        setData(res.data?.result)
-                    }
-                    
-                } catch (error) {
-                    console.error("Failed to fetch data by id",error.message)
-                } finally {
-                    setIsLoading(false)
-                }
+    const fetchData = async () => {
+        setIsLoading(true)
+        try {
+            const res = await api.get(`/${collection}/${id}`)
+            if(res.data?.success){
+                setData(res.data?.result)
             }
-            fetchData()
-        }, [collection,id])
+        } catch (error) {
+            console.error("Failed to fetch data by id",error.message)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [collection,id])
     
         return {
             data,
-            isLoading
+            isLoading,
+            refetch: fetchData
         }
 
 }

@@ -21,8 +21,6 @@ const primaryItems = [
   { to: "/admin/products", labelKey: "products", icon: FaBoxOpen },
   { to: "/admin/categories", labelKey: "categories", icon: FaTags },
   { to: "/admin/inventory", labelKey: "inventory", icon: FaBoxesStacked },
-  { to: "/admin/inventory/stock-in", labelKey: "receive_stock", icon: FaArrowRightToBracket },
-  { to: "/admin/inventory/adjustment", labelKey: "stock_adjustment", icon: FaSliders },
   { to: "/admin/suppliers", labelKey: "suppliers", icon: FaTruck },
   { to: "/admin/purchases", labelKey: "purchases", icon: FaReceipt },
   { to: "/admin/reports/sales", labelKey: "sales_report", icon: FaChartLine },

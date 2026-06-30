@@ -1,5 +1,3 @@
 export { default as Inventory } from "./Inventory"
-export { default as StockIn } from "./StockIn"
-export { default as StockAdjustment } from "./StockAdjustment"
 export { default as StockForm } from "./StockForm"
 export { default as History } from "./History"

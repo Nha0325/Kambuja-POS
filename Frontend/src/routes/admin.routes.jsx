@@ -24,8 +24,6 @@ const ListSale = lazy(() => import("../pages/cashier/pos/ListSale"))
 const SaleReport = lazy(() => import("../pages/admin/report").then(module => ({ default: module.SaleReport })))
 const StockReport = lazy(() => import("../pages/admin/report").then(module => ({ default: module.StockReport })))
 const Inventory = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.Inventory })))
-const StockAdjustment = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.StockAdjustment })))
-const StockIn = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.StockIn })))
 const History = lazy(() => import("../pages/admin/inventory").then(module => ({ default: module.History })))
 const NotificationChannels = lazy(() => import("../pages/admin/notification").then(module => ({ default: module.NotificationChannels })))
 const NotificationLogs = lazy(() => import("../pages/admin/notification").then(module => ({ default: module.NotificationLogs })))
@@ -49,9 +47,6 @@ export const adminRoutes = (
     <Route path="/admin" element={stockElement}>
       <Route path="inventory" element={<Inventory />} />
       <Route path="inventory/history" element={<History />} />
-      <Route path="inventory/stock-in" element={<StockIn />} />
-      <Route path="inventory/adjustment" element={<StockAdjustment />} />
-      <Route path="inventory/adjust" element={<Navigate to="/admin/inventory/adjustment" replace />} />
     </Route>
 
     <Route path="/admin" element={adminElement}>

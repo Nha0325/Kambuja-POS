@@ -8,7 +8,9 @@ import { useFindById } from "../../../hooks/common/useFindById";
 import { getImageUrl } from "../../../utils/helpers/getImageUrl";
 import ProductCodePreview from "../../../components/product/ProductCodePreview";
 import ProductLabelPrintModal from "../../../components/product/ProductLabelPrintModal";
+import ProductStockModal from "../../../components/product/ProductStockModal";
 import { useTranslation } from "react-i18next";
+import { LuPackagePlus, LuSlidersHorizontal } from "react-icons/lu";
 
 function EditProduct() {
   const { t } = useTranslation();
@@ -27,6 +29,8 @@ function EditProduct() {
   const [status, setStatus] = useState(true);
   const [reorderLevel, setReorderLevel] = useState(10);
   const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [stockModalOpen, setStockModalOpen] = useState(false);
+  const [stockMode, setStockMode] = useState("IN");
   const [isSaving, setIsSaving] = useState(false);
 
   const route = useParams();
@@ -35,7 +39,7 @@ function EditProduct() {
   const { data: categories } = useQuery("categories", "", 1, 100);
   const { uploadFile, removeFile } = useStorage();
   const { update } = useCollection("products");
-  const { data: product, isLoading: isFinding } = useFindById("products", route.id);
+  const { data: product, isLoading: isFinding, refetch } = useFindById("products", route.id);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -143,7 +147,7 @@ function EditProduct() {
   const numCost = Number(costPrice) || 0;
   const numSale = Number(salePrice) || 0;
   const numStock = Number(currentStock) || 0;
-  
+
   const margin = numSale > 0 ? (((numSale - numCost) / numSale) * 100).toFixed(1) : 0;
   const estProfit = ((numSale - numCost) * numStock).toFixed(2);
   const turnover = numStock <= 10 ? t('low') : numStock <= 50 ? t('medium') : t('high');
@@ -166,30 +170,30 @@ function EditProduct() {
           <span className="text-[#64748b] dark:text-[#a1a1aa]">&gt;</span>
           <span className="font-semibold text-[#020617] dark:text-[#f8fafc]">{t('edit_product')}</span>
         </nav>
-        
+
         <h1 className="text-2xl font-bold text-[#020617] dark:text-[#f8fafc] sm:text-3xl">{t('edit_product')}</h1>
         <p className="mt-1 text-sm text-[#64748b] dark:text-[#a1a1aa]">{t('manage_details_inventory', { name: product?.name || name || 'Product' })}</p>
 
         <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-          
+
           {/* Left card: Product Information */}
           <div className="flex flex-col gap-6">
             <div className="overflow-hidden rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
               <div className="flex items-center gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] px-5 py-4 text-sm font-bold text-[#020617] dark:text-[#f8fafc]">
                 {t('product_details')}
               </div>
-              
+
               <div className="p-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className={labelClass}>{t('product_name_req')}</label>
-                    <input 
+                    <input
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      type="text" 
-                      placeholder={t('enter_product_name')} 
-                      className={inputClass} 
+                      type="text"
+                      placeholder={t('enter_product_name')}
+                      className={inputClass}
                     />
                   </div>
 
@@ -205,7 +209,7 @@ function EditProduct() {
                         </span>
                       </div>
                     ) : (
-                      <select 
+                      <select
                         required
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
@@ -221,7 +225,7 @@ function EditProduct() {
 
                   <div>
                     <label className={labelClass}>{t('sku_product_code')}</label>
-                    <input 
+                    <input
                       type="text"
                       disabled
                       readOnly
@@ -232,52 +236,67 @@ function EditProduct() {
 
                   <div>
                     <label className={labelClass}>{t('sku')}</label>
-                    <input 
+                    <input
                       type="text"
                       value={sku}
                       onChange={(e) => setSku(e.target.value)}
-                      placeholder={t('enter_sku')} 
-                      className={inputClass} 
+                      placeholder={t('enter_sku')}
+                      className={inputClass}
                     />
                   </div>
 
                   <div>
                     <label className={labelClass}>{t('barcode')}</label>
-                    <input 
+                    <input
                       type="text"
                       value={barcode}
                       onChange={(e) => setBarcode(e.target.value)}
-                      placeholder={t('scan_or_type_barcode')} 
-                      className={inputClass} 
+                      placeholder={t('scan_or_type_barcode')}
+                      className={inputClass}
                     />
                   </div>
 
                   <div>
                     <label className={labelClass}>{t('current_stock')}</label>
-                    <input 
-                      type="number"
-                      readOnly
-                      disabled
-                      value={currentStock}
-                      className={inputClass}
-                    />
-                    <p className="mt-1 text-xs text-[#64748b] dark:text-[#a1a1aa]">
-                      {t('stock_added_from_receive_stock')}
-                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        readOnly
+                        disabled
+                        value={currentStock}
+                        className={`${inputClass} flex-1`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => { setStockMode("IN"); setStockModalOpen(true); }}
+                        className="flex h-11 items-center justify-center gap-1 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition border border-emerald-200 dark:border-emerald-500/30"
+                        title={t('receive_stock')}
+                      >
+                        <LuPackagePlus size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setStockMode("ADJUST"); setStockModalOpen(true); }}
+                        className="flex h-11 items-center justify-center gap-1 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 px-3 hover:bg-orange-100 dark:hover:bg-orange-500/20 transition border border-orange-200 dark:border-orange-500/30"
+                        title={t('stock_adjustment')}
+                      >
+                        <LuSlidersHorizontal size={18} />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
                     <label className={labelClass}>{t('cost_price_req')}</label>
                     <div className="relative">
                       <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
-                      <input 
+                      <input
                         required
                         type="number"
                         step="0.01"
                         value={costPrice}
                         onChange={(e) => setCostPrice(e.target.value)}
                         className={`${inputClass} pl-8`}
-                        placeholder="0.00" 
+                        placeholder="0.00"
                       />
                     </div>
                   </div>
@@ -286,21 +305,21 @@ function EditProduct() {
                     <label className={labelClass}>{t('sale_price_req')}</label>
                     <div className="relative">
                       <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#a1a1aa]">$</span>
-                      <input 
+                      <input
                         required
                         type="number"
                         step="0.01"
                         value={salePrice}
                         onChange={(e) => setSalePrice(e.target.value)}
                         className={`${inputClass} pl-8`}
-                        placeholder="0.00" 
+                        placeholder="0.00"
                       />
                     </div>
                   </div>
 
                   <div className="md:col-span-2">
                     <label className={labelClass}>{t('note')}</label>
-                    <textarea 
+                    <textarea
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       className={textareaClass}
@@ -345,7 +364,7 @@ function EditProduct() {
               </div>
               <div className="p-5">
                 {!preview ? (
-                  <label 
+                  <label
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     className="flex h-[260px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] transition-colors hover:border-[#06b6d4] dark:hover:border-[#06b6d4] hover:bg-slate-50 dark:hover:bg-white/5"
@@ -360,7 +379,7 @@ function EditProduct() {
                 ) : (
                   <div className="relative flex h-[260px] w-full flex-col items-center justify-center rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] p-2">
                     <img src={preview} alt="Preview" className="h-full w-full object-contain" />
-                    <button 
+                    <button
                       type="button"
                       onClick={handleRemoveImage}
                       className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-[#111113] shadow-sm border border-[#e5e7eb] dark:border-[#27272a] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
@@ -374,19 +393,19 @@ function EditProduct() {
             </div>
 
             <div className="rounded-xl border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] shadow-none">
-                <div className="flex items-center justify-between gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4">
-                  <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{t('barcode_qr_preview')}</span>
-                </div>
-                <div className="p-5 flex flex-col items-center bg-[#f8fafc] dark:bg-[#09090b]">
-                   <ProductCodePreview value={product?.code || barcode || sku} type="CODE128" />
-                   <button
-                     type="button"
-                     onClick={() => setPrintModalOpen(true)}
-                     className="mt-4 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#020617] dark:text-[#f8fafc] transition hover:bg-[#f8fafc] dark:hover:bg-white/5 active:scale-95"
-                   >
-                     {t('print_barcode_qr_label')}
-                   </button>
-                </div>
+              <div className="flex items-center justify-between gap-2 border-b border-[#e5e7eb] dark:border-[#27272a] px-5 py-4">
+                <span className="text-sm font-bold text-[#020617] dark:text-[#f8fafc]">{t('barcode_qr_preview')}</span>
+              </div>
+              <div className="p-5 flex flex-col items-center bg-[#f8fafc] dark:bg-[#09090b]">
+                <ProductCodePreview value={product?.code || barcode || sku} type="CODE128" />
+                <button
+                  type="button"
+                  onClick={() => setPrintModalOpen(true)}
+                  className="mt-4 w-full rounded-lg border border-[#e5e7eb] dark:border-[#27272a] bg-white dark:bg-[#111113] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#020617] dark:text-[#f8fafc] transition hover:bg-[#f8fafc] dark:hover:bg-white/5 active:scale-95"
+                >
+                  {t('print_barcode_qr_label')}
+                </button>
+              </div>
             </div>
 
             {/* Visibility & Status Card */}
@@ -408,7 +427,7 @@ function EditProduct() {
 
                 <div>
                   <label className={labelClass}>{t('low_stock_alert_threshold')}</label>
-                  <input 
+                  <input
                     type="number"
                     min="1"
                     value={reorderLevel}
@@ -454,13 +473,13 @@ function EditProduct() {
 
           {/* Action Bar */}
           <div className="lg:col-span-2 flex items-center justify-end gap-3 border-t border-[#e5e7eb] dark:border-[#27272a] bg-[#f8fafc] dark:bg-[#09090b] px-5 py-4">
-            <Link 
+            <Link
               to="/admin/products"
               className="rounded-lg border border-[#e5e7eb] bg-white text-[#020617] hover:bg-slate-50 dark:border-[#27272a] dark:bg-[#111113] dark:text-[#f8fafc] dark:hover:bg-white/5 px-6 py-2 text-sm font-semibold transition-colors flex items-center justify-center h-11 w-full sm:w-auto"
             >
               {t('cancel')}
             </Link>
-            <button 
+            <button
               type="submit"
               disabled={isSaving}
               className="bg-[#06b6d4] text-white hover:bg-[#0891b2] rounded-lg px-6 py-2 text-sm font-semibold disabled:opacity-60 transition-colors flex items-center justify-center h-11 w-full sm:w-auto"
@@ -471,11 +490,18 @@ function EditProduct() {
         </form>
       </div>
 
-      <ProductLabelPrintModal 
+      <ProductLabelPrintModal
         open={printModalOpen}
         onClose={() => setPrintModalOpen(false)}
         product={product}
         previewData={{ name, salePrice, sku, barcode }}
+      />
+      <ProductStockModal
+        isOpen={stockModalOpen}
+        onClose={() => setStockModalOpen(false)}
+        mode={stockMode}
+        product={product}
+        onSuccess={() => refetch()}
       />
     </div>
   );
