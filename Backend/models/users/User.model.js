@@ -24,6 +24,10 @@ const schema = new mongoose.Schema({
     lastLogin: {
         type: Date,
     },
+    sessionToken: {
+        type: String,
+        select: false
+    },
     password: {
         type: String,
         minLength: 6,

@@ -106,7 +106,12 @@ exports.signin = async (req, res, next) => {
             })
         }
  
+        const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_LIFETIME
+        })
+
         user.lastLogin = new Date();
+        user.sessionToken = token;
         await user.save();
 
         if (['ADMIN_MANAGER', 'ADMIN', 'CASHIER'].includes(user.role)) {
@@ -127,10 +132,6 @@ exports.signin = async (req, res, next) => {
             ipAddress: req.ip || req.headers["x-forwarded-for"],
             userAgent: req.headers["user-agent"]
         });
-
-        const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_LIFETIME
-        })
 
         res.cookie('token', token, {
             httpOnly: true,

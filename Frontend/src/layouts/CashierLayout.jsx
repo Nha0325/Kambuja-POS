@@ -96,7 +96,7 @@ function CashierLayout() {
           isDark={isDark}
           onToggleTheme={() => setIsDark(!isDark)}
         />
-        <main className="min-h-[calc(100vh-64px)] max-w-full p-4 lg:p-8 print:p-0 print:min-h-0">
+        <main className="min-h-[calc(100vh-64px)] max-w-full p-2 md:p-4 lg:p-6 print:p-0 print:min-h-0">
           <div className="w-full max-w-full min-w-0">
             <Outlet />
           </div>

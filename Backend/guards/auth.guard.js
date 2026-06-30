@@ -17,12 +17,19 @@ const authGuard = async (req, res, next) => {
 
       const payload = jwt.verify(token, process.env.JWT_SECRET)
 
-      const user = await User.findById(payload.userId)
+      const user = await User.findById(payload.userId).select("+sessionToken")
 
       if(!user || user.status === "INACTIVE"){
         return res.status(401).json({
             success: false,
             error: "Authentication Invalid: Account is unavailable!",
+        })
+      }
+
+      if (user.sessionToken && user.sessionToken !== token) {
+        return res.status(401).json({
+            success: false,
+            error: "Session expired: You logged in on another device.",
         })
       }
 

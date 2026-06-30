@@ -15,7 +15,7 @@ exports.createAlert = async (payload) => {
         
         try {
             const io = require('../config/socket').getIO();
-            io.to('ADMIN_MANAGER').to('ADMIN').emit('system_alert', {
+            io.to('ADMIN_MANAGER').emit('system_alert', {
                 type: payload.type,
                 severity: payload.severity || 'INFO',
                 title: payload.title,

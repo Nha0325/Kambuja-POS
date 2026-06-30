@@ -228,6 +228,8 @@ function POS() {
           } catch (e) { console.error("Failed to complete held bill", e); }
         }
 
+        const audio = new Audio('/Cha-Ching.mp3');
+        audio.play().catch(e => console.log('Audio play failed:', e));
         toast.success(t('sale_completed_success'));
         setTotalCost(0);
         setCartItems([]);
@@ -299,7 +301,7 @@ function POS() {
 
   return (
     <section className="min-h-[calc(100vh-64px)] bg-background text-foreground transition-colors duration-200">
-      <div className="grid grid-cols-1 gap-4 p-3 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-6 xl:p-6">
+      <div className="grid grid-cols-1 gap-4 p-0 md:p-2 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-6">
 
         {/* Left Product Browser / Scanned View */}
         <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-colors duration-200">

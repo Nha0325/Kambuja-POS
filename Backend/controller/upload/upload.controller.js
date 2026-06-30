@@ -44,26 +44,15 @@ exports.uploadFile = (req, res) => {
         }
         
         try {
-            const extName = path.extname(req.file.originalname).toLowerCase();
-            const isPng = extName === '.png' && req.file.mimetype === 'image/png';
-            
             const uniquePrefix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-            let finalBuffer;
-            let format;
             
-            // Resize all images to max 800x800
-            const imageProcessor = sharp(req.file.buffer)
-                .resize(800, 800, { fit: 'inside', withoutEnlargement: true });
+            // Resize all images to max 800x800 and convert to WebP (preserves transparency for PNGs)
+            const finalBuffer = await sharp(req.file.buffer)
+                .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
+                .webp({ quality: 80 })
+                .toBuffer();
                 
-            if (isPng) {
-                // For logo/icon: PNG keep original format
-                finalBuffer = await imageProcessor.png().toBuffer();
-                format = 'png';
-            } else {
-                // For product photo: WebP quality 80
-                finalBuffer = await imageProcessor.webp({ quality: 80 }).toBuffer();
-                format = 'webp';
-            }
+            const format = 'webp';
             
             // Upload to Cloudinary using upload_stream
             const result = await new Promise((resolve, reject) => {

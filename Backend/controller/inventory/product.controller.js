@@ -3,6 +3,13 @@ const { generateProductCode } = require('../system/counter.controller')
 const ProductCode = require('../../models/inventory/ProductCode.model')
 const Inventory = require('../../models/inventory/Inventory.model')
 const { getLowStockThreshold } = require('../../helper/stock.helper')
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const cashierSafeProduct = (product) => {
     const safe = product.toObject ? product.toObject() : { ...product };
@@ -393,6 +400,25 @@ exports.remove = async (req, res, next) => {
             Inventory.deleteMany({ shopId: req.shopId, product: id }),
             ProductCode.deleteMany({ shopId: req.shopId, product: id }),
         ])
+        
+        // Delete image from Cloudinary if it exists and is not used by other products
+        if (doc.imageUrl && doc.imageUrl.includes('cloudinary.com')) {
+            try {
+                // Check if any other product uses this exact same image URL
+                const isImageUsed = await Product.exists({ imageUrl: doc.imageUrl });
+                
+                if (!isImageUsed) {
+                    const parts = doc.imageUrl.split('/');
+                    const filename = parts.pop().split('.')[0];
+                    const folder2 = parts.pop();
+                    const folder1 = parts.pop();
+                    const publicId = `${folder1}/${folder2}/${filename}`;
+                    await cloudinary.uploader.destroy(publicId);
+                }
+            } catch (err) {
+                console.error("Cloudinary delete error on product remove:", err);
+            }
+        }
         
         try {
             const io = require('../../config/socket').getIO();
